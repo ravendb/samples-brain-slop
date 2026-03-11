@@ -1,0 +1,51 @@
+.header {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.55rem 0.65rem;
+    border-radius: var(--list-item-border-radius);
+}
+
+.header:hover {
+    background-color: var(--sidebar-hover);
+}
+
+.arrowButton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.4rem;
+	height: 1.4rem;
+	border: 0;
+	border-radius: 6px;
+	background: transparent;
+	color: #cbd5e1;
+	cursor: pointer;
+}
+
+.arrowButton:hover {
+	background-color: var(--sidebar-hover);
+}
+
+.arrow {
+	font-size: 0.75rem;
+	transform: rotate(0deg);
+	transition: transform 140ms ease;
+}
+
+.open {
+	transform: rotate(90deg);
+}
+
+.projectLink {
+	color: var(--foreground-muted);
+	text-decoration: none;
+	font-weight: 600;
+	font-size: 0.93rem;
+}
+
+.taskList {
+	display: grid;
+	gap: 0.25rem;
+	padding: 0 0.65rem 0.65rem 2rem;
+}

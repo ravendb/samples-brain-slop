@@ -1,23 +1,13 @@
-import { redirect } from "next/navigation";
-import { createTask } from "@/repositories/taskRepo";
-
-async function createTaskAction(formData: FormData) {
-  "use server";
-
-  const title = String(formData.get("title") ?? "").trim();
-  if (!title) return;
-
-  await createTask(title);
-}
+import Sidebar from "@/components/sidebar/Sidebar";
+import styles from "@/app/page.module.css";
 
 export default function Home() {
   return (
-    <main>
-      <h1>Brain Slop</h1>
-      <form action={createTaskAction}>
-        <input type="text" name="title" placeholder="Task title" required />
-        <button type="submit">Create Task</button>
-      </form>
+    <main className={styles.main}>
+      <Sidebar />
+      <section className={styles.chatSection}>
+        Chat panel
+      </section>
     </main>
   );
 }

@@ -1,4 +1,4 @@
-import { Task } from "../models/task";
+import { Task } from "@/models/task";
 import { store } from "@/db/ravendb";
 
 export async function createTask(title: string) {

@@ -1,0 +1,40 @@
+.item {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+	width: 100%;
+	padding: 0.45rem 0.6rem;
+	border-radius: var(--list-item-border-radius);
+	color: #e5e7eb;
+	text-decoration: none;
+	transition: background-color 120ms ease;
+    background-color: var(--sidebar-bg);
+}
+
+.item:hover {
+	background-color: var(--sidebar-hover);
+}
+
+.priorityDot {
+	flex: 0 0 auto;
+	width: 0.55rem;
+	height: 0.55rem;
+	border-radius: 999px;
+}
+
+.priorityLow {
+	background-color: #6b7280;
+}
+
+.priorityNormal {
+	background-color: #60a5fa;
+}
+
+.priorityHigh {
+	background-color: #ef4444;
+}
+
+.title {
+	font-size: 0.88rem;
+	line-height: 1.25;
+}
