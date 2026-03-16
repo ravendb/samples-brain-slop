@@ -1,0 +1,54 @@
+.page {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 1.2rem;
+	color: var(--foreground);
+}
+
+.subtle {
+	margin: 0;
+	color: var(--foreground-muted);
+	font-size: 0.9rem;
+}
+
+.messageList {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 0.65rem;
+}
+
+.message {
+	padding: 0.7rem;
+    width: fit-content;
+    user-select: text;
+}
+
+.message[data-role="user"] {
+    border: 1px solid var(--border);
+	border-radius: var(--list-item-border-radius);
+	background-color: var(--surface);
+}
+
+.meta {
+	display: block;
+	margin-bottom: 0.35rem;
+	font-size: 0.8rem;
+	color: var(--foreground-muted);
+}
+
+.content {
+	margin: 0;
+	line-height: 1.45;
+	color: var(--foreground);
+	white-space: pre-wrap;
+}
+
+.error {
+	color: var(--danger);
+}

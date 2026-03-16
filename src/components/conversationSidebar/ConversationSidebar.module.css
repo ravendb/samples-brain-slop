@@ -23,17 +23,26 @@
 }
 
 .item {
-	padding: 0.7rem;
 	background-color: var(--surface);
 	border: 1px solid transparent;
 	border-radius: var(--list-item-border-radius);
-	cursor: pointer;
 	transition: var(--transition-base);
 }
 
 .item:hover {
 	background-color: var(--surface-hover);
 	border-color: var(--border);
+}
+
+.itemActive {
+	border-color: var(--primary);
+	background-color: var(--surface-hover);
+}
+
+.itemLink {
+	display: block;
+	padding: 0.7rem;
+	text-decoration: none;
 }
 
 .itemTitle {

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
+import Sidebar from "@/components/sidebar/Sidebar";
+import ConversationSidebar from "@/components/conversationSidebar/ConversationSidebar";
+import shellStyles from "@/app/layout.module.css";
 import "./globals.css";
 
 const geist = Geist({
@@ -20,7 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={geist.variable}>
-        {children}
+        <main className={shellStyles.main}>
+          <Sidebar />
+          <section className={shellStyles.chatSection}>{children}</section>
+          <ConversationSidebar />
+        </main>
       </body>
     </html>
   );
