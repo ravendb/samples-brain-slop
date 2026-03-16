@@ -10,21 +10,6 @@ function decodeChatId(encodedChatId: string): string {
 	return decodeURIComponent(encodedChatId);
 }
 
-function formatMessageDate(value: string): string {
-	const parsed = new Date(value);
-
-	if (Number.isNaN(parsed.getTime())) {
-		return value;
-	}
-
-	return new Intl.DateTimeFormat("en", {
-		month: "short",
-		day: "numeric",
-		hour: "numeric",
-		minute: "2-digit",
-	}).format(parsed);
-}
-
 export default async function ChatPage({ params }: ChatPageProps) {
 	const { chatid } = await params;
 
@@ -59,7 +44,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
 
 	return (
 		<div className={styles.page}>
-			<h1 className={styles.title}>Chat</h1>
+			{/* <h1 className={styles.title}>Chat</h1> */}
 			{messages.length === 0 ? (
 				<p className={styles.subtle}>No messages yet.</p>
 			) : (

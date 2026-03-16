@@ -11,13 +11,41 @@
   --primary: #945ab5;
   --danger: #d3405f;
   --link: #c072ee;
+  --scrollbar-track: #151825;
+  --scrollbar-thumb: #474257;
+  --scrollbar-thumb-hover: #5a5370;
   --transition-base: all 0.2s cubic-bezier(0.6, 0, 0.6, 1);
   --list-item-border-radius: 4px;
 }
 
 body {
-    margin: 0;
-    height: 100vh;
-    font-family: var(--font-geist), "Segoe UI", Arial, sans-serif;
-    user-select: none;
+	margin: 0;
+	height: 100vh;
+	font-family: var(--font-geist), "Segoe UI", Arial, sans-serif;
+	user-select: none;
+	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+* {
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--scrollbar-thumb-hover), var(--scrollbar-thumb));
+  border-radius: 999px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ab79cf, var(--scrollbar-thumb-hover));
 }
