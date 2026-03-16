@@ -1,0 +1,60 @@
+.inputRow {
+	position: relative;
+	display: flex;
+	align-items: flex-end;
+	border-radius: 12px;
+	border: 1px solid var(--border);
+	background: var(--surface);
+	transition: border-color 0.15s;
+}
+
+.inputRow:focus-within {
+	border-color: var(--primary);
+}
+
+.input {
+	flex: 1;
+	resize: none;
+	box-sizing: border-box;
+	padding: 0.65rem 0.75rem;
+	padding-right: 0.5rem;
+	border: none;
+	border-radius: 12px;
+	background: transparent;
+	color: var(--foreground);
+	font-family: inherit;
+	font-size: 0.95rem;
+	line-height: 1.5;
+	outline: none;
+}
+
+.input::placeholder {
+	color: var(--foreground-muted);
+}
+
+.input::-webkit-scrollbar {
+	display: none;
+}
+
+.input {
+	scrollbar-width: none;
+}
+
+.sendButton {
+	flex-shrink: 0;
+	align-self: flex-end;
+	margin: 0.35rem;
+	padding: 0.4rem 0.9rem;
+	border-radius: 8px;
+	border: none;
+	background: var(--primary);
+	color: #fff;
+	font-family: inherit;
+	font-size: 0.9rem;
+	cursor: pointer;
+	transition: opacity 0.15s;
+}
+
+.sendButton:hover {
+	opacity: 0.85;
+}

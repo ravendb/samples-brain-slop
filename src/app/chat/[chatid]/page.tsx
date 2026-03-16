@@ -1,6 +1,7 @@
 import { loadChatMessages } from "@/repositories/chatRepo";
 import { ChatMessage } from "@/models/chat";
 import styles from "./page.module.css";
+import MessageInput from "@/components/messageInput/MessageInput";
 
 type ChatPageProps = {
 	params: Promise<{ chatid: string }>;
@@ -44,7 +45,6 @@ export default async function ChatPage({ params }: ChatPageProps) {
 
 	return (
 		<div className={styles.page}>
-			{/* <h1 className={styles.title}>Chat</h1> */}
 			{messages.length === 0 ? (
 				<p className={styles.subtle}>No messages yet.</p>
 			) : (
@@ -56,6 +56,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
 					))}
 				</ul>
 			)}
+			<MessageInput />
 		</div>
 	);
 }

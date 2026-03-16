@@ -1,6 +1,9 @@
 .page {
-	display: grid;
+	display: flex;
+	flex-direction: column;
 	gap: 0.75rem;
+	height: 100%;
+	min-height: 0;
 }
 
 .title {
@@ -20,7 +23,11 @@
 	margin: 0;
 	padding: 0;
 	display: grid;
+	align-content: start;
 	gap: 0.65rem;
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
 }
 
 .message {
@@ -31,7 +38,7 @@
 
 .message[data-role="user"] {
     border: 1px solid var(--border);
-	border-radius: 24px;
+	border-radius: 12px;
 	background-color: var(--surface);
 }
 
