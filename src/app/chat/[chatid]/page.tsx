@@ -1,6 +1,6 @@
 import { loadChatMessages } from "@/repositories/chatRepo";
 import styles from "./page.module.css";
-import MessageInput from "@/components/messageInput/MessageInput";
+import ChatMessages from "@/components/chatMessages/ChatMessages";
 
 type ChatPageProps = {
 	params: Promise<{ chatid: string }>;
@@ -40,18 +40,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
 
 	return (
 		<div className={styles.page}>
-			{messages.length === 0 ? (
-				<p className={styles.subtle}>No messages yet.</p>
-			) : (
-				<ul className={styles.messageList}>
-					{messages.map((message, index) => (
-						<li key={index} className={styles.message} data-role={message.role}>
-							<p className={styles.content}>{message.content}</p>
-						</li>
-					))}
-				</ul>
-			)}
-			<MessageInput chatId={decodedChatId} />
+			<ChatMessages chatId={decodedChatId} initialMessages={messages} />
 		</div>
 	);
 }

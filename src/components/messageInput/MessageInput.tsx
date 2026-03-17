@@ -4,26 +4,11 @@ import { useRef } from "react";
 import styles from "./MessageInput.module.css";
 
 type MessageInputProps = {
-	chatId: string;
+	onSend: (content: string) => Promise<void> | void;
+	disabled: boolean;
 };
 
-async function sendMessage(chatId: string, content: string) {
-    const response = await fetch("/api/chat/message", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ chatId, content }),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to send message: ${response.status}`);
-    }
-
-    console.log(await response.text());
-}
-
-export default function MessageInput({ chatId }: MessageInputProps) {
+export default function MessageInput({ onSend, disabled }: MessageInputProps) {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	function handleInput() {
@@ -36,18 +21,18 @@ export default function MessageInput({ chatId }: MessageInputProps) {
 	function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();
-			handleSend();
+			void handleSend();
 		}
 	}
 
-	function handleSend() {
+	async function handleSend() {
         const input = textareaRef.current;
-        if (!input) return;
+        if (!input || disabled) return;
         const content = input.value.trim();
         if (content === "") return;
 
 		try {
-            sendMessage(chatId, content);
+			await onSend(content);
 			input.value = "";
 			input.style.height = "auto";
 		} catch (error) {
@@ -62,10 +47,11 @@ export default function MessageInput({ chatId }: MessageInputProps) {
 				className={styles.input}
 				placeholder="Message..."
 				rows={1}
+				disabled={disabled}
 				onInput={handleInput}
                 onKeyDown={handleKeyDown}
 			/>
-			<button className={styles.sendButton} type="button" onClick={handleSend}>
+			<button className={styles.sendButton} type="button" onClick={() => void handleSend()}>
 				Send
 			</button>
 		</div>

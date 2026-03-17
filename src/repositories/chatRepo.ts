@@ -1,6 +1,6 @@
+import { AiAnswer } from "ravendb"
 import { store } from "@/db/ravendb";
-import { Chat, ChatDocument, AgentResponse, Message } from "@/models/chat";
-import { format } from "path";
+import { Chat, Message } from "@/models/chat";
 
 const AGENT_ID = "assistant";
 
@@ -48,34 +48,34 @@ export async function loadChatMessages(chatId: string) {
     return formatMessages(chat.messages);
 }
 
-function formatMessages(messages: Message[]) {
+function formatMessages(messages: StoredMessage[]): Message[] {
     return messages
         .filter(message => message.role !== "system")
-        .map(message => {
-            let normalizedContent: string;
+        .map((message, index) => ({
+            id: index.toString(),
+            role: message.role,
+            content: normalizeContent(message),
+        }));
+}
 
-            if (message.role === "assistant") {
-                normalizedContent = message.content.response;
-            }
-            else {
-                if (typeof message.content === "string") {
-                    normalizedContent = message.content;
+function normalizeContent(message: AssistantMessage | UserMessage) {
+    if (message.role === "assistant") {
+        return message.content.response;
+    }
+    else {
+        if (typeof message.content === "string") {
+            return message.content;
+        }
+        else {
+            let normalizedContent = '';
+            for (const part of message.content) {
+                if (part.type === "text") {
+                    normalizedContent += part.text;
                 }
-                else {
-                    normalizedContent = '';
-                    for (const part of message.content) {
-                        if (part.type === "text") {
-                            normalizedContent += part.text;
-                        }
-                    }
-                }
             }
-
-            return {
-                role: message.role,
-                content: normalizedContent
-            };
-        })
+            return normalizedContent;
+        }
+    }
 }
 
 function formatUpdatedAt(updatedAt: string): string {
@@ -92,3 +92,29 @@ function formatUpdatedAt(updatedAt: string): string {
 		minute: "2-digit",
 	}).format(parsed);
 }
+
+type ChatDocument = {
+    messages: StoredMessage[]
+}
+
+type StoredMessage = UserMessage | AssistantMessage | SystemMessage;
+
+type UserMessage = {
+    role: "user";
+    content: string | ({ type: string; text: string })[];
+    date: string;
+};
+
+type AssistantMessage = {
+    role: "assistant";
+    content: { response: string };
+    date: string;
+};
+
+type SystemMessage = {
+    role: "system";
+    content: string;
+    date: string;
+};
+
+export type AgentResponse = AiAnswer<{ response: string }>
