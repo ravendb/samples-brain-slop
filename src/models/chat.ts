@@ -1,3 +1,7 @@
+import { AiAnswer } from "ravendb"
+
+export type AgentResponse = AiAnswer<{ response: string }>
+
 export type Chat = {
     id: string,
     updatedAt: string,
@@ -8,17 +12,11 @@ export type ChatDocument = {
     messages: Message[]
 }
 
-type Message = UserMessage | AssistantMessage | SystemMessage;
-
-export type ChatMessage = {
-    role: "user" | "assistant";
-    content: string;
-    date: string;
-}
+export type Message = UserMessage | AssistantMessage | SystemMessage;
 
 type UserMessage = {
     role: "user";
-    content: string;
+    content: string | ({ type: string; text: string })[];
     date: string;
 };
 

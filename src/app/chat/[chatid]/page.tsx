@@ -1,5 +1,4 @@
 import { loadChatMessages } from "@/repositories/chatRepo";
-import { ChatMessage } from "@/models/chat";
 import styles from "./page.module.css";
 import MessageInput from "@/components/messageInput/MessageInput";
 
@@ -7,40 +6,36 @@ type ChatPageProps = {
 	params: Promise<{ chatid: string }>;
 };
 
-function decodeChatId(encodedChatId: string): string {
-	return decodeURIComponent(encodedChatId);
+function decodeChatId(encodedChatId: string): string | null {
+	try {
+		return decodeURIComponent(encodedChatId);
+	} catch {
+		return null;
+	}
+}
+
+function renderError(message: string) {
+	return (
+		<div className={styles.page}>
+			<h1 className={styles.title}>Chat</h1>
+			<p className={`${styles.subtle} ${styles.error}`}>{message}</p>
+		</div>
+	);
 }
 
 export default async function ChatPage({ params }: ChatPageProps) {
 	const { chatid } = await params;
 
-	let decodedChatId: string;
-	try {
-		decodedChatId = decodeChatId(chatid);
-	} catch {
-		return (
-			<div className={styles.page}>
-				<h1 className={styles.title}>Chat</h1>
-				<p className={`${styles.subtle} ${styles.error}`}>
-					Could not load this conversation: invalid chat id.
-				</p>
-			</div>
-		);
+	const decodedChatId = decodeChatId(chatid);
+	if (!decodedChatId) {
+		return renderError("Could not load this conversation: invalid chat id.");
 	}
 
-	let messages: ChatMessage[];
+	let messages;
 	try {
 		messages = await loadChatMessages(decodedChatId);
 	} catch (error) {
-        console.error("Error loading chat messages:", error);
-		return (
-			<div className={styles.page}>
-				<h1 className={styles.title}>Chat</h1>
-				<p className={`${styles.subtle} ${styles.error}`}>
-					Could not load this conversation.
-				</p>
-			</div>
-		);
+		return renderError("Could not load this conversation.");
 	}
 
 	return (
@@ -50,13 +45,13 @@ export default async function ChatPage({ params }: ChatPageProps) {
 			) : (
 				<ul className={styles.messageList}>
 					{messages.map((message, index) => (
-						<li key={`${message.date}-${index}`} className={styles.message} data-role={message.role}>
+						<li key={index} className={styles.message} data-role={message.role}>
 							<p className={styles.content}>{message.content}</p>
 						</li>
 					))}
 				</ul>
 			)}
-			<MessageInput />
+			<MessageInput chatId={decodedChatId} />
 		</div>
 	);
 }
