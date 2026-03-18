@@ -1,15 +1,16 @@
 import styles from "./ConversationSidebar.module.css";
-import { loadChats } from "@/repositories/chatRepo";
 import ConversationList from "./ConversationList";
+import Link from "next/link";
 
 
-export default async function ConversationSidebar() {
-	const chats = await loadChats();
-
+export default function ConversationSidebar() {
 	return (
 		<aside className={styles.sidebar}>
-			<h2 className={styles.title}>Your chats</h2>
-			<ConversationList chats={chats} />
+			<div className={styles.header}>
+				<h2 className={styles.title}>Your chats</h2>
+				<Link href="/chat/new" className={styles.newChatLink}>New chat</Link>
+			</div>
+			<ConversationList />
 		</aside>
 	);
 }

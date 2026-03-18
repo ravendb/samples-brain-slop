@@ -4,13 +4,20 @@ import { Message } from "@/models/chat";
 import { useEffect, useRef, useState } from "react";
 import MessageInput from "@/components/messageInput/MessageInput";
 import styles from "./ChatMessages.module.css";
+import { useRouter } from "next/navigation";
 
 type ChatMessagesProps = {
     chatId: string;
     initialMessages: Message[];
+    isNewChat: boolean;
 };
 
-async function sendMessage(chatId: string, content: string): Promise<string | null> {
+type SendMessageResult = {
+    reply: string | null;
+    chatId: string | null;
+};
+
+async function sendMessage(chatId: string, content: string): Promise<SendMessageResult> {
     const response = await fetch("/api/chat/messages", {
         method: "POST",
         headers: {
@@ -23,23 +30,27 @@ async function sendMessage(chatId: string, content: string): Promise<string | nu
         throw new Error(`Failed to send message: ${response.status}`);
     }
 
-    const reply = (await response.text()).trim();
+    const payload = await response.json() as SendMessageResult;
+    const reply = payload.reply?.trim();
 
-    if (!reply || reply === "undefined") {
-        return null;
-    }
-
-    return reply;
+    return {
+        reply: reply ?? null,
+        chatId: payload.chatId ?? null,
+    };
 }
 
-export default function ChatMessages({ chatId, initialMessages }: ChatMessagesProps) {
+export default function ChatMessages({ chatId, initialMessages, isNewChat }: ChatMessagesProps) {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [currentChatId, setCurrentChatId] = useState(chatId);
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const listRef = useRef<HTMLUListElement>(null);
+    const router = useRouter();
+    const isCentered = isNewChat && messages.length === 0;
 
     useEffect(() => {
         setMessages(initialMessages);
+        setCurrentChatId(chatId);
         setError(null);
         setIsSending(false);
     }, [initialMessages, chatId]);
@@ -53,19 +64,21 @@ export default function ChatMessages({ chatId, initialMessages }: ChatMessagesPr
     }, [messages, isSending]);
 
     function addUserMessage(content: string) {
-        const optimisticMessage: Message = {
-            id: messages.length.toString(),
-            role: "user",
-            content,
-        };
-        setMessages(prev => [...prev, optimisticMessage]);
+        setMessages(prev => [
+            ...prev,
+            {
+                id: prev.length.toString(),
+                role: "user",
+                content,
+            },
+        ]);
     }
 
     function addAgentMessage(reply: string) {
         setMessages(prev => [
             ...prev,
             {
-                id: (messages.length + 1).toString(),
+                id: prev.length.toString(),
                 role: "assistant",
                 content: reply,
             },
@@ -79,8 +92,15 @@ export default function ChatMessages({ chatId, initialMessages }: ChatMessagesPr
 
         setIsSending(true);
         try {
-            const reply = await sendMessage(chatId, content);
-            if (reply) addAgentMessage(reply);
+            const result = await sendMessage(currentChatId, content);
+            if (result.reply) {
+                addAgentMessage(result.reply);
+            }
+
+            if (isNewChat && result.chatId && result.chatId !== currentChatId) {
+                setCurrentChatId(result.chatId);
+                router.replace(`/chat/${encodeURIComponent(result.chatId)}`);
+            }
         } catch {
             setError("Could not send message. Please try again.");
         } finally {
@@ -89,8 +109,8 @@ export default function ChatMessages({ chatId, initialMessages }: ChatMessagesPr
     }
 
     return (
-        <div className={styles.page}>
-            {messages.length === 0 && <p className={styles.subtle}>No messages yet.</p>}
+        <div className={`${styles.page} ${isCentered ? styles.pageCentered : ""}`}>
+            {messages.length === 0 && !isCentered && <p className={styles.subtle}>No messages yet.</p>}
             {messages.length > 0 && (
                 <ul className={styles.messageList} ref={listRef}>
                     {messages.map((message) => (

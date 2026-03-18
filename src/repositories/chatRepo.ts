@@ -15,7 +15,7 @@ export async function loadChats(): Promise<Chat[]> {
 
     return chats.map(chat => ({
         id: chat.id,
-        title: chat.title,
+        title: chat.title?.trim() ? chat.title : "New chat",
         updatedAt: formatUpdatedAt(chat.updatedAt)
     }));
 }
@@ -31,7 +31,10 @@ export async function sendMessage(chatId: string, content: string) {
     const llmResponse: AgentResponse = await chat.run()
     console.log("LLM response:", llmResponse);
 
-    return llmResponse.answer?.response;
+    return {
+        chatId: chat.id,
+        reply: llmResponse.answer?.response ?? null,
+    };
 }
 
 export async function loadChatMessages(chatId: string) {

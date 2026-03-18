@@ -19,7 +19,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: Request) {
     const { chatId, content } = await request.json();
 
-    const response = await sendMessage(chatId, content);
+    if (!chatId || !content) {
+        return NextResponse.json({ error: "Missing chatId or content." }, { status: 400 });
+    }
 
-    return new Response(response, { status: 200 });
+    try {
+        const result = await sendMessage(chatId, content);
+        return NextResponse.json(result);
+    } catch {
+        return NextResponse.json({ error: "Could not send message." }, { status: 500 });
+    }
 }

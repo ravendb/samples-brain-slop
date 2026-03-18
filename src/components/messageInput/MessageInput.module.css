@@ -6,6 +6,8 @@
 	border: 1px solid var(--border);
 	background: var(--surface);
 	transition: border-color 0.15s;
+    width: 85%;
+    align-self: center;
 }
 
 .inputRow:focus-within {

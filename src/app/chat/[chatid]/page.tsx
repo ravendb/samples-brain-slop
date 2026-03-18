@@ -40,7 +40,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
 
 	return (
 		<div className={styles.page}>
-			<ChatMessages chatId={decodedChatId} initialMessages={messages} />
+			<ChatMessages chatId={decodedChatId} initialMessages={messages} isNewChat={false} />
 		</div>
 	);
 }
