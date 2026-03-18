@@ -20,6 +20,12 @@ export async function loadChats(): Promise<Chat[]> {
     }));
 }
 
+export async function deleteChat(chatId: string) {
+    const session = store.openSession();
+    session.delete(chatId);
+    await session.saveChanges();
+}
+
 export async function sendMessage(chatId: string, content: string) {
     const chat = store.ai.conversation(
         AGENT_ID,

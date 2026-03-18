@@ -57,6 +57,13 @@
 	transition: var(--transition-base);
 }
 
+.itemRow {
+	display: flex;
+	align-items: stretch;
+	gap: 0.35rem;
+	position: relative;
+}
+
 .item:hover {
 	background-color: var(--surface-hover);
 	border-color: var(--border);
@@ -69,8 +76,46 @@
 
 .itemLink {
 	display: block;
+	flex: 1;
 	padding: 0.7rem;
 	text-decoration: none;
+}
+
+.deleteButton {
+	position: absolute;
+	top: 50%;
+	right: 0.35rem;
+	transform: translateY(-50%);
+	width: 2rem;
+	height: 2rem;
+	border: none;
+	border-radius: 0.4rem;
+	background: transparent;
+	color: var(--foreground-muted);
+	cursor: pointer;
+	transition: var(--transition-base);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+}
+
+.item:hover .deleteButton {
+	opacity: 1;
+}
+
+.deleteButton:hover:not(:disabled) {
+	background: color-mix(in srgb, #d14343 15%, var(--surface));
+}
+
+.deleteButton:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: 1px;
+}
+
+.deleteButton:disabled {
+	opacity: 0.5;
+	cursor: wait;
 }
 
 .itemTitle {

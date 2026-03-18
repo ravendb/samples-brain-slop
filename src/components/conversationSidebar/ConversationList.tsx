@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./ConversationSidebar.module.css";
 import { Chat } from "@/models/chat";
+import ConversationItem from "./ConversationItem";
 
 function getActiveChatId(pathname: string): string | null {
 	if (!pathname.startsWith("/chat/")) {
@@ -36,7 +36,7 @@ async function loadChats(signal: AbortSignal): Promise<Chat[]> {
 
 export default function ConversationList() {
 	const pathname = usePathname();
-    const activeChatId = getActiveChatId(pathname);
+	const activeChatId = getActiveChatId(pathname);
 	const [chatList, setChatList] = useState<Chat[]>([]);
 
 	useEffect(() => {
@@ -62,7 +62,13 @@ export default function ConversationList() {
 		};
 	}, [pathname]);
 
-	const sortedChats = chatList.toSorted((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+	const sortedChats = chatList.toSorted((a, b) =>
+		b.updatedAt.localeCompare(a.updatedAt)
+	);
+
+	function handleDeleteChat(chatId: string) {
+		setChatList((current) => current.filter((chat) => chat.id !== chatId));
+	}
 
 	return (
 		<ul className={styles.conversationList}>
@@ -75,15 +81,12 @@ export default function ConversationList() {
 				const isActive = activeChatId === chat.id;
 
 				return (
-					<li
+					<ConversationItem
 						key={chat.id}
-						className={`${styles.item} ${isActive ? styles.itemActive : ""}`.trim()}
-					>
-						<Link href={`/chat/${encodeURIComponent(chat.id)}`} className={styles.itemLink}>
-							<p className={styles.itemTitle}>{chat.title}</p>
-							<span className={styles.updatedAt}>{chat.updatedAt}</span>
-						</Link>
-					</li>
+						chat={chat}
+						isActive={isActive}
+						onDelete={handleDeleteChat}
+					/>
 				);
 			})}
 		</ul>
