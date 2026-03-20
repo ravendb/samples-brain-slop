@@ -24,9 +24,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={geist.variable}>
         <main className={shellStyles.main}>
-          <Sidebar />
-          <section className={shellStyles.chatSection}>{children}</section>
           <ConversationSidebar />
+          <section className={shellStyles.chatSection}>{children}</section>
+          <Sidebar />
         </main>
       </body>
     </html>

@@ -1,14 +1,17 @@
 "use client";
 
 import { Message } from "@/models/chat";
+import { Action } from "@/models/action";
 import { useEffect, useRef, useState } from "react";
 import MessageInput from "@/components/messageInput/MessageInput";
+import ActionPager from "@/components/actionPager/ActionPager";
 import styles from "./ChatMessages.module.css";
 import { useRouter } from "next/navigation";
 
 type ChatMessagesProps = {
     chatId: string;
     initialMessages: Message[];
+    initialActions: Action[];
     isNewChat: boolean;
 };
 
@@ -39,28 +42,30 @@ async function sendMessage(chatId: string, content: string): Promise<SendMessage
     };
 }
 
-export default function ChatMessages({ chatId, initialMessages, isNewChat }: ChatMessagesProps) {
+export default function ChatMessages({ chatId, initialMessages, initialActions, isNewChat }: ChatMessagesProps) {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [actions, setActions] = useState<Action[]>(initialActions);
     const [currentChatId, setCurrentChatId] = useState(chatId);
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const listRef = useRef<HTMLUListElement>(null);
+    const scrollAreaRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const isCentered = isNewChat && messages.length === 0;
 
     useEffect(() => {
         setMessages(initialMessages);
+        setActions(initialActions);
         setCurrentChatId(chatId);
         setError(null);
         setIsSending(false);
-    }, [initialMessages, chatId]);
+    }, [initialMessages, initialActions, chatId]);
 
-    // Auto-scroll to show new messages
+    // Auto-scroll container to show new messages or actions
     useEffect(() => {
-        if (!listRef.current) {
+        if (!scrollAreaRef.current) {
             return;
         }
-        listRef.current.scrollTop = listRef.current.scrollHeight;
+        scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }, [messages, isSending]);
 
     function addUserMessage(content: string) {
@@ -110,21 +115,28 @@ export default function ChatMessages({ chatId, initialMessages, isNewChat }: Cha
 
     return (
         <div className={`${styles.page} ${isCentered ? styles.pageCentered : ""}`}>
-            {messages.length === 0 && !isCentered && <p className={styles.subtle}>No messages yet.</p>}
-            {messages.length > 0 && (
-                <ul className={styles.messageList} ref={listRef}>
-                    {messages.map((message) => (
-                        <li key={message.id} className={styles.message} data-role={message.role}>
-                            <p className={styles.content}>{message.content}</p>
-                        </li>
-                    ))}
-                    {isSending ? (
-                        <li className={styles.message} data-role="assistant" data-pending="true">
-                            <p className={styles.content}>Thinking...</p>
-                        </li>
-                    ) : null}
-                </ul>
-            )}
+            <div className={styles.scrollArea} ref={scrollAreaRef}>
+                {messages.length === 0 && !isCentered && <p className={styles.subtle}>No messages yet.</p>}
+                {messages.length > 0 && (
+                    <ul className={styles.messageList}>
+                        {messages.map((message) => (
+                            <li key={message.id} className={styles.message} data-role={message.role}>
+                                <p className={styles.content}>{message.content}</p>
+                            </li>
+                        ))}
+                        {isSending ? (
+                            <li className={styles.message} data-role="assistant" data-pending="true">
+                                <p className={styles.content}>Thinking...</p>
+                            </li>
+                        ) : null}
+                        {actions.length > 0 && (
+                            <li className={styles.actionItem}>
+                                <ActionPager actions={actions} />
+                            </li>
+                        )}
+                    </ul>
+                )}
+            </div>
 
             {error ? <p className={`${styles.subtle} ${styles.error}`}>{error}</p> : null}
 

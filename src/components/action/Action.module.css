@@ -1,0 +1,48 @@
+.card {
+    border: 1px solid #9c5fc4;
+    border-radius: 12px;
+    padding: 0.9rem;
+    background:
+        radial-gradient(circle at 12% 10%, rgba(188, 122, 234, 0.16), transparent 48%),
+        radial-gradient(circle at 88% 84%, rgba(122, 78, 159, 0.14), transparent 46%),
+        linear-gradient(145deg, #312543 0%, #2a2038 55%, #251d31 100%);
+    box-shadow:
+        inset 0 0 0 1px rgba(214, 176, 241, 0.05),
+        0 8px 18px rgba(64, 28, 89, 0.2);
+}
+
+.label {
+    margin: 0 0 0.25rem;
+    color: #c9a6e7;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.name {
+    margin: 0;
+    font-size: 1rem;
+    color: #f1ecfb;
+}
+
+.details {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+}
+
+.row {
+    display: grid;
+    gap: 0.15rem;
+}
+
+.row dt {
+    color: var(--foreground-muted);
+    font-size: 0.8rem;
+}
+
+.row dd {
+    margin: 0;
+    color: #ddd7e8;
+    line-height: 1.35;
+}

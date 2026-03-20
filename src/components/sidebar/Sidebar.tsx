@@ -50,7 +50,9 @@ const projects: Project[] = [
 export default function Sidebar() {
 	return (
 		<aside className={styles.sidebar}>
-			<h2 className={styles.title}>Projects</h2>
+			<div className={styles.header}>
+				<h2 className={styles.title}>Your projects</h2>
+			</div>
 			<div className={styles.projectList}>
 				{projects.map((project) => (
 					<ProjectItem key={project.id} project={project} />

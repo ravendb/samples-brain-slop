@@ -1,6 +1,7 @@
 import { AiAnswer } from "ravendb"
 import { store } from "@/db/ravendb";
 import { Chat, Message } from "@/models/chat";
+import { CreateProjectArgumentntsSchema, Action } from "@/models/action";
 
 const AGENT_ID = "assistant";
 
@@ -43,33 +44,70 @@ export async function sendMessage(chatId: string, content: string) {
     };
 }
 
-export async function loadChatMessages(chatId: string) {
+export async function loadChat(chatId: string) {
     const session = store.openSession();
 
     const chat = await session.advanced.rawQuery<ChatDocument>(`
             from @conversations
             where id() = $chatId
-            select Messages as messages
+            select Messages as messages, OpenActionCalls as openActionCalls
         `)
         .addParameter("chatId", chatId)
         .first();
 
-    return formatMessages(chat.messages);
+    return {
+        messages: formatMessages(chat.messages),
+        actions: extractActions(chat.openActionCalls)
+    };
 }
 
-function formatMessages(messages: StoredMessage[]): Message[] {
-    return messages
-        .filter(message => message.role !== "system")
-        .map((message, index) => ({
-            id: index.toString(),
-            role: message.role,
-            content: normalizeContent(message),
-        }));
+function extractActions(openActionCalls: unknown): Action[] {
+    if (!openActionCalls || typeof openActionCalls !== "object") {
+        return [];
+    }
+
+    const actionCalls: StoredAction[] = Object.values(openActionCalls) as StoredAction[];
+    const actions: Action[] = [];
+
+    actionCalls.forEach(call => {
+        try {
+            const jsonArguments = JSON.parse(call.Arguments);
+            const parsedArguments = CreateProjectArgumentntsSchema.parse(jsonArguments);
+            actions.push({
+                name: call.Name,
+                arguments: parsedArguments,
+                id: call.ToolId
+            });
+        } catch {
+            // Ignore parsing errors - the call might not be related to CreateProjectAction
+        }
+    });
+
+    return actions;
 }
 
-function normalizeContent(message: AssistantMessage | UserMessage) {
+function formatMessages(storedMessages: StoredMessage[]): Message[] {
+    const uiMessages: Message[] = [];
+
+    storedMessages
+        .filter(m => m.role !== "system")
+        .forEach((m, index) => {
+            const content = extractContent(m);
+            if (content) {
+                uiMessages.push({
+                    id: index.toString(),
+                    role: m.role,
+                    content
+                });
+            }
+        });
+        
+    return uiMessages;
+}
+
+function extractContent(message: Exclude<StoredMessage, SystemMessage>) {
     if (message.role === "assistant") {
-        return message.content.response;
+        return message.content?.response ?? null;
     }
     else {
         if (typeof message.content === "string") {
@@ -103,10 +141,17 @@ function formatUpdatedAt(updatedAt: string): string {
 }
 
 type ChatDocument = {
-    messages: StoredMessage[]
+    messages: StoredMessage[];
+    openActionCalls: unknown;
 }
 
-type StoredMessage = UserMessage | AssistantMessage | SystemMessage;
+type StoredAction = {
+    Name: string;
+    Arguments: string;
+    ToolId: string;
+}
+
+type StoredMessage = UserMessage | AssistantMessage | SystemMessage | ToolMessage;
 
 type UserMessage = {
     role: "user";
@@ -116,7 +161,7 @@ type UserMessage = {
 
 type AssistantMessage = {
     role: "assistant";
-    content: { response: string };
+    content: { response: string } | null;
     date: string;
 };
 
@@ -125,5 +170,11 @@ type SystemMessage = {
     content: string;
     date: string;
 };
+
+type ToolMessage = {
+    role: "tool";
+    content: string;
+    date: string;
+}
 
 export type AgentResponse = AiAnswer<{ response: string }>

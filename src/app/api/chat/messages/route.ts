@@ -1,4 +1,4 @@
-import { loadChatMessages, sendMessage } from "@/repositories/chatRepo";
+import { loadChat, sendMessage } from "@/repositories/chatRepo";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const messages = await loadChatMessages(chatId);
+        const messages = await loadChat(chatId);
         return NextResponse.json(messages);
     } catch {
         return NextResponse.json({ error: "Could not load messages." }, { status: 500 });

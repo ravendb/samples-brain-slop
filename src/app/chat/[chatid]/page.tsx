@@ -1,4 +1,4 @@
-import { loadChatMessages } from "@/repositories/chatRepo";
+import { loadChat } from "@/repositories/chatRepo";
 import styles from "./page.module.css";
 import ChatMessages from "@/components/chatMessages/ChatMessages";
 
@@ -31,16 +31,24 @@ export default async function ChatPage({ params }: ChatPageProps) {
 		return renderError("Could not load this conversation: invalid chat id.");
 	}
 
-	let messages;
+	let messages = [];
+	let actions = [];
 	try {
-		messages = await loadChatMessages(decodedChatId);
-	} catch (error) {
+		const chat = await loadChat(decodedChatId);
+		messages = chat.messages;
+		actions = chat.actions;
+	} catch {
 		return renderError("Could not load this conversation.");
 	}
 
 	return (
 		<div className={styles.page}>
-			<ChatMessages chatId={decodedChatId} initialMessages={messages} isNewChat={false} />
+			<ChatMessages
+				chatId={decodedChatId}
+				initialMessages={messages}
+				initialActions={actions}
+				isNewChat={false}
+			/>
 		</div>
 	);
 }
