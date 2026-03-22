@@ -18,6 +18,7 @@ type ChatMessagesProps = {
 type SendMessageResult = {
     reply: string | null;
     chatId: string | null;
+    actions: Action[];
 };
 
 async function sendMessage(chatId: string, content: string): Promise<SendMessageResult> {
@@ -33,13 +34,7 @@ async function sendMessage(chatId: string, content: string): Promise<SendMessage
         throw new Error(`Failed to send message: ${response.status}`);
     }
 
-    const payload = await response.json() as SendMessageResult;
-    const reply = payload.reply?.trim();
-
-    return {
-        reply: reply ?? null,
-        chatId: payload.chatId ?? null,
-    };
+    return await response.json() as SendMessageResult;
 }
 
 export default function ChatMessages({ chatId, initialMessages, initialActions, isNewChat }: ChatMessagesProps) {
@@ -51,6 +46,23 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const isCentered = isNewChat && messages.length === 0;
+
+    function onActionDecision(toolResponse: string, agentResponse: string | null, openActions: Action[]) {
+        setMessages(prev => [
+            ...prev,
+            {
+                id: crypto.randomUUID(),
+                role: "tool",
+                content: toolResponse,
+            },
+        ]);
+
+        if (agentResponse) {
+            addAgentMessage(agentResponse);
+        }
+
+        setActions(openActions);
+    }
 
     useEffect(() => {
         setMessages(initialMessages);
@@ -72,7 +84,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
         setMessages(prev => [
             ...prev,
             {
-                id: prev.length.toString(),
+                id: crypto.randomUUID(),
                 role: "user",
                 content,
             },
@@ -83,7 +95,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
         setMessages(prev => [
             ...prev,
             {
-                id: prev.length.toString(),
+                id: crypto.randomUUID(),
                 role: "assistant",
                 content: reply,
             },
@@ -101,6 +113,8 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
             if (result.reply) {
                 addAgentMessage(result.reply);
             }
+
+            setActions(result.actions);
 
             if (isNewChat && result.chatId && result.chatId !== currentChatId) {
                 setCurrentChatId(result.chatId);
@@ -131,7 +145,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
                         ) : null}
                         {actions.length > 0 && (
                             <li className={styles.actionItem}>
-                                <ActionPager actions={actions} />
+                                <ActionPager actions={actions} chatId={currentChatId} onActionDecision={onActionDecision} />
                             </li>
                         )}
                     </ul>
@@ -140,7 +154,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
 
             {error ? <p className={`${styles.subtle} ${styles.error}`}>{error}</p> : null}
 
-            <MessageInput onSend={handleSend} disabled={isSending} />
+            <MessageInput onSend={handleSend} disabled={isSending || (actions?.length ?? 0) > 0} />
         </div>
     );
 }

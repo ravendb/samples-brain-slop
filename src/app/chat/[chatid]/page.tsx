@@ -36,7 +36,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
 	try {
 		const chat = await loadChat(decodedChatId);
 		messages = chat.messages;
-		actions = chat.actions;
+		actions = chat.actions ? chat.actions : [];
 	} catch {
 		return renderError("Could not load this conversation.");
 	}

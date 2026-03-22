@@ -4,7 +4,7 @@ import styles from "@/app/chat/[chatid]/page.module.css";
 export default function NewChatPage() {
 	return (
 		<div className={styles.page}>
-			<ChatMessages chatId="Chats/" initialMessages={[]} isNewChat={true} />
+			<ChatMessages chatId="Chats/" initialMessages={[]} initialActions={[]} isNewChat={true} />
 		</div>
 	);
 }

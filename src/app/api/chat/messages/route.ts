@@ -26,7 +26,8 @@ export async function POST(request: Request) {
     try {
         const result = await sendMessage(chatId, content);
         return NextResponse.json(result);
-    } catch {
+    } catch (error) {
+        console.error("Error sending message:", error);
         return NextResponse.json({ error: "Could not send message." }, { status: 500 });
     }
 }

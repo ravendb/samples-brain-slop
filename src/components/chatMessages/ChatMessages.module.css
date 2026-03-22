@@ -18,6 +18,12 @@
 
 .pageCentered {
 	justify-content: center;
+	align-items: center;
+}
+.pageCentered .scrollArea {
+	flex: none;
+	height: auto;
+	min-height: 0;
 }
 
 .subtle {
@@ -56,13 +62,14 @@
 
 .message[data-role="tool"] {
 	justify-self: start;
-	padding: 0.7rem;
+	padding: 0.4rem 0.7rem;
 	padding-left: 0.9rem;
 	border: 0;
 	border-left: 2px solid #cc8cff;
 	border-radius: 4px;
     background: transparent;
 	max-width: min(85%, 72ch);
+    font-size: small;
 }
 
 .message[data-pending="true"] {

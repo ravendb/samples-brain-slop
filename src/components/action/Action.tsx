@@ -19,35 +19,38 @@ export default function ActionCard({ action }: ActionCardProps) {
 
     return (
         <article className={styles.card}>
-            <p className={styles.label}>Action</p>
-            <h3 className={styles.name}>{action.name}</h3>
-            <dl className={styles.details}>
-                <div className={styles.row}>
-                    <dt>Title</dt>
-                    <dd>{action.arguments.title}</dd>
-                </div>
-
-                {action.arguments.description ? (
+            <div className={styles.content}>
+                <p className={styles.label}>Action</p>
+                <h3 className={styles.name}>{action.name}</h3>
+                <dl className={styles.details}>
                     <div className={styles.row}>
-                        <dt>Description</dt>
-                        <dd>{action.arguments.description}</dd>
+                        <dt>Title</dt>
+                        <dd>{action.arguments.title}</dd>
                     </div>
-                ) : null}
 
-                {action.arguments.dueDate ? (
-                    <div className={styles.row}>
-                        <dt>Due</dt>
-                        <dd>{action.arguments.dueDate}</dd>
-                    </div>
-                ) : null}
+                    {action.arguments.description ? (
+                        <div className={styles.row}>
+                            <dt>Description</dt>
+                            <dd>{action.arguments.description}</dd>
+                        </div>
+                    ) : null}
 
-                {taskSummary ? (
-                    <div className={styles.row}>
-                        <dt>Tasks</dt>
-                        <dd>{taskSummary}</dd>
-                    </div>
-                ) : null}
-            </dl>
+                    {action.arguments.dueDate ? (
+                        <div className={styles.row}>
+                            <dt>Due</dt>
+                            <dd>{action.arguments.dueDate}</dd>
+                        </div>
+                    ) : null}
+
+                    {taskSummary ? (
+                        <div className={styles.row}>
+                            <dt>Tasks</dt>
+                            <dd>{taskSummary}</dd>
+                        </div>
+                    ) : null}
+                </dl>
+            </div>
+
         </article>
     );
 }

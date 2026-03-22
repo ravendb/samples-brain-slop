@@ -1,9 +1,12 @@
 import { AiAnswer } from "ravendb"
 import { store } from "@/db/ravendb";
 import { Chat, Message } from "@/models/chat";
-import { CreateProjectArgumentntsSchema, Action } from "@/models/action";
+import { receiveActions } from "@/services/actions";
+import { Action, ToolResponse } from "@/models/action";
+import { extractActions, formatActions } from "@/repositories/actionRepo";
+import { randomUUID } from "crypto";
 
-const AGENT_ID = "assistant";
+const AGENT_ID = process.env.AGENT_ID || "assistant";
 
 export async function loadChats(): Promise<Chat[]> {
     const session = store.openSession();
@@ -27,21 +30,42 @@ export async function deleteChat(chatId: string) {
     await session.saveChanges();
 }
 
-export async function sendMessage(chatId: string, content: string) {
+export async function sendMessage(chatId: string, prompt: string) {
     const chat = store.ai.conversation(
         AGENT_ID,
         chatId
     )
 
-    chat.setUserPrompt(content)
+    chat.setUserPrompt(prompt)
+
+    receiveActions(chat);
 
     const llmResponse: AgentResponse = await chat.run()
     console.log("LLM response:", llmResponse);
 
+    let requiredActions: Action[] = [];
+    if (llmResponse.status === 'ActionRequired') {
+        requiredActions = formatActions(chat.requiredActions());
+    }
+
     return {
         chatId: chat.id,
         reply: llmResponse.answer?.response ?? null,
+        actions: requiredActions
     };
+}
+
+export async function sendToolMessage(chatId: string, toolResponse: ToolResponse) {
+    const chat = store.ai.conversation(AGENT_ID, chatId);
+
+    chat.addActionResponse(toolResponse.toolId, toolResponse.response);
+    
+    receiveActions(chat);
+
+    const llmResponse: AgentResponse = await chat.run()
+    console.log("LLM response after tool message:", llmResponse);
+
+    return llmResponse.answer?.response ?? null;
 }
 
 export async function loadChat(chatId: string) {
@@ -61,31 +85,6 @@ export async function loadChat(chatId: string) {
     };
 }
 
-function extractActions(openActionCalls: unknown): Action[] {
-    if (!openActionCalls || typeof openActionCalls !== "object") {
-        return [];
-    }
-
-    const actionCalls: StoredAction[] = Object.values(openActionCalls) as StoredAction[];
-    const actions: Action[] = [];
-
-    actionCalls.forEach(call => {
-        try {
-            const jsonArguments = JSON.parse(call.Arguments);
-            const parsedArguments = CreateProjectArgumentntsSchema.parse(jsonArguments);
-            actions.push({
-                name: call.Name,
-                arguments: parsedArguments,
-                id: call.ToolId
-            });
-        } catch {
-            // Ignore parsing errors - the call might not be related to CreateProjectAction
-        }
-    });
-
-    return actions;
-}
-
 function formatMessages(storedMessages: StoredMessage[]): Message[] {
     const uiMessages: Message[] = [];
 
@@ -95,7 +94,7 @@ function formatMessages(storedMessages: StoredMessage[]): Message[] {
             const content = extractContent(m);
             if (content) {
                 uiMessages.push({
-                    id: index.toString(),
+                    id: randomUUID(),
                     role: m.role,
                     content
                 });
@@ -143,12 +142,6 @@ function formatUpdatedAt(updatedAt: string): string {
 type ChatDocument = {
     messages: StoredMessage[];
     openActionCalls: unknown;
-}
-
-type StoredAction = {
-    Name: string;
-    Arguments: string;
-    ToolId: string;
 }
 
 type StoredMessage = UserMessage | AssistantMessage | SystemMessage | ToolMessage;

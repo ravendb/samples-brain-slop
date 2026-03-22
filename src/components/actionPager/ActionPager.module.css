@@ -1,3 +1,43 @@
+.actions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.approve {
+    background: linear-gradient(90deg, var(--primary), #7a3ea8);
+    color: var(--foreground);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 0.5rem 0.9rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(148, 90, 181, 0.12);
+    transition: var(--transition-base);
+}
+.approve:hover {
+    transform: translateY(-1px);
+}
+
+.reject {
+    background: var(--surface);
+    color: var(--foreground-muted);
+    border: 1px solid rgba(255,255,255,0.03);
+    border-radius: 8px;
+    padding: 0.5rem 0.9rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(10,10,20,0.3);
+    transition: var(--transition-base);
+}
+.reject:hover {
+    transform: translateY(-1px);
+    color: var(--foreground);
+}
 .container {
     display: grid;
     gap: 0.65rem;
@@ -22,9 +62,14 @@
     font-size: 0.85rem;
 }
 
-.controls {
+.headerRight {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.navButtons {
+    display: flex;
     gap: 0.5rem;
 }
 

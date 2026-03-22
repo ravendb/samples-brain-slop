@@ -21,8 +21,27 @@ export const CreateProjectArgumentntsSchema = z.object({
 
 type CreateProjectArguments = z.infer<typeof CreateProjectArgumentntsSchema>;
 
+export type ActionStatus = "pending" | "approved" | "rejected";
+
 export type Action = {
     name: string;
     arguments: CreateProjectArguments;
     id: string;
+}
+
+export type ActionResult = {
+    agentResponse: string | null;
+    toolResponse: string;
+    openActions: Action[];
+};
+
+export type StoredAction = {
+    name: string;
+    arguments: string;
+    toolId: string;
+}
+
+export type ToolResponse = {
+    toolId: string;
+    response: string;
 }

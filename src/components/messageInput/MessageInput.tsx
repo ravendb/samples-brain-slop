@@ -51,9 +51,9 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
 				onInput={handleInput}
                 onKeyDown={handleKeyDown}
 			/>
-			<button className={styles.sendButton} type="button" onClick={() => void handleSend()}>
-				Send
-			</button>
+            <button className={styles.sendButton} type="button" onClick={() => void handleSend()} disabled={disabled}>
+                Send
+            </button>
 		</div>
 	);
 }
