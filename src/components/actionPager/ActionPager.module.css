@@ -1,3 +1,19 @@
+.spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2.5px solid #d1c4e9;
+    border-top: 2.5px solid #7a3ea8;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 0.5em;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 .actions {
     display: flex;
     flex-direction: row;
