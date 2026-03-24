@@ -20,10 +20,23 @@ export function tasksToDocuments(tasks: Task[]) {
 export async function markTaskCompleted(taskId: string, completed: boolean) {
     const session = store.openSession();
     const task = await session.load<TaskDocument>(taskId);
-    if (task) {
-        task.completed = completed;
-        await session.saveChanges();
-        return completed;
+
+    if (!task) {
+        throw new Error("Task not found");
     }
-    throw new Error("Task not found");
+
+    task.completed = completed;
+    await session.saveChanges();
+    return completed;
+}
+
+export async function isTaskCompleted(taskId: string) {
+    const session = store.openSession();
+    const task = await session.load<TaskDocument>(taskId);
+    
+    if (!task) {
+        throw new Error("Task not found");
+    }
+
+    return task.completed;
 }

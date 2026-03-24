@@ -1,5 +1,5 @@
 import { deleteChat } from "@/repositories/chatRepo";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 type RouteContext = {
     params: Promise<{
@@ -15,7 +15,7 @@ function decodeChatId(encodedChatId: string) {
     }
 }
 
-export async function DELETE(_request: Request, context: RouteContext) {
+export async function DELETE(_request: NextRequest, context: RouteContext) {
     const { chatId: encodedChatId } = await context.params;
 
     if (!encodedChatId) {

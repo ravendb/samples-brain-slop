@@ -33,9 +33,39 @@ export async function loadProjects(): Promise<Project[]> {
     for (const doc of documents) {
         const tasksDocs = await session.load<TaskDocument>(doc.taskIds);
         const tasks = Object.values(tasksDocs) as TaskDocument[];
+        const project = {
+            id: doc.id,
+            title: doc.title,
+            description: doc.description,
+            dueDate: doc.dueDate,
+            tasks: tasks
+        }
 
-        projects.push(doc.toProject(tasks));
+        projects.push(project);
     }
 
     return projects;
+}
+
+export async function loadProject(id: string) {
+    const session = store.openSession();
+    
+    const document = await session
+        .include("taskIds")
+        .load<ProjectDocument>(id);
+
+    if (!document) {
+        return null;
+    }
+
+    const tasksDocs = await session.load<TaskDocument>(document.taskIds);
+    const tasks = Object.values(tasksDocs) as TaskDocument[];
+
+    return {
+        id: document.id,
+        title: document.title,
+        description: document.description,
+        dueDate: document.dueDate,
+        tasks: tasks
+    }
 }

@@ -30,7 +30,7 @@ export default function ProjectItem({ project }: ProjectItemProps) {
           </span>
         </button>
 
-        <Link href={`/project/${project.id}`} className={styles.projectLink}>
+        <Link href={`/project/${encodeURIComponent(project.id!)}`} className={styles.projectLink}>
           {project.title}
         </Link>
       </header>

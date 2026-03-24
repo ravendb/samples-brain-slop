@@ -1,0 +1,25 @@
+.priorityBang {
+	display: inline-flex;
+	align-items: center;
+	margin-left: 0.2em;
+	font-size: 1.5em;
+	font-weight: 800;
+	line-height: 1;
+	
+	background: linear-gradient(90deg, var(--primary), #dea4ff, var(--primary));
+	background-size: 200% 100%;
+	background-position: 0% 0%;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	animation: bang-gradient-move 2s linear infinite;
+}
+
+@keyframes bang-gradient-move {
+	0% {
+		background-position: 0% 0%;
+	}
+	100% {
+		background-position: 200% 0%;
+	}
+}

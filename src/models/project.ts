@@ -19,16 +19,6 @@ export class ProjectDocument {
     setTasks(taskIds: string[]) {
         this.taskIds = taskIds;
     }
-
-    toProject(tasks: Task[]): Project {
-        return {
-            id: this.id,
-            title: this.title,
-            description: this.description,
-            dueDate: this.dueDate,
-            tasks: tasks
-        };
-    }
 }
 
 export const ProjectSchema = z.object({
