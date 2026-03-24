@@ -84,7 +84,7 @@
 	font-weight: 800;
 	line-height: 1;
 	
-	background: linear-gradient(90deg, var(--primary), #c072ee, var(--primary));
+	background: linear-gradient(90deg, var(--primary), #dea4ff, var(--primary));
 	background-size: 200% 100%;
 	background-position: 0% 0%;
 	-webkit-background-clip: text;

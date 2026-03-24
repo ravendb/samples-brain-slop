@@ -23,5 +23,7 @@ export async function markTaskCompleted(taskId: string, completed: boolean) {
     if (task) {
         task.completed = completed;
         await session.saveChanges();
+        return completed;
     }
+    throw new Error("Task not found");
 }
