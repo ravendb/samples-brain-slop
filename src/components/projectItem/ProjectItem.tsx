@@ -11,11 +11,13 @@ type ProjectItemProps = {
 };
 
 export default function ProjectItem({ project }: ProjectItemProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const dataOpen = isOpen ? "open" : "closed";
 
   return (
     <section className={styles.wrapper}>
-      <header className={styles.header}>
+      <header className={styles.header} data-open={dataOpen}>
         <button
           type="button"
           className={styles.arrowButton}
@@ -23,7 +25,9 @@ export default function ProjectItem({ project }: ProjectItemProps) {
           aria-label={isOpen ? `Collapse ${project.title}` : `Expand ${project.title}`}
           aria-expanded={isOpen}
         >
-          <span className={`${styles.arrow} ${isOpen ? styles.open : ""}`}>▶</span>
+          <span className={styles.arrow} data-open={dataOpen}>
+            ▶
+          </span>
         </button>
 
         <Link href={`/project/${project.id}`} className={styles.projectLink}>

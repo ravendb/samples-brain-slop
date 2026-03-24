@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import styles from "./MessageInput.module.css";
 
 type MessageInputProps = {
@@ -10,12 +10,14 @@ type MessageInputProps = {
 
 export default function MessageInput({ onSend, disabled }: MessageInputProps) {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [isEmpty, setIsEmpty] = useState(true);
 
 	function handleInput() {
 		const input = textareaRef.current;
 		if (!input) return;
 		input.style.height = "auto";
 		input.style.height = `${input.scrollHeight}px`;
+		setIsEmpty(input.value.trim() === "");
 	}
 
 	function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -51,7 +53,12 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
 				onInput={handleInput}
                 onKeyDown={handleKeyDown}
 			/>
-            <button className={styles.sendButton} type="button" onClick={() => void handleSend()} disabled={disabled}>
+            <button 
+                className={styles.sendButton} 
+                type="button" 
+                onClick={() => void handleSend()} 
+                disabled={disabled || isEmpty}
+            >
                 Send
             </button>
 		</div>

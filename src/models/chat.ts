@@ -1,5 +1,3 @@
-import { AiAnswer } from "ravendb"
-
 export type Chat = {
     id: string,
     updatedAt: string,

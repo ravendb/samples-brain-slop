@@ -1,4 +1,5 @@
-import { Action, CreateProjectArgumentntsSchema, StoredAction } from "@/models/action";
+import { Action, StoredAction } from "@/models/action";
+import { ProjectSchema } from "@/models/project";
 import { store } from "@/db/ravendb";
 
 export async function loadActions(chatId: string) {
@@ -63,7 +64,7 @@ export function formatActions(storedActions: StoredAction[]): Action[] {
 function parseArguments(argumentsString: string) {
     try {
         const jsonArguments = JSON.parse(argumentsString);
-        return CreateProjectArgumentntsSchema.parse(jsonArguments);
+        return ProjectSchema.parse(jsonArguments);
     } catch {
         return null;
     }

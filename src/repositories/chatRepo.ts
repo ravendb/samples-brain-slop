@@ -65,7 +65,15 @@ export async function sendToolMessage(chatId: string, toolResponse: ToolResponse
     const llmResponse: AgentResponse = await chat.run()
     console.log("LLM response after tool message:", llmResponse);
 
-    return llmResponse.answer?.response ?? null;
+    let requiredActions: Action[] = [];
+    if (llmResponse.status === 'ActionRequired') {
+        requiredActions = formatActions(chat.requiredActions());
+    }
+
+    return {
+        reply: llmResponse.answer?.response ?? null,
+        actions: requiredActions
+    };
 }
 
 export async function loadChat(chatId: string) {
@@ -90,7 +98,7 @@ function formatMessages(storedMessages: StoredMessage[]): Message[] {
 
     storedMessages
         .filter(m => m.role !== "system")
-        .forEach((m, index) => {
+        .forEach(m => {
             const content = extractContent(m);
             if (content) {
                 uiMessages.push({

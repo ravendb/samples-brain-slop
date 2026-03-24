@@ -33,7 +33,7 @@
 	transition: transform 140ms ease;
 }
 
-.open {
+.arrow[data-open="open"] {
 	transform: rotate(90deg);
 }
 
@@ -42,6 +42,11 @@
 	text-decoration: none;
 	font-weight: 600;
 	font-size: 0.93rem;
+    transition: color 120ms ease;
+}
+
+.header[data-open="open"] .projectLink {
+    color: var(--foreground);
 }
 
 .taskList {

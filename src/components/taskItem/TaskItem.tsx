@@ -1,4 +1,6 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
 import { Task } from "@/models/task";
 import styles from "./TaskItem.module.css";
 
@@ -6,22 +8,31 @@ type TaskItemProps = {
 	task: Task;
 };
 
-const priorityClassMap: Record<Task["priority"], string> = {
-	low: styles.priorityLow,
-	normal: styles.priorityNormal,
-	high: styles.priorityHigh,
-};
-
 export default function TaskItem({ task }: TaskItemProps) {
-	const taskId = task.id ?? "unknown";
+	const [isCompleted, setIsCompleted] = useState(task.completed);
 
 	return (
-		<Link href={`/task/${taskId}`} className={styles.item}>
+		<div className={styles.item}>
 			<span
-				className={`${styles.priorityDot} ${priorityClassMap[task.priority]}`}
-				aria-hidden="true"
-			/>
-			<span className={styles.title}>{task.title}</span>
-		</Link>
+				className={styles.checkbox}
+                data-checked={isCompleted}
+				role="checkbox"
+				onClick={() => setIsCompleted((prev) => !prev)}
+			>
+				{isCompleted && (
+					<img
+						src="/check_small.svg"
+						alt="Checked"
+						className={styles.checkmark}
+					/>
+				)}
+			</span>
+			<span className={styles.title}>
+				{task.title}
+				{task.priority === "high" && (
+					<span className={styles.priorityBang}>!</span>
+				)}
+			</span>
+		</div>
 	);
 }
