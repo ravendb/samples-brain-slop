@@ -1,7 +1,7 @@
 import { Project, ProjectDocument } from "@/models/project"
 import { TaskDocument } from "@/models/task";
 import { store } from "@/db/ravendb";
-import { tasksToDocuments } from "./taskRepo";
+import { taskToDocument } from "./taskRepo";
 
 export async function createProject(project: ProjectDocument, tasks: TaskDocument[]) {
     const session = store.openSession();
@@ -19,7 +19,7 @@ export async function createProject(project: ProjectDocument, tasks: TaskDocumen
 
 export async function createProjectFromAction(project: Project) {
     const projectDocument = new ProjectDocument(project.title, project.description, project.dueDate);
-    const taskDocuments = tasksToDocuments(project.tasks || []);
+    const taskDocuments = project.tasks?.map(taskToDocument) || [];
     await createProject(projectDocument, taskDocuments);
 }
 

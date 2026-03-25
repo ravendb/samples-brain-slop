@@ -1,12 +1,18 @@
 import { AiConversation } from "ravendb";
-import { Action, ActionResult } from "@/models/action";
+import { Action, ActionResult, AddNewTaskArguments } from "@/models/action";
 import { sendToolMessage } from "@/repositories/chatRepo";
 import { createProjectFromAction } from "@/repositories/projectRepo";
+import { createTask } from "@/repositories/taskRepo";
+import { Project } from "@/models/project";
 
 export function receiveActions(chat: AiConversation) {
-    chat.receive('CreateProject', (request, args) => {
-        console.log(`Received ${request.name} action. id: ${request.toolId}, with args:`, args);
+    chat.receive<Project>('CreateProject', (_request, args) => {
+        console.log("Received CreateProject action with args:", args);
     })
+
+    chat.receive<AddNewTaskArguments>('AddNewTask', (_request, args) => {
+        console.log("Received AddNewTask action with args:", args);
+    });
 }
 
 export async function executeAction(chatId: string, action: Action): Promise<ActionResult> {
@@ -44,13 +50,29 @@ export async function rejectAction(chatId: string, action: Action): Promise<Acti
 }
 
 async function executeMappedAction(action: Action): Promise<string> {
-    if (action.name === "CreateProject") {
-        const args = action.arguments;
-        const taskCount = args.tasks?.length || 0;
-
-        await createProjectFromAction(args);
-
-        return `Project '${args.title}' created successfully${taskCount > 0 ? ", with " + taskCount + " tasks." : "."}`;
+    try {
+        switch (action.name) {
+            case "CreateProject":
+                return await executeCreateProjectAction(action.arguments as Project);
+            case "AddNewTask":
+                return await executeAddNewTaskAction(action.arguments as AddNewTaskArguments);
+            default:
+                return `Action '${action.name}' (${action.id}) is not supported and was not executed.`;
+        }
+    } catch (error) {
+        console.error(`Error executing action ${action.name} (${action.id}):`, error);
+        return `An error occurred while executing action '${action.name}' (${action.id}).`;
     }
-    return `Action '${action.name}' (${action.id}) is not supported and was not executed.`;
+    
+}
+
+async function executeCreateProjectAction(args: Project): Promise<string> {
+    const taskCount = args.tasks?.length || 0;
+    await createProjectFromAction(args);
+    return `Project '${args.title}' created successfully${taskCount > 0 ? ", with " + taskCount + " tasks." : "."}`;
+}
+
+async function executeAddNewTaskAction(args: AddNewTaskArguments): Promise<string> {
+    await createTask(args.projectId, args.task);
+    return `Task '${args.task.title}' created successfully.`;
 }
