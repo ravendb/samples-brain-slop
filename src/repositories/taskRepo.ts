@@ -1,20 +1,33 @@
 import { TaskDocument } from "@/models/task";
 import { store } from "@/db/ravendb";
 import { Task } from "@/models/task";
+import { ProjectDocument } from "@/models/project";
 
-export async function createTask(task: TaskDocument) {
+export async function createTask(projectId: string, task: TaskDocument) {
+    const taskDocument = taskToDocument(task);
+
     const session = store.openSession();
-    await session.store(task);
+    await session.store(taskDocument);
+    if (!taskDocument.id) {
+        throw new Error("Failed to store task");
+    }
+
+    const project = await session.load<ProjectDocument>(projectId);
+    if (!project) {
+        throw new Error("Project not found");
+    }
+    project.taskIds.push(taskDocument.id);
+    
     await session.saveChanges();
 }
 
-export function tasksToDocuments(tasks: Task[]) {
-    return tasks.map(task => new TaskDocument(
+export function taskToDocument(task: Task) {
+    return new TaskDocument(
         task.title,
         task.description,
         task.priority,
         task.dueDate
-    ));
+    );
 }
 
 export async function markTaskCompleted(taskId: string, completed: boolean) {

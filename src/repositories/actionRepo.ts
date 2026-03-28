@@ -1,52 +1,24 @@
-import { Action, StoredAction } from "@/models/action";
-import { ProjectSchema } from "@/models/project";
-import { store } from "@/db/ravendb";
-
-export async function loadActions(chatId: string) {
-    const session = await store.openSession();
-    const chatDocument = await session.advanced.rawQuery<{ openActionCalls: unknown }>(`
-            from @conversations
-            where id() = $chatId
-            select OpenActionCalls as openActionCalls
-        `)
-        .addParameter("chatId", chatId)
-        .first();
-    
-    return extractActions(chatDocument.openActionCalls);
-}
+import { Action, parsers, StoredAction } from "@/models/action";
 
 export function extractActions(openActionCalls: unknown): Action[] {
     if (!openActionCalls || typeof openActionCalls !== "object") {
         return [];
     }
 
-    const storedActionCalls = Object.values(openActionCalls) as {
-        Name: string;
-        Arguments: string;
-        ToolId: string;
-    }[];
+    const storedActions = Object.values(openActionCalls).map(call => ({
+        name: call.Name,
+        arguments: call.Arguments,
+        toolId: call.ToolId
+    }))
 
-    const actionCalls: Action[] = []
-    
-    storedActionCalls.forEach(call => {
-        const parsedArguments = parseArguments(call.Arguments);
-        if (parsedArguments) {  
-            actionCalls.push({
-                name: call.Name,
-                arguments: parsedArguments,
-                id: call.ToolId
-            });
-        }
-    });
-
-    return actionCalls;
+    return formatActions(storedActions);
 }
 
 export function formatActions(storedActions: StoredAction[]): Action[] {
     const actions: Action[] = [];
 
     storedActions.forEach(call => {
-        const parsedArguments = parseArguments(call.arguments);
+        const parsedArguments = parseArguments(call.name, call.arguments);
         if (parsedArguments) {
             actions.push({
                 id: call.toolId,
@@ -58,14 +30,17 @@ export function formatActions(storedActions: StoredAction[]): Action[] {
 
     return actions;
 }
-    
 
+function parseArguments(actionName: Action["name"], argumentsString: string) {
+    const parser = parsers[actionName];
+    if (!parser) {
+        throw new Error(`No parser defined for action: ${actionName}`);
+    }
 
-function parseArguments(argumentsString: string) {
     try {
         const jsonArguments = JSON.parse(argumentsString);
-        return ProjectSchema.parse(jsonArguments);
+        return parser.parse(jsonArguments);
     } catch {
-        return null;
+        throw new Error(`Failed to parse arguments for action: ${actionName}`);
     }
 }

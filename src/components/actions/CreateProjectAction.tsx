@@ -1,11 +1,8 @@
+import { Project } from "@/models/project";
 import { Action } from "@/models/action";
 import styles from "./Action.module.css";
 
-type ActionCardProps = {
-    action: Action;
-};
-
-function summarizeTasks(action: Action) {
+function summarizeTasks(action: Action<Project>) {
     const totalTasks = action.arguments.tasks?.length ?? 0;
     if (totalTasks === 0) {
         return null;
@@ -14,7 +11,7 @@ function summarizeTasks(action: Action) {
     return `${totalTasks} task${totalTasks === 1 ? "" : "s"}`;
 }
 
-export default function ActionCard({ action }: ActionCardProps) {
+export default function CreateProjectAction({ action }: { action: Action<Project> }) {
     const taskSummary = summarizeTasks(action);
 
     return (

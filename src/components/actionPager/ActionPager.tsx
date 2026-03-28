@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Action, ActionResult } from "@/models/action";
-import ActionCard from "@/components/action/Action";
+import ActionCard from "@/components/actions/Action";
 import styles from "./ActionPager.module.css";
 
 type ActionDecision = "approve" | "reject";
