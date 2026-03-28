@@ -10,9 +10,11 @@ export function receiveActions(chat: AiConversation) {
     chat.receive('CreateProject', (_request, args) => {
         console.log("Received CreateProject action with args:", args);
     })
-
     chat.receive('AddNewTask', (_request, args) => {
         console.log("Received AddNewTask action with args:", args);
+    });
+    chat.receive('EditTask', (_request, args) => {
+        console.log("Received EditTask action with args:", args);
     });
 }
 
@@ -82,5 +84,5 @@ async function executeAddNewTaskAction(args: AddNewTaskArguments) {
 
 async function executeEditTaskAction(args: EditTaskArguments) {
     const updatedTask = await editTask(args.taskId, args.updates);
-    return `Task '${args.taskId}' updated successfully. Updated task: ${updatedTask}`;
+    return `Task '${args.currentTitle}' updated successfully. Updated task: ${updatedTask}`;
 }

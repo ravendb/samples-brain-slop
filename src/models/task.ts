@@ -41,6 +41,7 @@ export type AddNewTaskArguments = z.infer<typeof AddNewTaskArgumentsSchema>;
 
 export const EditTaskArgumentsSchema = z.object({
     taskId: z.string(),
+    currentTitle: z.string(),
     updates: z.object({
         title: z.string(),
         description: z.string(),
