@@ -1,4 +1,5 @@
-import { Action, AddNewTaskArguments } from "@/models/action";
+import { Action } from "@/models/action";
+import { AddNewTaskArguments } from "@/models/task";
 import styles from "./Action.module.css";
 
 export default function AddNewTaskAction({ action }: { action: Action<AddNewTaskArguments> }) {

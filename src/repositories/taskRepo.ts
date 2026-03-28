@@ -1,6 +1,6 @@
 import { TaskDocument } from "@/models/task";
 import { store } from "@/db/ravendb";
-import { Task } from "@/models/task";
+import { Task, EditTaskArguments } from "@/models/task";
 import { ProjectDocument } from "@/models/project";
 
 export async function createTask(projectId: string, task: TaskDocument) {
@@ -21,13 +21,22 @@ export async function createTask(projectId: string, task: TaskDocument) {
     await session.saveChanges();
 }
 
-export function taskToDocument(task: Task) {
-    return new TaskDocument(
-        task.title,
-        task.description,
-        task.priority,
-        task.dueDate
-    );
+export async function editTask(taskId: string, updates: EditTaskArguments["updates"]) {
+    const session = store.openSession();
+    const task = await session.load<TaskDocument>(taskId);
+    if (!task) {
+        throw new Error("Task not found");
+    }
+
+    for (const [key, value] of Object.entries(updates)) {
+        if (value !== undefined) {
+            (task as any)[key] = value;
+        }
+    }
+
+    await session.saveChanges();
+
+    return task;
 }
 
 export async function markTaskCompleted(taskId: string, completed: boolean) {
@@ -52,4 +61,13 @@ export async function isTaskCompleted(taskId: string) {
     }
 
     return task.completed;
+}
+
+export function taskToDocument(task: Task) {
+    return new TaskDocument(
+        task.title,
+        task.description,
+        task.priority,
+        task.dueDate
+    );
 }

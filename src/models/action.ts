@@ -1,8 +1,7 @@
 import { Project, ProjectSchema } from "./project";
-import { TaskSchema } from "./task";
-import { z } from "zod";
+import { AddNewTaskArguments, AddNewTaskArgumentsSchema, EditTaskArguments, EditTaskArgumentsSchema } from "./task";
 
-export type ActionArguments = Project | AddNewTaskArguments;
+export type ActionArguments = Project | AddNewTaskArguments | EditTaskArguments;
 
 export type Action<T extends ActionArguments = ActionArguments> = {
     name: string;
@@ -27,17 +26,10 @@ export type ToolResponse = {
     response: string;
 }
 
-export const AddNewTaskArgumentsSchema = z.object({
-    projectId: z.string(),
-    projectTitle: z.string(),
-    task: TaskSchema
-}).strict();
-
-export type AddNewTaskArguments = z.infer<typeof AddNewTaskArgumentsSchema>;
-
-type Parser = typeof ProjectSchema | typeof AddNewTaskArgumentsSchema;
+type Parser = typeof ProjectSchema | typeof AddNewTaskArgumentsSchema | typeof EditTaskArgumentsSchema;
 
 export const parsers: Record<string, Parser> = {
     "AddNewTask": AddNewTaskArgumentsSchema,
-    "CreateProject": ProjectSchema
+    "CreateProject": ProjectSchema,
+    "EditTask": EditTaskArgumentsSchema
 };

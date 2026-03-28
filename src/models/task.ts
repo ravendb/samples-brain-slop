@@ -28,6 +28,27 @@ export const TaskSchema = z.object({
     dueDate: DateSchema.optional(),
     completed: z.boolean().default(false)
 })
-.strict();
 
 export type Task = z.infer<typeof TaskSchema>;
+
+export const AddNewTaskArgumentsSchema = z.object({
+    projectId: z.string(),
+    projectTitle: z.string(),
+    task: TaskSchema
+})
+
+export type AddNewTaskArguments = z.infer<typeof AddNewTaskArgumentsSchema>;
+
+export const EditTaskArgumentsSchema = z.object({
+    taskId: z.string(),
+    currentTitle: z.string(),
+    updates: z.object({
+        title: z.string(),
+        description: z.string(),
+        priority: z.enum(["low", "normal", "high"]),
+        dueDate: DateSchema,
+        completed: z.boolean()
+    }).partial()
+})
+
+export type EditTaskArguments = z.infer<typeof EditTaskArgumentsSchema>;
