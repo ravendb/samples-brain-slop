@@ -1,16 +1,17 @@
 import { AiConversation } from "ravendb";
-import { Action, ActionResult, AddNewTaskArguments } from "@/models/action";
+import { Action, ActionResult } from "@/models/action";
 import { sendToolMessage } from "@/repositories/chatRepo";
 import { createProjectFromAction } from "@/repositories/projectRepo";
-import { createTask } from "@/repositories/taskRepo";
+import { createTask, editTask } from "@/repositories/taskRepo";
 import { Project } from "@/models/project";
+import { AddNewTaskArguments, EditTaskArguments } from "@/models/task";
 
 export function receiveActions(chat: AiConversation) {
-    chat.receive<Project>('CreateProject', (_request, args) => {
+    chat.receive('CreateProject', (_request, args) => {
         console.log("Received CreateProject action with args:", args);
     })
 
-    chat.receive<AddNewTaskArguments>('AddNewTask', (_request, args) => {
+    chat.receive('AddNewTask', (_request, args) => {
         console.log("Received AddNewTask action with args:", args);
     });
 }
@@ -56,6 +57,8 @@ async function executeMappedAction(action: Action): Promise<string> {
                 return await executeCreateProjectAction(action.arguments as Project);
             case "AddNewTask":
                 return await executeAddNewTaskAction(action.arguments as AddNewTaskArguments);
+            case "EditTask":
+                return await executeEditTaskAction(action.arguments as EditTaskArguments);
             default:
                 return `Action '${action.name}' (${action.id}) is not supported and was not executed.`;
         }
@@ -66,13 +69,18 @@ async function executeMappedAction(action: Action): Promise<string> {
     
 }
 
-async function executeCreateProjectAction(args: Project): Promise<string> {
+async function executeCreateProjectAction(args: Project) {
     const taskCount = args.tasks?.length || 0;
     await createProjectFromAction(args);
     return `Project '${args.title}' created successfully${taskCount > 0 ? ", with " + taskCount + " tasks." : "."}`;
 }
 
-async function executeAddNewTaskAction(args: AddNewTaskArguments): Promise<string> {
+async function executeAddNewTaskAction(args: AddNewTaskArguments) {
     await createTask(args.projectId, args.task);
     return `Task '${args.task.title}' created successfully.`;
+}
+
+async function executeEditTaskAction(args: EditTaskArguments) {
+    const updatedTask = await editTask(args.taskId, args.updates);
+    return `Task '${args.taskId}' updated successfully. Updated task: ${updatedTask}`;
 }

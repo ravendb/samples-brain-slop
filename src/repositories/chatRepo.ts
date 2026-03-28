@@ -97,7 +97,7 @@ function formatMessages(storedMessages: StoredMessage[]): Message[] {
     const uiMessages: Message[] = [];
 
     storedMessages
-        .filter(m => m.role !== "system")
+        .filter(m => m.role !== "system" && m.role !== "tool")
         .forEach(m => {
             const content = extractContent(m);
             if (content) {
