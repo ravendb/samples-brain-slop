@@ -1,4 +1,5 @@
 import { loadProject } from "@/repositories/projectRepo";
+import { compareTasksByDueDate } from "@/services/tasks";
 import Checkbox from "@/components/checkbox/Checkbox";
 import styles from "./page.module.css";
 import PriorityBang from "@/components/priorityBang/PriorityBang";
@@ -20,6 +21,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 		);
 	}
 
+    const tasks = project.tasks.toSorted(compareTasksByDueDate);
+
 	return (
 	  <main className={styles.main}>
 	    <div className={styles.projectCard}>
@@ -40,7 +43,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 	      <h2 className={styles.tasksTitle}>Tasks</h2>
 	      {project.tasks && project.tasks.length > 0 ? (
 	        <ul className={styles.tasksList}>
-				{project.tasks.map((task) => (
+				{tasks.map((task) => (
 					<li className={styles.taskCard} key={task.id ?? task.title}>
 						<div className={styles.taskHeader}>
 							<Checkbox taskId={task.id!} />
