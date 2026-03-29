@@ -1,8 +1,7 @@
 import { Action } from "@/models/action";
-import { EditTaskArguments } from "@/models/task";
 import styles from "./Action.module.css";
 
-export default function EditTaskAction({ action }: { action: Action<EditTaskArguments> }) {
+export default function EditTaskAction({ action }: { action: Action<'EditTask'> }) {
     const { currentTitle, updates } = action.arguments;
 
     return (

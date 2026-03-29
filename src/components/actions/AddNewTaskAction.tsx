@@ -1,8 +1,7 @@
 import { Action } from "@/models/action";
-import { AddNewTaskArguments } from "@/models/task";
 import styles from "./Action.module.css";
 
-export default function AddNewTaskAction({ action }: { action: Action<AddNewTaskArguments> }) {
+export default function AddNewTaskAction({ action }: { action: Action<'AddNewTask'> }) {
     const task = action.arguments.task;
 
     return (

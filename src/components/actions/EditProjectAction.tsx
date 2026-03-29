@@ -1,8 +1,7 @@
 import { Action } from "@/models/action";
-import { EditProjectArguments } from "@/models/project";
 import styles from "./Action.module.css";
 
-export default function EditProjectAction({ action }: { action: Action<EditProjectArguments> }) {
+export default function EditProjectAction({ action }: { action: Action<'EditProject'> }) {
     const { projectId, currentTitle, updates } = action.arguments;
 
     return (

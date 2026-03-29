@@ -39,6 +39,19 @@ export async function editTask(taskId: string, updates: EditTaskArguments["updat
     return task;
 }
 
+export async function deleteTask(projectId: string, taskId: string) {
+    const session = store.openSession();
+    const project = await session.load<ProjectDocument>(projectId);
+    if (!project) {
+        throw new Error("Project not found");
+    }
+    project.taskIds = project.taskIds.filter(id => id !== taskId);
+
+    await session.delete(taskId);
+    await session.saveChanges();
+}
+
+
 export async function markTaskCompleted(taskId: string, completed: boolean) {
     const session = store.openSession();
     const task = await session.load<TaskDocument>(taskId);

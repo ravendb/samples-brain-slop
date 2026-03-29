@@ -1,4 +1,4 @@
-import { Action, parsers, StoredAction } from "@/models/action";
+import { Action, schemas, StoredAction } from "@/models/action";
 
 export function extractActions(openActionCalls: unknown): Action[] {
     if (!openActionCalls || typeof openActionCalls !== "object") {
@@ -32,7 +32,7 @@ export function formatActions(storedActions: StoredAction[]): Action[] {
 }
 
 function parseArguments(actionName: Action["name"], argumentsString: string) {
-    const parser = parsers[actionName];
+    const parser = schemas[actionName];
     if (!parser) {
         throw new Error(`No parser defined for action: ${actionName}`);
     }
