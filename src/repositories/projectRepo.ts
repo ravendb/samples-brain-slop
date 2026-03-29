@@ -1,4 +1,4 @@
-import { Project, ProjectDocument } from "@/models/project"
+import { Project, ProjectDocument, EditProjectArguments } from "@/models/project"
 import { TaskDocument } from "@/models/task";
 import { store } from "@/db/ravendb";
 import { taskToDocument } from "./taskRepo";
@@ -68,4 +68,22 @@ export async function loadProject(id: string) {
         dueDate: document.dueDate,
         tasks: tasks
     }
+}
+
+export async function editProject(projectId: string, updates: EditProjectArguments["updates"]) {
+    const session = store.openSession();
+    const project = await session.load<ProjectDocument>(projectId);
+    if (!project) {
+        throw new Error(`Project with id ${projectId} not found`);
+    }
+
+    for (const [key, value] of Object.entries(updates)) {
+        if (value !== undefined) {
+            (project as any)[key] = value;
+        }
+    }
+
+    await session.saveChanges();
+
+    return project;
 }

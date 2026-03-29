@@ -27,6 +27,14 @@ export const ProjectSchema = z.object({
     description: z.string(),
     dueDate: DateSchema.optional(),
     tasks: z.array(TaskSchema).default([]),
-}).strict();
+})
 
 export type Project = z.infer<typeof ProjectSchema>;
+
+export const EditProjectArgumentsSchema = z.object({
+    projectId: z.string(),
+    currentTitle: z.string(),
+    updates: ProjectSchema.omit({ id: true, tasks: true }).partial(),
+});
+
+export type EditProjectArguments = z.infer<typeof EditProjectArgumentsSchema>;
