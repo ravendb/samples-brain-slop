@@ -1,7 +1,7 @@
-import { Project, ProjectSchema } from "./project";
+import { Project, ProjectSchema, EditProjectArgumentsSchema, EditProjectArguments } from "./project";
 import { AddNewTaskArguments, AddNewTaskArgumentsSchema, EditTaskArguments, EditTaskArgumentsSchema } from "./task";
 
-export type ActionArguments = Project | AddNewTaskArguments | EditTaskArguments;
+export type ActionArguments = Project | AddNewTaskArguments | EditTaskArguments | EditProjectArguments;
 
 export type Action<T extends ActionArguments = ActionArguments> = {
     name: string;
@@ -26,10 +26,11 @@ export type ToolResponse = {
     response: string;
 }
 
-type Parser = typeof ProjectSchema | typeof AddNewTaskArgumentsSchema | typeof EditTaskArgumentsSchema;
+type Parser = typeof ProjectSchema | typeof AddNewTaskArgumentsSchema | typeof EditTaskArgumentsSchema | typeof EditProjectArgumentsSchema;
 
 export const parsers: Record<string, Parser> = {
     "AddNewTask": AddNewTaskArgumentsSchema,
     "CreateProject": ProjectSchema,
-    "EditTask": EditTaskArgumentsSchema
+    "EditTask": EditTaskArgumentsSchema,
+    "EditProject": EditProjectArgumentsSchema
 };

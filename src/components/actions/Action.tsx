@@ -3,7 +3,8 @@ import { AddNewTaskArguments, EditTaskArguments } from "@/models/task";
 import CreateProjectAction from "./CreateProjectAction";
 import AddNewTaskAction from "./AddNewTaskAction";
 import EditTaskAction from "./EditTaskAction";
-import { Project } from "@/models/project";
+import EditProjectAction from "./EditProjectAction";
+import { Project, EditProjectArguments } from "@/models/project";
 
 type ActionCardProps = {
     action: Action;
@@ -17,6 +18,8 @@ export default function ActionCard({ action }: ActionCardProps) {
             return <AddNewTaskAction action={action as Action<AddNewTaskArguments>} />;
         case "EditTask":
             return <EditTaskAction action={action as Action<EditTaskArguments>} />;
+        case "EditProject":
+            return <EditProjectAction action={action as Action<EditProjectArguments>} />;
         default:
             return <div>Unknown action: {action.name}</div>;
     }

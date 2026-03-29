@@ -1,9 +1,9 @@
 import { AiConversation } from "ravendb";
 import { Action, ActionResult } from "@/models/action";
 import { sendToolMessage } from "@/repositories/chatRepo";
-import { createProjectFromAction } from "@/repositories/projectRepo";
+import { createProjectFromAction, editProject } from "@/repositories/projectRepo";
 import { createTask, editTask } from "@/repositories/taskRepo";
-import { Project } from "@/models/project";
+import { Project, EditProjectArguments } from "@/models/project";
 import { AddNewTaskArguments, EditTaskArguments } from "@/models/task";
 
 export function receiveActions(chat: AiConversation) {
@@ -15,6 +15,9 @@ export function receiveActions(chat: AiConversation) {
     });
     chat.receive('EditTask', (_request, args) => {
         console.log("Received EditTask action with args:", args);
+    });
+    chat.receive('EditProject', (_request, args) => {
+        console.log("Received EditProject action with args:", args);
     });
 }
 
@@ -61,6 +64,8 @@ async function executeMappedAction(action: Action): Promise<string> {
                 return await executeAddNewTaskAction(action.arguments as AddNewTaskArguments);
             case "EditTask":
                 return await executeEditTaskAction(action.arguments as EditTaskArguments);
+            case "EditProject":
+                return await executeEditProjectAction(action.arguments as EditProjectArguments);
             default:
                 return `Action '${action.name}' (${action.id}) is not supported and was not executed.`;
         }
@@ -85,4 +90,9 @@ async function executeAddNewTaskAction(args: AddNewTaskArguments) {
 async function executeEditTaskAction(args: EditTaskArguments) {
     const updatedTask = await editTask(args.taskId, args.updates);
     return `Task '${args.currentTitle}' updated successfully. Updated task: ${updatedTask}`;
+}
+
+async function executeEditProjectAction(args: EditProjectArguments) {
+    const updatedProject = await editProject(args.projectId, args.updates);
+    return `Project '${args.currentTitle}' updated successfully. Updated project: ${updatedProject}`;
 }
