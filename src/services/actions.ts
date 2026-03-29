@@ -1,10 +1,17 @@
 import { AiConversation } from "ravendb";
-import { Action, ActionResult } from "@/models/action";
+import { Action, ActionResult, ActionMap } from "@/models/action";
 import { sendToolMessage } from "@/repositories/chatRepo";
-import { createProjectFromAction, editProject } from "@/repositories/projectRepo";
-import { createTask, editTask } from "@/repositories/taskRepo";
-import { Project, EditProjectArguments } from "@/models/project";
-import { AddNewTaskArguments, EditTaskArguments } from "@/models/task";
+import { createProjectFromAction, editProject, deleteProject } from "@/repositories/projectRepo";
+import { createTask, deleteTask, editTask } from "@/repositories/taskRepo";
+
+const executors: { [K in keyof ActionMap]: (args: ActionMap[K]) => Promise<string> } = {
+    CreateProject: executeCreateProjectAction,
+    AddNewTask: executeAddNewTaskAction,
+    EditTask: executeEditTaskAction,
+    EditProject: executeEditProjectAction,
+    DeleteProject: executeDeleteProjectAction,
+    DeleteTask: executeDeleteTaskAction
+};
 
 export function receiveActions(chat: AiConversation) {
     chat.receive('CreateProject', (_request, args) => {
@@ -18,6 +25,9 @@ export function receiveActions(chat: AiConversation) {
     });
     chat.receive('EditProject', (_request, args) => {
         console.log("Received EditProject action with args:", args);
+    });
+    chat.receive('DeleteProject', (_request, args) => {
+        console.log("Received DeleteProject action with args:", args);
     });
 }
 
@@ -55,44 +65,43 @@ export async function rejectAction(chatId: string, action: Action): Promise<Acti
     };
 }
 
-async function executeMappedAction(action: Action): Promise<string> {
+async function executeMappedAction<K extends keyof ActionMap>(action: Action<K>) {
     try {
-        switch (action.name) {
-            case "CreateProject":
-                return await executeCreateProjectAction(action.arguments as Project);
-            case "AddNewTask":
-                return await executeAddNewTaskAction(action.arguments as AddNewTaskArguments);
-            case "EditTask":
-                return await executeEditTaskAction(action.arguments as EditTaskArguments);
-            case "EditProject":
-                return await executeEditProjectAction(action.arguments as EditProjectArguments);
-            default:
-                return `Action '${action.name}' (${action.id}) is not supported and was not executed.`;
-        }
+        const executor = executors[action.name];
+        return await executor(action.arguments as ActionMap[K]);
     } catch (error) {
         console.error(`Error executing action ${action.name} (${action.id}):`, error);
         return `An error occurred while executing action '${action.name}' (${action.id}).`;
     }
-    
 }
 
-async function executeCreateProjectAction(args: Project) {
+async function executeCreateProjectAction(args: ActionMap["CreateProject"]) {
     const taskCount = args.tasks?.length || 0;
     await createProjectFromAction(args);
     return `Project '${args.title}' created successfully${taskCount > 0 ? ", with " + taskCount + " tasks." : "."}`;
 }
 
-async function executeAddNewTaskAction(args: AddNewTaskArguments) {
+async function executeAddNewTaskAction(args: ActionMap["AddNewTask"]) {
     await createTask(args.projectId, args.task);
     return `Task '${args.task.title}' created successfully.`;
 }
 
-async function executeEditTaskAction(args: EditTaskArguments) {
+async function executeEditTaskAction(args: ActionMap["EditTask"]) {
     const updatedTask = await editTask(args.taskId, args.updates);
     return `Task '${args.currentTitle}' updated successfully. Updated task: ${updatedTask}`;
 }
 
-async function executeEditProjectAction(args: EditProjectArguments) {
+async function executeEditProjectAction(args: ActionMap["EditProject"]) {
     const updatedProject = await editProject(args.projectId, args.updates);
     return `Project '${args.currentTitle}' updated successfully. Updated project: ${updatedProject}`;
+}
+
+async function executeDeleteProjectAction(args: ActionMap["DeleteProject"]) {
+    await deleteProject(args.projectId);
+    return `Project '${args.title}' deleted successfully.`;
+}
+
+async function executeDeleteTaskAction(args: ActionMap["DeleteTask"]) {
+    await deleteTask(args.projectId, args.taskId);
+    return `Task '${args.taskTitle}' from project '${args.projectTitle}' deleted successfully.`;
 }

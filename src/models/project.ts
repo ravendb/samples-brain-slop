@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { DateSchema } from "./date";
-import { TaskSchema, Task } from "./task";
+import { TaskSchema } from "./task";
 
 export class ProjectDocument {
     id?: string;
@@ -38,3 +38,10 @@ export const EditProjectArgumentsSchema = z.object({
 });
 
 export type EditProjectArguments = z.infer<typeof EditProjectArgumentsSchema>;
+
+export const DeleteProjectArgumentsSchema = z.object({
+    projectId: z.string(),
+    title: z.string()
+});
+
+export type DeleteProjectArguments = z.infer<typeof DeleteProjectArgumentsSchema>;

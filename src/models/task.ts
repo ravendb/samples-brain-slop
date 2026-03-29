@@ -52,3 +52,12 @@ export const EditTaskArgumentsSchema = z.object({
 })
 
 export type EditTaskArguments = z.infer<typeof EditTaskArgumentsSchema>;
+
+export const DeleteTaskArgumentsSchema = z.object({
+    taskId: z.string(),
+    taskTitle: z.string(),
+    projectId: z.string(),
+    projectTitle: z.string()
+})
+
+export type DeleteTaskArguments = z.infer<typeof DeleteTaskArgumentsSchema>;

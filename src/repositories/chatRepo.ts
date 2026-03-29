@@ -2,7 +2,7 @@ import { AiAnswer } from "ravendb"
 import { store } from "@/db/ravendb";
 import { Chat, Message } from "@/models/chat";
 import { receiveActions } from "@/services/actions";
-import { Action, ToolResponse } from "@/models/action";
+import { Action, StoredAction, ToolResponse } from "@/models/action";
 import { extractActions, formatActions } from "@/repositories/actionRepo";
 import { randomUUID } from "crypto";
 
@@ -45,7 +45,7 @@ export async function sendMessage(chatId: string, prompt: string) {
 
     let requiredActions: Action[] = [];
     if (llmResponse.status === 'ActionRequired') {
-        requiredActions = formatActions(chat.requiredActions());
+        requiredActions = formatActions(chat.requiredActions() as StoredAction[]);
     }
 
     return {
@@ -67,7 +67,7 @@ export async function sendToolMessage(chatId: string, toolResponse: ToolResponse
 
     let requiredActions: Action[] = [];
     if (llmResponse.status === 'ActionRequired') {
-        requiredActions = formatActions(chat.requiredActions());
+        requiredActions = formatActions(chat.requiredActions() as StoredAction[]);
     }
 
     return {

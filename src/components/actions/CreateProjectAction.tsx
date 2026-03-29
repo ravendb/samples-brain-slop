@@ -1,8 +1,7 @@
-import { Project } from "@/models/project";
 import { Action } from "@/models/action";
 import styles from "./Action.module.css";
 
-function summarizeTasks(action: Action<Project>) {
+function summarizeTasks(action: Action<'CreateProject'>) {
     const totalTasks = action.arguments.tasks?.length ?? 0;
     if (totalTasks === 0) {
         return null;
@@ -11,7 +10,7 @@ function summarizeTasks(action: Action<Project>) {
     return `${totalTasks} task${totalTasks === 1 ? "" : "s"}`;
 }
 
-export default function CreateProjectAction({ action }: { action: Action<Project> }) {
+export default function CreateProjectAction({ action }: { action: Action<'CreateProject'> }) {
     const taskSummary = summarizeTasks(action);
 
     return (

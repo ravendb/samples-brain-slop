@@ -1,13 +1,25 @@
-import { Project, ProjectSchema, EditProjectArgumentsSchema, EditProjectArguments } from "./project";
-import { AddNewTaskArguments, AddNewTaskArgumentsSchema, EditTaskArguments, EditTaskArgumentsSchema } from "./task";
+import z from "zod";
+import { ProjectSchema, EditProjectArgumentsSchema, DeleteProjectArgumentsSchema } from "./project";
+import { AddNewTaskArgumentsSchema, EditTaskArgumentsSchema, DeleteTaskArgumentsSchema } from "./task";
 
-export type ActionArguments = Project | AddNewTaskArguments | EditTaskArguments | EditProjectArguments;
+export const schemas = {
+    CreateProject: ProjectSchema,
+    AddNewTask: AddNewTaskArgumentsSchema,
+    EditTask: EditTaskArgumentsSchema,
+    EditProject: EditProjectArgumentsSchema,
+    DeleteProject: DeleteProjectArgumentsSchema,
+    DeleteTask: DeleteTaskArgumentsSchema
+};
 
-export type Action<T extends ActionArguments = ActionArguments> = {
-    name: string;
-    arguments: T;
+export type ActionMap = {
+    [K in keyof typeof schemas]: z.infer<(typeof schemas)[K]>;
+};
+
+export type Action<K extends keyof typeof schemas = keyof typeof schemas> = {
+    name: K;
+    arguments: z.infer<(typeof schemas)[K]>;
     id: string;
-}
+};
 
 export type ActionResult = {
     agentResponse: string | null;
@@ -16,21 +28,12 @@ export type ActionResult = {
 };
 
 export type StoredAction = {
-    name: string;
+    name: Action["name"];
     arguments: string;
     toolId: string;
-}
+};
 
 export type ToolResponse = {
     toolId: string;
     response: string;
-}
-
-type Parser = typeof ProjectSchema | typeof AddNewTaskArgumentsSchema | typeof EditTaskArgumentsSchema | typeof EditProjectArgumentsSchema;
-
-export const parsers: Record<string, Parser> = {
-    "AddNewTask": AddNewTaskArgumentsSchema,
-    "CreateProject": ProjectSchema,
-    "EditTask": EditTaskArgumentsSchema,
-    "EditProject": EditProjectArgumentsSchema
 };

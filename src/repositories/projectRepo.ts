@@ -87,3 +87,19 @@ export async function editProject(projectId: string, updates: EditProjectArgumen
 
     return project;
 }
+
+export async function deleteProject(projectId: string) {
+    const session = store.openSession();
+    const project = await session.load<ProjectDocument>(projectId);
+    if (!project) {
+        throw new Error(`Project with id ${projectId} not found`);
+    }
+
+    for (const taskId of project.taskIds) {
+        await session.delete<TaskDocument>(taskId);
+    }
+
+    await session.delete(projectId);
+
+    await session.saveChanges();
+}
