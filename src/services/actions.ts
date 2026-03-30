@@ -15,11 +15,11 @@ const executors: { [K in keyof ActionMap]: (args: ActionMap[K]) => Promise<strin
 
 export function receiveActions(chat: AiConversation) {
     const actionNames = Object.keys(executors)
-    actionNames.forEach((name) => {
+    for (const name of actionNames) {
         chat.receive(name, (_request, args) => {
             console.log(`Received ${name} action with args:`, args);
         });
-    });
+    }
 }
 
 export async function executeAction(chatId: string, action: Action): Promise<ActionResult> {
