@@ -14,20 +14,11 @@ const executors: { [K in keyof ActionMap]: (args: ActionMap[K]) => Promise<strin
 };
 
 export function receiveActions(chat: AiConversation) {
-    chat.receive('CreateProject', (_request, args) => {
-        console.log("Received CreateProject action with args:", args);
-    })
-    chat.receive('AddNewTask', (_request, args) => {
-        console.log("Received AddNewTask action with args:", args);
-    });
-    chat.receive('EditTask', (_request, args) => {
-        console.log("Received EditTask action with args:", args);
-    });
-    chat.receive('EditProject', (_request, args) => {
-        console.log("Received EditProject action with args:", args);
-    });
-    chat.receive('DeleteProject', (_request, args) => {
-        console.log("Received DeleteProject action with args:", args);
+    const actionNames = Object.keys(executors)
+    actionNames.forEach((name) => {
+        chat.receive(name, (_request, args) => {
+            console.log(`Received ${name} action with args:`, args);
+        });
     });
 }
 
