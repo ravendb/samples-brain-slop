@@ -8,6 +8,7 @@
 	text-decoration: none;
 	transition: background-color 120ms ease;
     background-color: var(--sidebar-bg);
+    box-sizing: border-box;
 }
 
 .item:hover {
