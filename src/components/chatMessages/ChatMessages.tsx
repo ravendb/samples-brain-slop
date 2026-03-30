@@ -3,10 +3,12 @@
 import { Message } from "@/models/chat";
 import { Action } from "@/models/action";
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import MessageInput from "@/components/messageInput/MessageInput";
 import ActionPager from "@/components/actionPager/ActionPager";
 import styles from "./ChatMessages.module.css";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 
 type ChatMessagesProps = {
     chatId: string;
@@ -38,14 +40,48 @@ async function sendMessage(chatId: string, content: string): Promise<SendMessage
 }
 
 export default function ChatMessages({ chatId, initialMessages, initialActions, isNewChat }: ChatMessagesProps) {
+    const queryClient = useQueryClient();
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [actions, setActions] = useState<Action[]>(initialActions);
     const [currentChatId, setCurrentChatId] = useState(chatId);
-    const [isSending, setIsSending] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const isCentered = isNewChat && messages.length === 0;
+
+    useEffect(() => {
+        setMessages(initialMessages);
+        setActions(initialActions);
+        setCurrentChatId(chatId);
+    }, [initialMessages, initialActions, chatId]);
+
+    // Auto-scroll container to show new messages or actions
+    useEffect(() => {
+        if (!scrollAreaRef.current) return;
+        scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+    }, [messages]);
+
+    const { mutate: sendMessageMutation, isPending, error, isError } = useMutation({
+        mutationFn: (content: string) => sendMessage(currentChatId, content),
+        onMutate: (content: string) => {
+            addUserMessage(content);
+        },
+        onSuccess: (result) => {
+            if (result.reply) addAgentMessage(result.reply);
+            setActions(result.actions);
+
+            if (isNewChat && result.chatId && result.chatId !== currentChatId) {
+                setCurrentChatId(result.chatId);
+                router.replace(`/chat/${encodeURIComponent(result.chatId)}`);
+
+                queryClient.invalidateQueries({ queryKey: ["chats"] });
+
+                setTimeout(
+                    () => { queryClient.invalidateQueries({ queryKey: ["chats"] }); }, 
+                    1000 * 30 // 30 seconds
+                );
+            }
+        }
+    });
 
     function onActionDecision(toolResponse: string, agentResponse: string | null, openActions: Action[]) {
         setMessages(prev => [
@@ -63,22 +99,6 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
 
         setActions(openActions);
     }
-
-    useEffect(() => {
-        setMessages(initialMessages);
-        setActions(initialActions);
-        setCurrentChatId(chatId);
-        setError(null);
-        setIsSending(false);
-    }, [initialMessages, initialActions, chatId]);
-
-    // Auto-scroll container to show new messages or actions
-    useEffect(() => {
-        if (!scrollAreaRef.current) {
-            return;
-        }
-        scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-    }, [messages, isSending]);
 
     function addUserMessage(content: string) {
         setMessages(prev => [
@@ -102,31 +122,6 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
         ]);
     }
 
-    async function handleSend(content: string) {
-        setError(null);
-
-        addUserMessage(content);
-
-        setIsSending(true);
-        try {
-            const result = await sendMessage(currentChatId, content);
-            if (result.reply) {
-                addAgentMessage(result.reply);
-            }
-
-            setActions(result.actions);
-
-            if (isNewChat && result.chatId && result.chatId !== currentChatId) {
-                setCurrentChatId(result.chatId);
-                router.replace(`/chat/${encodeURIComponent(result.chatId)}`);
-            }
-        } catch {
-            setError("Could not send message. Please try again.");
-        } finally {
-            setIsSending(false);
-        }
-    }
-
     return (
         <div className={`${styles.page} ${isCentered ? styles.pageCentered : ""}`}>
             <div className={styles.scrollArea} ref={scrollAreaRef}>
@@ -138,7 +133,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
                                 <p className={styles.content}>{message.content}</p>
                             </li>
                         ))}
-                        {isSending ? (
+                        {isPending ? (
                             <li className={styles.message} data-role="assistant" data-pending="true">
                                 <p className={styles.content}>Thinking...</p>
                             </li>
@@ -152,9 +147,9 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
                 )}
             </div>
 
-            {error ? <p className={`${styles.subtle} ${styles.error}`}>{error}</p> : null}
+            {isError && <p className={`${styles.subtle} ${styles.error}`}>{error.message}</p>}
 
-            <MessageInput onSend={handleSend} disabled={isSending || (actions?.length ?? 0) > 0} />
+            <MessageInput onSend={sendMessageMutation} disabled={isPending || actions.length > 0} />
         </div>
     );
 }

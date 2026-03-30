@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { Chat } from "@/models/chat";
 import styles from "./ConversationSidebar.module.css";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 async function deleteChat(chatId: string): Promise<void> {
 	const response = await fetch(`/api/chat/${encodeURIComponent(chatId)}`, {
@@ -17,39 +17,59 @@ async function deleteChat(chatId: string): Promise<void> {
 	}
 }
 
+function isActiveChat(pathname: string, chatId: string): boolean {
+    if (!pathname?.startsWith("/chat/")) {
+        return false;
+    }
+
+    const encodedChatId = pathname.slice("/chat/".length).split("/")[0];
+
+    try {
+        return decodeURIComponent(encodedChatId) === chatId;
+    } catch {
+        return false;
+    }
+}
+
 type ConversationItemProps = {
 	chat: Chat;
-	isActive: boolean;
-	onDelete: (chatId: string) => void;
 };
 
-export default function ConversationItem({ chat, isActive, onDelete }: ConversationItemProps) {
+export default function ConversationItem({ chat }: ConversationItemProps) {
+	const pathname = usePathname();
+	const isActive = isActiveChat(pathname, chat.id);
 	const router = useRouter();
-	const [isDeleting, setIsDeleting] = useState(false);
+    const queryClient = useQueryClient();
+
+    const deleteMutation = useMutation({
+        mutationFn: deleteChat,
+        onMutate: () => {
+            queryClient.setQueryData(["chats"], (oldChats: Chat[] | undefined) => {
+                if (!oldChats) return oldChats;
+                return oldChats.filter(c => c.id !== chat.id);
+            });
+
+            if (isActive) {
+				router.push("/chat/new");
+			}
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["chats"] });
+        },
+        onError: (error) => {
+            console.error("Failed to delete chat:", error);
+        }
+    });
 
 	async function handleDelete() {
 		const title = chat.title.trim() || "this chat";
-		const shouldDelete = window.confirm(
+		const isDeleteConfirmed = window.confirm(
 			`Delete ${title}? This cannot be undone.`
 		);
 
-		if (!shouldDelete) {
-			return;
-		}
-
-		setIsDeleting(true);
-
-		try {
-			await deleteChat(chat.id);
-			onDelete(chat.id);
-
-			if (isActive) {
-				router.push("/chat/new");
-			}
-		} catch (error) {
-			console.error("Failed to delete chat:", error);
-			setIsDeleting(false);
-		}
+		if (isDeleteConfirmed) {
+			deleteMutation.mutate(chat.id);
+		}        
 	}
 
 	return (
@@ -68,7 +88,7 @@ export default function ConversationItem({ chat, isActive, onDelete }: Conversat
 					type="button"
 					className={styles.deleteButton}
 					onClick={handleDelete}
-					disabled={isDeleting}
+					disabled={deleteMutation.isPending}
 					aria-label={`Delete chat ${chat.title}`}
 				>
 					<Image

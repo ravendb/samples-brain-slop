@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Action, ActionResult } from "@/models/action";
 import ActionCard from "@/components/actions/Action";
 import styles from "./ActionPager.module.css";
@@ -32,6 +33,7 @@ async function sendActionDecision(chatId: string, action: Action, decision: Acti
 export default function ActionPager({ actions, chatId, onActionDecision }: ActionPagerProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [decision, setDecision] = useState<ActionDecision | null>(null);
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         setCurrentIndex(0);
@@ -61,6 +63,9 @@ export default function ActionPager({ actions, chatId, onActionDecision }: Actio
             const result = await sendActionDecision(chatId, action, decision);
             console.log("Action decision result:", result);
             onActionDecision(result.toolResponse, result.agentResponse, result.openActions);
+            
+            queryClient.invalidateQueries({ queryKey: ["projects"] });
+            queryClient.invalidateQueries({ queryKey: ["task"] });
         } catch (err) {
             console.error("Error handling action decision:", err);
         } finally {

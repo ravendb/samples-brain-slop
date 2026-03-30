@@ -1,30 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import styles from "./ConversationSidebar.module.css";
 import { Chat } from "@/models/chat";
 import ConversationItem from "./ConversationItem";
 
-function getActiveChatId(pathname: string): string | null {
-	if (!pathname.startsWith("/chat/")) {
-		return null;
-	}
-
-	const encodedChatId = pathname.slice("/chat/".length).split("/")[0];
-
-	try {
-		return decodeURIComponent(encodedChatId);
-	} catch {
-		return null;
-	}
-}
-
-async function loadChats(signal: AbortSignal): Promise<Chat[]> {
+async function loadChats(): Promise<Chat[]> {
 	const response = await fetch("/api/chat", {
 		method: "GET",
 		cache: "no-store",
-		signal,
 	});
 
 	if (!response.ok) {
@@ -35,40 +19,15 @@ async function loadChats(signal: AbortSignal): Promise<Chat[]> {
 }
 
 export default function ConversationList() {
-	const pathname = usePathname();
-	const activeChatId = getActiveChatId(pathname);
-	const [chatList, setChatList] = useState<Chat[]>([]);
+    const { data: chatList = [] } = useQuery<Chat[]>({
+        queryKey: ["chats"],
+        queryFn: loadChats,
+        staleTime: 1000 * 60, // 1 minute
+    });
 
-	useEffect(() => {
-		const controller = new AbortController();
-
-		async function refreshChats() {
-			try {
-				const nextChats = await loadChats(controller.signal);
-				if (!controller.signal.aborted) {
-					setChatList(nextChats);
-				}
-			} catch (error) {
-				if (error instanceof DOMException && error.name === "AbortError") {
-					return;
-				}
-			}
-		}
-
-		refreshChats();
-
-		return () => {
-			controller.abort();
-		};
-	}, [pathname]);
-
-	const sortedChats = chatList.toSorted((a, b) =>
-		b.updatedAt.localeCompare(a.updatedAt)
-	);
-
-	function handleDeleteChat(chatId: string) {
-		setChatList((current) => current.filter((chat) => chat.id !== chatId));
-	}
+    const sortedChats = chatList.toSorted((a, b) =>
+        b.updatedAt.localeCompare(a.updatedAt)
+    );
 
 	return (
 		<ul className={styles.conversationList}>
@@ -77,18 +36,12 @@ export default function ConversationList() {
 					<p className={styles.itemTitle}>No conversations yet</p>
 				</li>
 			)}
-			{sortedChats.map((chat) => {
-				const isActive = activeChatId === chat.id;
-
-				return (
-					<ConversationItem
-						key={chat.id}
-						chat={chat}
-						isActive={isActive}
-						onDelete={handleDeleteChat}
-					/>
-				);
-			})}
+			{sortedChats.map((chat) => (
+				<ConversationItem
+					key={chat.id}
+					chat={chat}
+				/>
+			))}
 		</ul>
 	);
 }
