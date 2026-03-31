@@ -61,7 +61,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
     useEffect(() => {
         if (!scrollAreaRef.current) return;
         scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-    }, [messages]);
+    }, [messages, actions]);
 
     function sendMessageMutation(content: string) {
         setError(null);
@@ -69,12 +69,12 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
 
         const id = crypto.randomUUID();
         setMessages(prev => [...prev,
-        {
-            id,
-            role: "assistant",
-            chunks: [],
-            type: "chunks"
-        },
+            {
+                id,
+                role: "assistant",
+                chunks: [],
+                type: "chunks"
+            },
         ]);
 
         setIsPending(true);
@@ -118,23 +118,6 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
         }
     }
 
-    function onActionDecision(toolResponse: string, agentResponse: string | null, openActions: Action[]) {
-        setMessages(prev => [
-            ...prev,
-            {
-                id: crypto.randomUUID(),
-                role: "tool",
-                content: toolResponse,
-            },
-        ]);
-
-        if (agentResponse) {
-            addAgentMessage(agentResponse);
-        }
-
-        setActions(openActions);
-    }
-
     function addUserMessage(content: string) {
         setMessages(prev => [
             ...prev,
@@ -168,12 +151,19 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
                         ))}
                         {isPending ? (
                             <li className={styles.message} data-role="assistant" data-pending="true">
-                                <p className={styles.content}>Thinking...</p>
+                                <p className={styles.content}>
+                                    Thinking
+                                    <span className={styles.ellipsis} aria-label="thinking">
+                                        <span>.</span>
+                                        <span>.</span>
+                                        <span>.</span>
+                                    </span>
+                                </p>
                             </li>
                         ) : null}
                         {actions.length > 0 && (
                             <li className={styles.actionItem}>
-                                <ActionPager actions={actions} chatId={currentChatId} onActionDecision={onActionDecision} />
+                                <ActionPager actions={actions} chatId={currentChatId} setActions={setActions} setMessages={setMessages} />
                             </li>
                         )}
                     </ul>

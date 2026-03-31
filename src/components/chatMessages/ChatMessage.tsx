@@ -5,6 +5,9 @@ import styles from "./ChatMessages.module.css";
 
 
 export default function ChatMessage({ message }: { message: Message }) {
+    if (!message.content && !message.chunks) {
+        return null;
+    }
 
     function renderContent() {
         if (message.chunks) {

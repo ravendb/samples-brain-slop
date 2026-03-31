@@ -58,12 +58,12 @@ export async function sendMessage(chatId: string, prompt: string, onChunk: (chun
     };
 }
 
-export async function sendToolMessage(chatId: string, toolResponse: ToolResponse) {
+export async function sendToolMessage(chatId: string, toolResponse: ToolResponse, onChunk: (chunk: string) => void) {
     const chat = store.ai.conversation(AGENT_ID, chatId);
 
     chat.addActionResponse(toolResponse.toolId, toolResponse.response);
 
-    return await runChat(chat);
+    return await streamChat(chat, onChunk);
 }
 
 async function runChat(chat: AiConversation) {

@@ -1,5 +1,5 @@
 import { AiConversation } from "ravendb";
-import { Action, ActionResult, ActionMap } from "@/models/action";
+import { Action, ActionResult, ActionMap, ToolResponse } from "@/models/action";
 import { sendToolMessage } from "@/repositories/chatRepo";
 import { createProjectFromAction, editProject, deleteProject } from "@/repositories/projectRepo";
 import { createTask, deleteTask, editTask } from "@/repositories/taskRepo";
@@ -22,38 +22,28 @@ export function receiveActions(chat: AiConversation) {
     }
 }
 
-export async function executeAction(chatId: string, action: Action): Promise<ActionResult> {
+export async function executeAction(chatId: string, action: Action, onChunk: (chunk: string) => void): Promise<ActionResult> {
     const executionResponse = await executeMappedAction(action);
     console.log("Execution response for action:", executionResponse);
 
-    const result = await sendToolMessage(chatId, {
-        toolId: action.id,
-        response: executionResponse
-    });
-
-    return {
-        toolResponse: executionResponse,
-        agentResponse: result.reply,
-        openActions: result.actions
-    };
+    return await sendToolMessage(
+        chatId, 
+        { toolId: action.id, response: executionResponse }, 
+        onChunk
+    ) 
 }
 
-export async function rejectAction(chatId: string, action: Action): Promise<ActionResult> {
+export async function rejectAction(chatId: string, action: Action, onChunk: (chunk: string) => void): Promise<ActionResult> {
     const rejectionMessage = `
     Action '${action.name}' (${action.id}) was rejected by the user. 
     Dont try to execute it, and move on with the conversation.
     `;
 
-    const result = await sendToolMessage(chatId, {
-        toolId: action.id,
-        response: rejectionMessage
-    });
-
-    return {
-        toolResponse: rejectionMessage,
-        agentResponse: result.reply,
-        openActions: result.actions
-    };
+    return await sendToolMessage(
+        chatId, 
+        { toolId: action.id, response: rejectionMessage }, 
+        onChunk
+    )
 }
 
 async function executeMappedAction<K extends keyof ActionMap>(action: Action<K>) {
