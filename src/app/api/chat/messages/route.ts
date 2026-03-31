@@ -23,11 +23,25 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Missing chatId or content." }, { status: 400 });
     }
 
-    try {
-        const result = await sendMessage(chatId, content);
-        return NextResponse.json(result);
-    } catch (error) {
-        console.error("Error sending message:", error);
-        return NextResponse.json({ error: "Could not send message." }, { status: 500 });
-    }
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+        async start(controller) {
+            try {
+                const result = await sendMessage(chatId, content, (chunk) => {
+                    const payload = JSON.stringify({ chunk });
+                    controller.enqueue(encoder.encode(payload + "\n"));
+                });
+
+                const finalPayload = JSON.stringify(result);
+                controller.enqueue(encoder.encode(finalPayload + "\n"));
+                controller.close();
+            } catch (err) {
+                const errPayload = JSON.stringify({ error: "Failed to send message." });
+                controller.enqueue(encoder.encode(errPayload + "\n"));
+                controller.close();
+            }
+        }
+    });
+
+    return new NextResponse(stream, { headers: { "Content-Type": "application/x-ndjson; charset=utf-8" } });
 }

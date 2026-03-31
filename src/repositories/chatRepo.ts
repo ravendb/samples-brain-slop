@@ -1,4 +1,4 @@
-import { AiAnswer } from "ravendb"
+import { AiAnswer, AiConversation } from "ravendb"
 import { store } from "@/db/ravendb";
 import { Chat, Message } from "@/models/chat";
 import { receiveActions } from "@/services/actions";
@@ -30,28 +30,31 @@ export async function deleteChat(chatId: string) {
     await session.saveChanges();
 }
 
-export async function sendMessage(chatId: string, prompt: string) {
-    const chat = store.ai.conversation(
-        AGENT_ID,
-        chatId
-    )
-
-    chat.setUserPrompt(prompt)
-
+async function streamChat(chat: AiConversation, onChunk: (chunk: string) => void) {
     receiveActions(chat);
 
-    const llmResponse: AgentResponse = await chat.run()
-    console.log("LLM response:", llmResponse);
+    const llmResponse: AgentResponse = await chat.stream("response", (chunk) => {
+        onChunk(chunk);
+    });
 
     let requiredActions: Action[] = [];
     if (llmResponse.status === 'ActionRequired') {
         requiredActions = formatActions(chat.requiredActions() as StoredAction[]);
     }
 
+    return requiredActions
+}
+
+export async function sendMessage(chatId: string, prompt: string, onChunk: (chunk: string) => void) {
+    const chat = store.ai.conversation(AGENT_ID, chatId)
+
+    chat.setUserPrompt(prompt)
+
+    const actions = await streamChat(chat, onChunk);
+
     return {
         chatId: chat.id,
-        reply: llmResponse.answer?.response ?? null,
-        actions: requiredActions
+        actions
     };
 }
 
@@ -59,11 +62,15 @@ export async function sendToolMessage(chatId: string, toolResponse: ToolResponse
     const chat = store.ai.conversation(AGENT_ID, chatId);
 
     chat.addActionResponse(toolResponse.toolId, toolResponse.response);
-    
+
+    return await runChat(chat);
+}
+
+async function runChat(chat: AiConversation) {
     receiveActions(chat);
 
     const llmResponse: AgentResponse = await chat.run()
-    console.log("LLM response after tool message:", llmResponse);
+    console.log("LLM response:", llmResponse);
 
     let requiredActions: Action[] = [];
     if (llmResponse.status === 'ActionRequired') {

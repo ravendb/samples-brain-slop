@@ -1,3 +1,5 @@
+import { Action } from "./action";
+
 export type Chat = {
     id: string,
     updatedAt: string,
@@ -7,5 +9,11 @@ export type Chat = {
 export type Message = {
     id: string,
     role: "user" | "assistant" | "tool",
-    content: string
+    content?: string
+    chunks?: string[],
 }
+
+export type SendMessageResult = {
+    chatId: string | null;
+    actions: Action[];
+};
