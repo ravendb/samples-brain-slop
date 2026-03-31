@@ -1,20 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Action, ActionResult } from "@/models/action";
 import ActionCard from "@/components/actions/Action";
 import styles from "./ActionPager.module.css";
+import { decodeStream } from "@/services/stream";
+import { Message } from "@/models/chat";
 
 type ActionDecision = "approve" | "reject";
 
 type ActionPagerProps = {
     actions: Action[];
     chatId: string;
-    onActionDecision: (toolResponse: string, agentResponse: string | null, openActions: Action[]) => void;
+    setActions: Dispatch<SetStateAction<Action[]>>;
+    setMessages: Dispatch<SetStateAction<Message[]>>;
 };
 
-async function sendActionDecision(chatId: string, action: Action, decision: ActionDecision) {
+async function sendActionDecision(
+    chatId: string, 
+    action: Action, 
+    decision: ActionDecision,
+    onChunk: (chunk: string) => void,
+    onFinalResult: (result: ActionResult) => void
+) {
     const response = await fetch(`/api/actions/${decision}`, {
         method: "POST",
         headers: {
@@ -23,14 +32,19 @@ async function sendActionDecision(chatId: string, action: Action, decision: Acti
         body: JSON.stringify({ chatId, action }),
     });
 
-    if (!response.ok) {
+    if (!response.ok || !response.body) {
         throw new Error(`Action ${action.id} failed. Status: ${response.status}`);
     }
 
-    return await response.json() as ActionResult;
+    const reader = response.body.getReader();
+    try {
+        await decodeStream(reader, onChunk, onFinalResult);
+    } catch (err) {
+        throw err
+    }
 }
 
-export default function ActionPager({ actions, chatId, onActionDecision }: ActionPagerProps) {
+export default function ActionPager({ actions, chatId, setActions, setMessages }: ActionPagerProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [decision, setDecision] = useState<ActionDecision | null>(null);
     const queryClient = useQueryClient();
@@ -59,18 +73,44 @@ export default function ActionPager({ actions, chatId, onActionDecision }: Actio
     async function handleActionDecision(action: Action, decision: ActionDecision) {
         setDecision(decision);
 
+        const id = crypto.randomUUID();
+        setMessages(prev => [...prev,
+            {
+                id,
+                role: "assistant",
+                chunks: [],
+                type: "chunks"
+            },
+        ]);
+
         try {
-            const result = await sendActionDecision(chatId, action, decision);
-            console.log("Action decision result:", result);
-            onActionDecision(result.toolResponse, result.agentResponse, result.openActions);
-            
-            queryClient.invalidateQueries({ queryKey: ["projects"] });
-            queryClient.invalidateQueries({ queryKey: ["task"] });
+            await sendActionDecision(chatId, action, decision, (chunk) => onChunk(chunk, id), onFinalResult);
         } catch (err) {
             console.error("Error handling action decision:", err);
         } finally {
             setDecision(null);
         }
+    }
+
+    function onChunk(chunk: string, streamedMessageId: string) {
+        setActions((prev) => prev.filter(action => action.id !== actions[currentIndex].id));
+        setMessages(prev => prev.map(msg => {
+            if (msg.id === streamedMessageId && msg.chunks) {
+                return {
+                    ...msg,
+                    chunks: [...msg.chunks, chunk]
+                }
+            }
+            else {
+                return msg
+            }
+        }));
+    }
+
+    function onFinalResult(result: ActionResult) {
+        setActions(result)
+        queryClient.invalidateQueries({ queryKey: ["projects"] });
+        queryClient.invalidateQueries({ queryKey: ["task"] });
     }
 
     return (

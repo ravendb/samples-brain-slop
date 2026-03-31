@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { executeAction } from "@/services/actions";
 import { Action } from "@/models/action";
+import { encodeStream } from "@/services/stream";
 
 export async function POST(request: Request) {
     const { chatId, action } = await request.json() as { chatId: string; action: Action };
@@ -9,12 +10,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Missing chatId or action." }, { status: 400 });
     }
 
-    try {
-        const result = await executeAction(chatId, action);
-        console.log("Action execution result:", result);
-        return NextResponse.json(result);
-    } catch (err) {
-        console.error("Error executing action", err);
-        return NextResponse.json({ error: "Could not execute action." }, { status: 500 });
-    }
+    const stream = encodeStream((onChunk) => executeAction(chatId, action, onChunk));
+    
+    return new NextResponse(stream, { headers: { "Content-Type": "application/x-ndjson; charset=utf-8" } });
 }

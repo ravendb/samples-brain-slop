@@ -25,9 +25,9 @@ export default function ConversationList() {
         staleTime: 1000 * 60, // 1 minute
     });
 
-    const sortedChats = chatList.toSorted((a, b) =>
-        b.updatedAt.localeCompare(a.updatedAt)
-    );
+	const sortedChats = chatList.toSorted((a, b) =>
+		new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+	);
 
 	return (
 		<ul className={styles.conversationList}>

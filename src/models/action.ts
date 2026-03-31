@@ -21,11 +21,7 @@ export type Action<K extends keyof typeof schemas = keyof typeof schemas> = {
     id: string;
 };
 
-export type ActionResult = {
-    agentResponse: string | null;
-    toolResponse: string;
-    openActions: Action[];
-};
+export type ActionResult = Action[]
 
 export type StoredAction = {
     name: Action["name"];

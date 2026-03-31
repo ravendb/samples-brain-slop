@@ -77,6 +77,34 @@
 	font-style: italic;
 }
 
+.ellipsis {
+	display: inline-block;
+	width: 1.5em;
+	text-align: left;
+}
+.ellipsis span {
+	opacity: 0;
+	animation: ellipsisFade 1.2s infinite;
+	display: inline-block;
+	font-weight: bold;
+	font-size: 1.2em;
+	line-height: 0;
+}
+.ellipsis span:nth-child(1) {
+	animation-delay: 0s;
+}
+.ellipsis span:nth-child(2) {
+	animation-delay: 0.3s;
+}
+.ellipsis span:nth-child(3) {
+	animation-delay: 0.6s;
+}
+@keyframes ellipsisFade {
+	0% { opacity: 0; }
+	20% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
 .content {
 	margin: 0;
 	line-height: 1.45;
@@ -103,8 +131,39 @@
 	list-style: none;
 	padding: 0;
 	margin: 0;
+	animation: actionFadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes actionFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(6px) scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
 }
 
 .error {
 	color: var(--danger);
+}
+
+.chunk {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(1px);
+  animation: chunkFadeIn 600ms ease forwards;
+  margin-right: 2px;
+}
+
+@keyframes chunkFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message:has(> .content:empty) {
+    display: none;
 }

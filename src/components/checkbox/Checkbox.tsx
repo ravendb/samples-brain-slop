@@ -40,7 +40,7 @@ export default function Checkbox({ taskId }: { taskId: string }) {
     const queryClient = useQueryClient();
     const queryKey = ['task', taskId, 'completed'];
 
-    const { data, error } = useQuery({
+    const { data } = useQuery({
         queryKey,
         queryFn: () => isTaskCompleted(taskId),
         staleTime: 1000 * 60 * 5, // 5 minute

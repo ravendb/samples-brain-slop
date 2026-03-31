@@ -1,14 +1,15 @@
 "use client";
 
-import { Message } from "@/models/chat";
+import { Message, SendMessageResult } from "@/models/chat";
 import { Action } from "@/models/action";
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import MessageInput from "@/components/messageInput/MessageInput";
 import ActionPager from "@/components/actionPager/ActionPager";
+import ChatMessage from "./ChatMessage";
 import styles from "./ChatMessages.module.css";
 import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
+import { decodeStream } from "@/services/stream";
 
 type ChatMessagesProps = {
     chatId: string;
@@ -17,13 +18,12 @@ type ChatMessagesProps = {
     isNewChat: boolean;
 };
 
-type SendMessageResult = {
-    reply: string | null;
-    chatId: string | null;
-    actions: Action[];
-};
-
-async function sendMessage(chatId: string, content: string): Promise<SendMessageResult> {
+async function sendMessage(
+    chatId: string,
+    content: string,
+    onChunk: (chunk: string) => void,
+    onFinalResult: (result: SendMessageResult) => void
+) {
     const response = await fetch("/api/chat/messages", {
         method: "POST",
         headers: {
@@ -32,20 +32,23 @@ async function sendMessage(chatId: string, content: string): Promise<SendMessage
         body: JSON.stringify({ chatId, content }),
     });
 
-    if (!response.ok) {
+    if (!response.ok || !response.body) {
         throw new Error(`Failed to send message: ${response.status}`);
     }
 
-    return await response.json() as SendMessageResult;
+    const reader = response.body.getReader();
+    await decodeStream(reader, onChunk, onFinalResult);
 }
 
 export default function ChatMessages({ chatId, initialMessages, initialActions, isNewChat }: ChatMessagesProps) {
-    const queryClient = useQueryClient();
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [actions, setActions] = useState<Action[]>(initialActions);
     const [currentChatId, setCurrentChatId] = useState(chatId);
+    const [isPending, setIsPending] = useState(false);
+    const [error, setError] = useState<Error | null>(null);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
+    const queryClient = useQueryClient();
     const isCentered = isNewChat && messages.length === 0;
 
     useEffect(() => {
@@ -58,46 +61,61 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
     useEffect(() => {
         if (!scrollAreaRef.current) return;
         scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-    }, [messages]);
+    }, [messages, actions]);
 
-    const { mutate: sendMessageMutation, isPending, error, isError } = useMutation({
-        mutationFn: (content: string) => sendMessage(currentChatId, content),
-        onMutate: (content: string) => {
-            addUserMessage(content);
-        },
-        onSuccess: (result) => {
-            if (result.reply) addAgentMessage(result.reply);
-            setActions(result.actions);
+    function sendMessageMutation(content: string) {
+        setError(null);
+        addUserMessage(content);
 
-            if (isNewChat && result.chatId && result.chatId !== currentChatId) {
-                setCurrentChatId(result.chatId);
-                router.replace(`/chat/${encodeURIComponent(result.chatId)}`);
-
-                queryClient.invalidateQueries({ queryKey: ["chats"] });
-
-                setTimeout(
-                    () => { queryClient.invalidateQueries({ queryKey: ["chats"] }); }, 
-                    1000 * 30 // 30 seconds
-                );
-            }
-        }
-    });
-
-    function onActionDecision(toolResponse: string, agentResponse: string | null, openActions: Action[]) {
-        setMessages(prev => [
-            ...prev,
+        const id = crypto.randomUUID();
+        setMessages(prev => [...prev,
             {
-                id: crypto.randomUUID(),
-                role: "tool",
-                content: toolResponse,
+                id,
+                role: "assistant",
+                chunks: [],
+                type: "chunks"
             },
         ]);
 
-        if (agentResponse) {
-            addAgentMessage(agentResponse);
+        setIsPending(true);
+        try {
+            sendMessage(currentChatId, content, (chunk) => onChunk(chunk, id), onFinalResult)
+        } catch (err) {
+            setError(err as Error);
+            setIsPending(false);
         }
+    }
 
-        setActions(openActions);
+    function onChunk(chunk: string, streamedMessageId: string) {
+        setIsPending(false);
+        setMessages(prev => prev.map(msg => {
+            if (msg.id === streamedMessageId && msg.chunks) {
+                return {
+                    ...msg,
+                    chunks: [...msg.chunks, chunk]
+                }
+            }
+            else {
+                return msg
+            }
+        }))
+    }
+
+    function onFinalResult(result: SendMessageResult) {
+        setIsPending(false);
+        setActions(result.actions);
+
+        if (isNewChat && result.chatId && result.chatId !== currentChatId) {
+            setCurrentChatId(result.chatId);
+            router.replace(`/chat/${encodeURIComponent(result.chatId)}`);
+
+            queryClient.invalidateQueries({ queryKey: ["chats"] });
+
+            setTimeout(
+                () => { queryClient.invalidateQueries({ queryKey: ["chats"] }); },
+                1000 * 30 // 30 seconds
+            );
+        }
     }
 
     function addUserMessage(content: string) {
@@ -106,7 +124,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
             {
                 id: crypto.randomUUID(),
                 role: "user",
-                content,
+                content: content,
             },
         ]);
     }
@@ -129,25 +147,30 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
                 {messages.length > 0 && (
                     <ul className={styles.messageList}>
                         {messages.map((message) => (
-                            <li key={message.id} className={styles.message} data-role={message.role}>
-                                <p className={styles.content}>{message.content}</p>
-                            </li>
+                            <ChatMessage key={message.id} message={message} />
                         ))}
                         {isPending ? (
                             <li className={styles.message} data-role="assistant" data-pending="true">
-                                <p className={styles.content}>Thinking...</p>
+                                <p className={styles.content}>
+                                    Thinking
+                                    <span className={styles.ellipsis} aria-label="thinking">
+                                        <span>.</span>
+                                        <span>.</span>
+                                        <span>.</span>
+                                    </span>
+                                </p>
                             </li>
                         ) : null}
                         {actions.length > 0 && (
                             <li className={styles.actionItem}>
-                                <ActionPager actions={actions} chatId={currentChatId} onActionDecision={onActionDecision} />
+                                <ActionPager actions={actions} chatId={currentChatId} setActions={setActions} setMessages={setMessages} />
                             </li>
                         )}
                     </ul>
                 )}
             </div>
 
-            {isError && <p className={`${styles.subtle} ${styles.error}`}>{error.message}</p>}
+            {error !== null && <p className={`${styles.subtle} ${styles.error}`}>{error.message}</p>}
 
             <MessageInput onSend={sendMessageMutation} disabled={isPending || actions.length > 0} />
         </div>
