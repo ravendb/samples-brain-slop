@@ -3,16 +3,20 @@ import { getAppConfig } from "@/lib/config";
 
 declare global {
   var ravenStore: DocumentStore | undefined;
+  var ravenStoreKey: string | undefined;
 }
 
 export function getStore(): DocumentStore {
-  if (global.ravenStore) return global.ravenStore;
-
   const config = getAppConfig();
   if (!config) throw new Error("App not configured. Complete setup first.");
 
+  const key = `${config.ravenUrl}|${config.ravenDb}`;
+  if (global.ravenStore && global.ravenStoreKey === key) return global.ravenStore;
+
+  global.ravenStore?.dispose();
   const store = new DocumentStore([config.ravenUrl], config.ravenDb);
   store.initialize();
   global.ravenStore = store;
+  global.ravenStoreKey = key;
   return store;
 }
