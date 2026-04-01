@@ -1,17 +1,18 @@
-import { DocumentStore } from "ravendb"
+import { DocumentStore } from "ravendb";
+import { getAppConfig } from "@/lib/config";
 
 declare global {
-  var ravenStore: DocumentStore | undefined
+  var ravenStore: DocumentStore | undefined;
 }
 
-export const store =
-  global.ravenStore ??
-  new DocumentStore(
-    [process.env.RAVEN_URL!],
-    process.env.RAVEN_DB!
-  )
+export function getStore(): DocumentStore {
+  if (global.ravenStore) return global.ravenStore;
 
-if (!global.ravenStore) {
-  store.initialize()
-  global.ravenStore = store
+  const config = getAppConfig();
+  if (!config) throw new Error("App not configured. Complete setup first.");
+
+  const store = new DocumentStore([config.ravenUrl], config.ravenDb);
+  store.initialize();
+  global.ravenStore = store;
+  return store;
 }
