@@ -1,10 +1,10 @@
 import { Project, ProjectDocument, EditProjectArguments } from "@/models/project"
 import { TaskDocument } from "@/models/task";
-import { store } from "@/db/ravendb";
+import { getStore } from "@/db/ravendb";
 import { taskToDocument } from "./taskRepo";
 
 export async function createProject(project: ProjectDocument, tasks: TaskDocument[]) {
-    const session = store.openSession();
+    const session = getStore().openSession();
 
     const taskIds: string[] = [];
     for (const task of tasks) {
@@ -24,7 +24,7 @@ export async function createProjectFromAction(project: Project) {
 }
 
 export async function loadProjects(): Promise<Project[]> {
-    const session = store.openSession();
+    const session = getStore().openSession();
     const documents = await session.query(ProjectDocument)
         .include("taskIds")
         .all();
@@ -48,7 +48,7 @@ export async function loadProjects(): Promise<Project[]> {
 }
 
 export async function loadProject(id: string) {
-    const session = store.openSession();
+    const session = getStore().openSession();
     
     const document = await session
         .include("taskIds")
@@ -71,7 +71,7 @@ export async function loadProject(id: string) {
 }
 
 export async function editProject(projectId: string, updates: EditProjectArguments["updates"]) {
-    const session = store.openSession();
+    const session = getStore().openSession();
     const project = await session.load<ProjectDocument>(projectId);
     if (!project) {
         throw new Error(`Project with id ${projectId} not found`);
@@ -89,7 +89,7 @@ export async function editProject(projectId: string, updates: EditProjectArgumen
 }
 
 export async function deleteProject(projectId: string) {
-    const session = store.openSession();
+    const session = getStore().openSession();
     const project = await session.load<ProjectDocument>(projectId);
     if (!project) {
         throw new Error(`Project with id ${projectId} not found`);

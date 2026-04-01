@@ -1,12 +1,12 @@
 import { TaskDocument } from "@/models/task";
-import { store } from "@/db/ravendb";
+import { getStore } from "@/db/ravendb";
 import { Task, EditTaskArguments } from "@/models/task";
 import { ProjectDocument } from "@/models/project";
 
 export async function createTask(projectId: string, task: TaskDocument) {
     const taskDocument = taskToDocument(task);
 
-    const session = store.openSession();
+    const session = getStore().openSession();
     await session.store(taskDocument);
     if (!taskDocument.id) {
         throw new Error("Failed to store task");
@@ -22,7 +22,7 @@ export async function createTask(projectId: string, task: TaskDocument) {
 }
 
 export async function editTask(taskId: string, updates: EditTaskArguments["updates"]) {
-    const session = store.openSession();
+    const session = getStore().openSession();
     const task = await session.load<TaskDocument>(taskId);
     if (!task) {
         throw new Error("Task not found");
@@ -40,7 +40,7 @@ export async function editTask(taskId: string, updates: EditTaskArguments["updat
 }
 
 export async function deleteTask(projectId: string, taskId: string) {
-    const session = store.openSession();
+    const session = getStore().openSession();
     const project = await session.load<ProjectDocument>(projectId);
     if (!project) {
         throw new Error("Project not found");
@@ -53,7 +53,7 @@ export async function deleteTask(projectId: string, taskId: string) {
 
 
 export async function markTaskCompleted(taskId: string, completed: boolean) {
-    const session = store.openSession();
+    const session = getStore().openSession();
     const task = await session.load<TaskDocument>(taskId);
 
     if (!task) {
@@ -66,7 +66,7 @@ export async function markTaskCompleted(taskId: string, completed: boolean) {
 }
 
 export async function isTaskCompleted(taskId: string) {
-    const session = store.openSession();
+    const session = getStore().openSession();
     const task = await session.load<TaskDocument>(taskId);
     
     if (!task) {

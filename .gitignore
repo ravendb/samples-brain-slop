@@ -22,6 +22,12 @@
 .DS_Store
 *.pem
 
+# app config (written by setup wizard)
+.app-config.json
+
+# Claude Code
+.claude/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

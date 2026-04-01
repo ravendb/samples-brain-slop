@@ -1,15 +1,14 @@
 import { AiAnswer, AiConversation } from "ravendb"
-import { store } from "@/db/ravendb";
+import { getStore } from "@/db/ravendb";
+import { getAgentId } from "@/lib/config";
 import { Chat, Message } from "@/models/chat";
 import { receiveActions } from "@/services/actions";
 import { Action, StoredAction, ToolResponse } from "@/models/action";
 import { extractActions, formatActions } from "@/repositories/actionRepo";
 import { randomUUID } from "crypto";
 
-const AGENT_ID = process.env.AGENT_ID || "assistant";
-
 export async function loadChats(): Promise<Chat[]> {
-    const session = store.openSession();
+    const session = getStore().openSession();
 
     const chats = await session.advanced.rawQuery<Chat>(`
             from @conversations
@@ -25,7 +24,7 @@ export async function loadChats(): Promise<Chat[]> {
 }
 
 export async function deleteChat(chatId: string) {
-    const session = store.openSession();
+    const session = getStore().openSession();
     session.delete(chatId);
     await session.saveChanges();
 }
@@ -46,7 +45,8 @@ async function streamChat(chat: AiConversation, onChunk: (chunk: string) => void
 }
 
 export async function sendMessage(chatId: string, prompt: string, onChunk: (chunk: string) => void) {
-    const chat = store.ai.conversation(AGENT_ID, chatId)
+    const agentId = getAgentId();
+    const chat = getStore().ai.conversation(agentId, chatId)
 
     chat.setUserPrompt(prompt)
 
@@ -59,7 +59,8 @@ export async function sendMessage(chatId: string, prompt: string, onChunk: (chun
 }
 
 export async function sendToolMessage(chatId: string, toolResponse: ToolResponse, onChunk: (chunk: string) => void) {
-    const chat = store.ai.conversation(AGENT_ID, chatId);
+    const agentId = getAgentId();
+    const chat = getStore().ai.conversation(agentId, chatId);
 
     chat.addActionResponse(toolResponse.toolId, toolResponse.response);
 
@@ -84,7 +85,7 @@ async function runChat(chat: AiConversation) {
 }
 
 export async function loadChat(chatId: string) {
-    const session = store.openSession();
+    const session = getStore().openSession();
 
     const chat = await session.advanced.rawQuery<ChatDocument>(`
             from @conversations

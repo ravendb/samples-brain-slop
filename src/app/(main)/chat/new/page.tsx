@@ -1,5 +1,5 @@
 import ChatMessages from "@/components/chatMessages/ChatMessages";
-import styles from "@/app/chat/[chatid]/page.module.css";
+import styles from "@/app/(main)/chat/[chatid]/page.module.css";
 
 export default function NewChatPage() {
 	return (

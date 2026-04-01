@@ -1,0 +1,150 @@
+.page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background);
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.title {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+
+    background: linear-gradient(90deg, var(--primary), #dea4ff, var(--primary));
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: title-gradient-move 2s linear infinite;
+}
+
+@keyframes title-gradient-move {
+    0%   { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+}
+
+.description {
+    margin: 0 0 1.75rem 0;
+    font-size: 0.9rem;
+    color: var(--foreground-muted);
+    line-height: 1.5;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.fieldGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.hint {
+    font-size: 0.78rem;
+    color: var(--foreground-muted);
+}
+
+.input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.input:focus {
+    border-color: var(--primary);
+}
+
+.submitButton {
+    margin-top: 0.5rem;
+    padding: 0.65rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: opacity 0.15s;
+}
+
+.submitButton:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.submitButton:active:not(:disabled) {
+    opacity: 0.7;
+    transform: translateY(1px);
+}
+
+.submitButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    background: #5a4f6c;
+}
+
+.spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--danger);
+    line-height: 1.4;
+    user-select: text;
+}
+
+.successMessage {
+    margin: 0 0 1.5rem 0;
+    font-size: 1rem;
+    color: var(--foreground-muted);
+    line-height: 1.5;
+}
