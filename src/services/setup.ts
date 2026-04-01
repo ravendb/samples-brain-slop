@@ -114,12 +114,12 @@ const AGENT_ACTIONS = [
     },
     {
         name: "EditTask",
-        description: "Trigger this action when the user intends to edit an existing task. Make sure you know the ID of the task to edit. You can use query tools to get the info you need.\nOnly fill the properties that the user wants to edit. Leave the other properties empty so the task wont change beyond what the user intended.",
+        description: "Trigger this action when the user intends to edit an existing task. Make sure you know the ID of the task to edit. You can use query tools to get the info you need.\nOnly fill the properties that the user wants to edit. Leave the other properties empty so the task won't change beyond what the user intended.",
         parametersSchema: JSON.stringify({
             type: "object",
             properties: {
                 taskId: { type: "string", description: "The ID of the task to edit." },
-                currentTitle: { type: "string", description: "The current title of the task to display to the user which task is being eddited." },
+                currentTitle: { type: "string", description: "The current title of the task to display to the user which task is being edited." },
                 updates: {
                     type: "object",
                     properties: {
