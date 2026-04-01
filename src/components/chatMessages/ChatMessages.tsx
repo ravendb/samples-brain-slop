@@ -63,7 +63,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
         scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }, [messages, actions]);
 
-    function sendMessageMutation(content: string) {
+    async function sendMessageMutation(content: string) {
         setError(null);
         addUserMessage(content);
 
@@ -79,7 +79,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
 
         setIsPending(true);
         try {
-            sendMessage(currentChatId, content, (chunk) => onChunk(chunk, id), onFinalResult)
+            await sendMessage(currentChatId, content, (chunk) => onChunk(chunk, id), onFinalResult)
         } catch (err) {
             setError(err as Error);
             setIsPending(false);
