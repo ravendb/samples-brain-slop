@@ -1,73 +1,56 @@
-# The Scenario
+# BrainSlop
 
-`BrainSlop` is an AI-assisted task management application designed for busy (and slightly chaotic) managers who don’t have time to manually structure their work.
+## Overview
 
-It acts as a hybrid between a notebook and an advanced todo list, where AI plays the role of a personal assistant that understands messy input and turns it into actionable tasks.
+BrainSlop **solves the chaos of unstructured task input** by using an AI Agent to interpret sloppy, free-form messages and automatically turn them into organized, actionable tasks. Instead of forcing managers to carefully structure every entry, the system does the heavy lifting—parsing intent, creating tasks, and taking the correct actions.
 
-The application allows users to dump unstructured thoughts, or short commands, while the system automatically organizes, categorizes, and enriches them.
+The app **turns vague goals into one-click actions** — managers describe a project or objective in plain language, and the AI Agent suggests what to do next. A single click is all it takes to approve and move forward.
 
-# Design
+Finally, BrainSlop **surfaces slow-moving work before it becomes a problem** by using Time Series to track task and project progress over time, giving managers early warnings on stalled initiatives.
 
-A Next.js application using RavenDB. (Designed for Chrome)
-The app has only one user - the manager. It doesn't support employees or other managers.
+Built with [RavenDB](https://ravendb.net) and [Next.js](https://nextjs.org).
 
-# Problem - Solution - Benefit
+## Features used
 
-| Problem | Solution | Benefit |
-| --- | --- | --- |
-| Messages are captured in a sloppy/unstructured way | An `AI Agent` interprets the input and uses `Agent Tools` to perform the correct actions automatically (e.g., create tasks, mark tasks as completed, or query tasks due this week) | The sloppy manager can interact naturally without worrying about formatting or structure |
-| Messages are written quickly, lack details and without enough context | A `GenAI` task enriches the description using the project context, automatically adding subtasks, tags, priority, and additional details. | Tasks become clearer and more actionable, reducing follow-up questions |
-| The manager has to handle multiple projects, each containing a large number of tasks | Use `Time Series` to identify projects or tasks that show insufficient progress | Helps spot slow progress early so projects stay on track |
+The following RavenDB features are used to build the application:
 
-# **RavenDB Features Used**
+1. [AI Agents](https://ravendb.net/docs/article-page/7.0/csharp/ai-integration/ai-agents) – Interprets unstructured user input and dispatches the correct actions (e.g., create tasks, mark as completed, query by due date)
+1. [GenAI](https://ravendb.net/docs/article-page/7.0/csharp/ai-integration/overview) – Enriches task descriptions with subtasks, tags, and priority using project context
+1. [Time Series](https://ravendb.net/docs/article-page/7.0/csharp/document-extensions/timeseries/overview) – Track task creation, completion, and progress over time to display in a Burndown chart.
+1. [Attachments / Remote Attachments](https://ravendb.net/docs/article-page/7.0/csharp/document-extensions/attachments/what-are-attachments) – Store PDFs, images, or screenshots with project and task documents
+1. [Revisions](https://ravendb.net/docs/article-page/7.0/csharp/document-extensions/revisions/overview) – Show previous versions of a task document
+## Technologies
 
-## **Input Handling**
+The following technologies were used to build this application:
 
-* **AI Agents** – Users can enter tasks in a sloppy, unstructured way. For example:
-  * “Call Mark about invoices, send report to the board by Friday, and buy coffee because we’re out.”
-  * “Fix login, update docs, call John, urgent!”
-* **GenAI** – Enriches task descriptions using project context, automatically adds subtasks, assigns priority and tags to clarify and improve actionability
-  
-## **Project Management**
-* **Counters** - Counters track project metrics like tasks created and tasks completed
-* **Time Series** – Track task completion and creation time
-* **Attachments / Remote Attachments** – Store PDFs, images, or screenshots as part of the project's context
+1. [RavenDB](https://ravendb.net/)
+1. [Next.js](https://nextjs.org/)
 
-## **Task Management**
-* **Revisions** – Show previous task versions
-* **Time Series** – Capture task lifecycle metrics such as progress and time to completion
-* **Document Expiration** – Auto-expire tasks after a default period (e.g., 30 days), configurable by users
-* **Attachments / Remote Attachments** – Store PDFs, images, or screenshots directly with task documents
+## Run locally
 
-# Roadmap
+If you want to run the application locally, please follow the steps:
 
-## Phase 1 - MVP
+1. Check out the GIT repository
+1. Install prerequisites:
+   1. [Node.js](https://nodejs.org)
+   1. [RavenDB](https://ravendb.net/download)
+1. Request a [dev license](https://ravendb.net/license/request/dev-ai-agent-inside) and create a local unsecured database.
+1. Get the app running:
+   ```
+   npm install
+   npm run dev
+   ```
 
-### Pages
+## Community & Support
 
-* Main page - Primary place to manage projects and tasks. Includes a two-panel layout:
-  * Sidebar - Contains a list of projects, each with a collapsible list of tasks
-  * Chat - Conversation window where the manager can type or record (using speech-to-text) messages for the AI Agent to interpret and take action
-* Project page - Shows project-level details such as name, description, status, and timeline, plus a summary of open, in-progress, completed, and overdue tasks.
+If you spot a bug, have an idea or a question, please let us know by raising an issue or creating a pull request.
 
-* Task page - Shows full task details including title, description, status, priority, tags, due date, change history, and related context files.
+We do use a [Discord server](https://discord.gg/ravendb). If you have any doubts, don't hesitate to reach out!
 
-### Features
-* AI Agent
-* GenAI
+## Contributing
 
-## Phase 2 - Enhanced Project and Task Features
+We encourage you to contribute! Please read our [CONTRIBUTING](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
-### Pages
+## License
 
-* Project page - Expanded to include project counters, progress and attachments.
-* Task page - Expanded to include task revision history, progress, expiration settings, and task-level attached files.
-
-### Features
-* Counters - For each project: tasks created, completed, and open.
-* Time Series
-  * Project - track task creation/completion
-  * Task - track subtask creation/completion
-* Attachments / Remote Attachments - For projects and tasks.
-* Revisions - Task version history
-* Document Expiration - Automatically delete tasks upon expiration.
+This project is licensed with the [MIT license](LICENSE).
