@@ -3,7 +3,6 @@ import CreateProjectAction from "./CreateProjectAction";
 import AddNewTaskAction from "./AddNewTaskAction";
 import EditTaskAction from "./EditTaskAction";
 import EditProjectAction from "./EditProjectAction";
-import { Project, EditProjectArguments, DeleteProjectArguments } from "@/models/project";
 import DeleteProjectAction from "./DeleteProjectAction";
 import DeleteTaskAction from "./DeleteTaskAction";
 

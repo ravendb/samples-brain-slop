@@ -30,7 +30,7 @@ export async function editTask(taskId: string, updates: EditTaskArguments["updat
 
     for (const [key, value] of Object.entries(updates)) {
         if (value !== undefined) {
-            (task as any)[key] = value;
+            (task as unknown as Record<string, unknown>)[key] = value;
         }
     }
 

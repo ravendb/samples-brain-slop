@@ -1,5 +1,5 @@
 import { AiConversation } from "ravendb";
-import { Action, ActionResult, ActionMap, ToolResponse } from "@/models/action";
+import { Action, ActionResult, ActionMap } from "@/models/action";
 import { sendToolMessage } from "@/repositories/chatRepo";
 import { createProjectFromAction, editProject, deleteProject } from "@/repositories/projectRepo";
 import { createTask, deleteTask, editTask } from "@/repositories/taskRepo";

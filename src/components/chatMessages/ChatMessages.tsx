@@ -51,11 +51,13 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
     const queryClient = useQueryClient();
     const isCentered = isNewChat && messages.length === 0;
 
-    useEffect(() => {
+    const [prevChatId, setPrevChatId] = useState(chatId);
+    if (chatId !== prevChatId) {
         setMessages(initialMessages);
         setActions(initialActions);
         setCurrentChatId(chatId);
-    }, [initialMessages, initialActions, chatId]);
+        setPrevChatId(chatId);
+    }
 
     // Auto-scroll container to show new messages or actions
     useEffect(() => {
@@ -125,17 +127,6 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
                 id: crypto.randomUUID(),
                 role: "user",
                 content: content,
-            },
-        ]);
-    }
-
-    function addAgentMessage(reply: string) {
-        setMessages(prev => [
-            ...prev,
-            {
-                id: crypto.randomUUID(),
-                role: "assistant",
-                content: reply,
             },
         ]);
     }

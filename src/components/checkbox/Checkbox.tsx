@@ -73,9 +73,11 @@ export default function Checkbox({ taskId }: { taskId: string }) {
         className={styles.checkbox}
         data-checked={data?.completed}
         role="checkbox"
+        aria-checked={data?.completed ?? false}
         onClick={handleToggle}
     >
         {data?.completed && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
                 src="/check_small.svg"
                 alt="Checked"

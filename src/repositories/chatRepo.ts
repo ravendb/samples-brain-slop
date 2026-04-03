@@ -67,23 +67,6 @@ export async function sendToolMessage(chatId: string, toolResponse: ToolResponse
     return await streamChat(chat, onChunk);
 }
 
-async function runChat(chat: AiConversation) {
-    receiveActions(chat);
-
-    const llmResponse: AgentResponse = await chat.run()
-    console.log("LLM response:", llmResponse);
-
-    let requiredActions: Action[] = [];
-    if (llmResponse.status === 'ActionRequired') {
-        requiredActions = formatActions(chat.requiredActions() as StoredAction[]);
-    }
-
-    return {
-        reply: llmResponse.answer?.response ?? null,
-        actions: requiredActions
-    };
-}
-
 export async function loadChat(chatId: string) {
     const session = getStore().openSession();
 

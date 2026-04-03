@@ -79,7 +79,7 @@ export async function editProject(projectId: string, updates: EditProjectArgumen
 
     for (const [key, value] of Object.entries(updates)) {
         if (value !== undefined) {
-            (project as any)[key] = value;
+            (project as unknown as Record<string, unknown>)[key] = value;
         }
     }
 

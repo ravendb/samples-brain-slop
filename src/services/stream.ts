@@ -1,5 +1,3 @@
-import { SendMessageResult } from "@/models/chat";
-
 const decoder = new TextDecoder();
 
 type StreamReader = ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>;
@@ -17,7 +15,7 @@ export function encodeStream<T>(streamingFunction: (onChunk: (chunk: string) => 
                 const finalPayload = JSON.stringify(result);
                 controller.enqueue(encoder.encode(finalPayload + "\n"));
                 controller.close();
-            } catch (err) {
+            } catch {
                 const errPayload = JSON.stringify({ error: "Failed to send message." });
                 controller.enqueue(encoder.encode(errPayload + "\n"));
                 controller.close();
@@ -60,7 +58,7 @@ function decodeStreamMessage<T>(
                 onFinalResult(parsed as T);
             }
         }
-        catch (err) {
+        catch {
             throw new Error('Failed to parse message.')
         }
     }

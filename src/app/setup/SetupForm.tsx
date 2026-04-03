@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
 import styles from "./setup.module.css";
 
 type FormState = {
@@ -52,9 +53,9 @@ export default function SetupForm() {
                     <p className={styles.successMessage}>
                         Setup complete. Your AI assistant is ready.
                     </p>
-                    <a href="/" className={styles.submitButton}>
+                    <Link href="/" className={styles.submitButton}>
                         Open the app
-                    </a>
+                    </Link>
                 </div>
             </div>
         );
