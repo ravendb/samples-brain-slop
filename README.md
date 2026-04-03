@@ -14,11 +14,11 @@ Built with [RavenDB](https://ravendb.net) and [Next.js](https://nextjs.org).
 
 The following RavenDB features are used to build the application:
 
-1. [AI Agents](https://ravendb.net/docs/article-page/7.0/csharp/ai-integration/ai-agents) – Interprets unstructured user input and dispatches the correct actions (e.g., create tasks, mark as completed, query by due date)
-1. [GenAI](https://ravendb.net/docs/article-page/7.0/csharp/ai-integration/overview) – Enriches task descriptions with subtasks, tags, and priority using project context
-1. [Time Series](https://ravendb.net/docs/article-page/7.0/csharp/document-extensions/timeseries/overview) – Track task creation, completion, and progress over time to display in a Burndown chart.
-1. [Attachments / Remote Attachments](https://ravendb.net/docs/article-page/7.0/csharp/document-extensions/attachments/what-are-attachments) – Store PDFs, images, or screenshots with project and task documents
-1. [Revisions](https://ravendb.net/docs/article-page/7.0/csharp/document-extensions/revisions/overview) – Show previous versions of a task document
+1. [AI Agents](https://ravendb.net/docs/article-page/7.2/csharp/ai-integration/ai-agents) – Interprets unstructured user input and dispatches the correct actions (e.g., create tasks, mark as completed, query by due date)
+1. [GenAI](https://ravendb.net/docs/article-page/7.2/csharp/ai-integration/overview) – Enriches task descriptions with subtasks, tags, and priority using project context
+1. [Time Series](https://ravendb.net/docs/article-page/7.2/csharp/document-extensions/timeseries/overview) – Track task creation, completion, and progress over time to display in a Burndown chart.
+1. [Attachments / Remote Attachments](https://ravendb.net/docs/article-page/7.2/csharp/document-extensions/attachments/what-are-attachments) – Store PDFs, images, or screenshots with project and task documents
+1. [Revisions](https://ravendb.net/docs/article-page/7.2/csharp/document-extensions/revisions/overview) – Show previous versions of a task document
 ## Technologies
 
 The following technologies were used to build this application:
@@ -33,8 +33,8 @@ If you want to run the application locally, please follow the steps:
 1. Check out the GIT repository
 1. Install prerequisites:
    1. [Node.js](https://nodejs.org)
-   1. [RavenDB](https://ravendb.net/download)
-1. Request a [dev license](https://ravendb.net/license/request/dev-ai-agent-inside) and create a local unsecured database.
+   1. [RavenDB](https://ravendb.net/download) – grab a new license while you're there
+1. Create a local unsecured database.
 1. Get the app running:
    ```
    npm install
