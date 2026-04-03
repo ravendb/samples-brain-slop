@@ -10,6 +10,9 @@ Finally, BrainSlop **surfaces slow-moving work before it becomes a problem** by 
 
 Built with [RavenDB](https://ravendb.net) and [Next.js](https://nextjs.org).
 
+<img width="2229" height="1180" alt="image" src="https://github.com/user-attachments/assets/c4be7913-27b7-49f8-a527-865f27116f3c" />
+
+
 ## Features used
 
 The following RavenDB features are used to build the application:
