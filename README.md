@@ -1,5 +1,7 @@
 # BrainSlop
 
+[![Build](https://github.com/ravendb/samples-brain-slop/actions/workflows/build.yml/badge.svg)](https://github.com/ravendb/samples-brain-slop/actions/workflows/build.yml)
+
 ## Overview
 
 BrainSlop **solves the chaos of unstructured task input** by using an AI Agent to interpret sloppy, free-form messages and automatically turn them into organized, actionable tasks. Instead of forcing managers to carefully structure every entry, the system does the heavy lifting—parsing intent, creating tasks, and taking the correct actions.
