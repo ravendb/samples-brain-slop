@@ -1,4 +1,4 @@
-import { DocumentStore, AiConnectionString, OpenAiSettings, PutConnectionStringOperation } from "ravendb";
+import { DocumentStore, AiConnectionString, OpenAiSettings, PutConnectionStringOperation, CreateDatabaseOperation, GetStatisticsOperation } from "ravendb";
 import { AddOrUpdateAiAgentOperation } from "ravendb";
 import { AddGenAiOperation, UpdateGenAiOperation, GenAiConfiguration, GenAiTransformation } from "ravendb";
 import { writeAppConfig } from "@/lib/config";
@@ -188,11 +188,43 @@ export type SetupPayload = {
     smallModel: string;
 };
 
+async function ensureDatabaseExists(store: DocumentStore, ravenDb: string, ravenUrl: string): Promise<void> {
+    try {
+        await store.maintenance.forDatabase(ravenDb).send(new GetStatisticsOperation());
+    } catch (err) {
+        if (err instanceof Error && err.name === "DatabaseDoesNotExistException") {
+            await store.maintenance.server.send(
+                new CreateDatabaseOperation({ databaseName: ravenDb }, 1)
+            );
+        } else if (err instanceof Error && err.message.includes("ECONNREFUSED")) {
+            throw new Error(`Cannot reach RavenDB at "${ravenUrl}". Is the server running?`);
+        } else {
+            throw err;
+        }
+    }
+}
+
+async function validateOpenAiKey(openAiApiKey: string): Promise<void> {
+    const res = await fetch("https://api.openai.com/v1/models", {
+        headers: { Authorization: `Bearer ${openAiApiKey}` },
+    });
+    if (res.status === 401) {
+        throw new Error("Invalid OpenAI API key.");
+    }
+    if (!res.ok) {
+        throw new Error(`OpenAI API returned an unexpected error (${res.status}). Please try again.`);
+    }
+}
+
 export async function runSetup(payload: SetupPayload): Promise<void> {
     const { ravenUrl, ravenDb, openAiApiKey, mainModel, smallModel } = payload;
 
+    await validateOpenAiKey(openAiApiKey);
+
     const store = new DocumentStore([ravenUrl], ravenDb);
     store.initialize();
+
+    await ensureDatabaseExists(store, ravenDb, ravenUrl);
 
     try {
         // Connection strings
