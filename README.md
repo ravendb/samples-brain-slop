@@ -39,7 +39,7 @@ If you want to run the application locally, please follow the steps:
 1. Install prerequisites:
    1. [Node.js](https://nodejs.org)
    1. [RavenDB](https://ravendb.net/download) – grab a new license while you're there
-1. Create a local unsecured database.
+1. Start RavenDB in [unsecured mode](https://docs.ravendb.net/7.2/start/installation/setup-wizard/choose-security-option) (no TLS or authentication — suitable for local development). The app will create the database automatically on first setup.
 1. Get the app running:
    ```
    npm install

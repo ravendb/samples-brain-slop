@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true });
     } catch (err) {
         console.error("Setup error:", err);
-        return NextResponse.json({ error: "Setup failed. Check the server logs for details." }, { status: 500 });
+        const message = err instanceof Error ? err.message : "Setup failed.";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

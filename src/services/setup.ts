@@ -1,4 +1,4 @@
-import { DocumentStore, AiConnectionString, OpenAiSettings, PutConnectionStringOperation } from "ravendb";
+import { DocumentStore, AiConnectionString, OpenAiSettings, PutConnectionStringOperation, CreateDatabaseOperation, GetStatisticsOperation } from "ravendb";
 import { AddOrUpdateAiAgentOperation } from "ravendb";
 import { AddGenAiOperation, UpdateGenAiOperation, GenAiConfiguration, GenAiTransformation } from "ravendb";
 import { writeAppConfig } from "@/lib/config";
@@ -188,11 +188,27 @@ export type SetupPayload = {
     smallModel: string;
 };
 
+async function ensureDatabaseExists(store: DocumentStore, ravenDb: string): Promise<void> {
+    try {
+        await store.maintenance.forDatabase(ravenDb).send(new GetStatisticsOperation());
+    } catch (err) {
+        if (err instanceof Error && err.name === "DatabaseDoesNotExistException") {
+            await store.maintenance.server.send(
+                new CreateDatabaseOperation({ databaseName: ravenDb }, 1)
+            );
+        } else {
+            throw err;
+        }
+    }
+}
+
 export async function runSetup(payload: SetupPayload): Promise<void> {
     const { ravenUrl, ravenDb, openAiApiKey, mainModel, smallModel } = payload;
 
     const store = new DocumentStore([ravenUrl], ravenDb);
     store.initialize();
+
+    await ensureDatabaseExists(store, ravenDb);
 
     try {
         // Connection strings
