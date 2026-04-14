@@ -188,7 +188,7 @@ export type SetupPayload = {
     smallModel: string;
 };
 
-async function ensureDatabaseExists(store: DocumentStore, ravenDb: string): Promise<void> {
+async function ensureDatabaseExists(store: DocumentStore, ravenDb: string, ravenUrl: string): Promise<void> {
     try {
         await store.maintenance.forDatabase(ravenDb).send(new GetStatisticsOperation());
     } catch (err) {
@@ -196,6 +196,8 @@ async function ensureDatabaseExists(store: DocumentStore, ravenDb: string): Prom
             await store.maintenance.server.send(
                 new CreateDatabaseOperation({ databaseName: ravenDb }, 1)
             );
+        } else if (err instanceof Error && err.message.includes("ECONNREFUSED")) {
+            throw new Error(`Cannot reach RavenDB at "${ravenUrl}". Is the server running?`);
         } else {
             throw err;
         }
@@ -208,7 +210,7 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
     const store = new DocumentStore([ravenUrl], ravenDb);
     store.initialize();
 
-    await ensureDatabaseExists(store, ravenDb);
+    await ensureDatabaseExists(store, ravenDb, ravenUrl);
 
     try {
         // Connection strings
