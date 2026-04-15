@@ -1,0 +1,67 @@
+.container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+    max-width: 640px;
+    width: 100%;
+}
+
+.title {
+    margin: 0 0 1.25rem 0;
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1.1;
+
+    background: linear-gradient(90deg, var(--primary), #dea4ff, var(--primary));
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: title-gradient-move 2s linear infinite;
+}
+
+@keyframes title-gradient-move {
+    0%   { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+}
+
+.description {
+    margin: 0 0 2.5rem 0;
+    font-size: 1.1rem;
+    color: var(--foreground-muted);
+    line-height: 1.7;
+}
+
+.newChatButton {
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s;
+}
+
+.newChatButton:hover {
+    opacity: 0.85;
+}
+
+.newChatButton:active {
+    opacity: 0.7;
+    transform: translateY(1px);
+}
