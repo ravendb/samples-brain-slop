@@ -17,6 +17,7 @@ type ChatMessagesProps = {
     initialMessages: Message[];
     initialActions: Action[];
     isNewChat: boolean;
+    initialPrompt?: string;
 };
 
 async function sendMessage(
@@ -41,13 +42,14 @@ async function sendMessage(
     await decodeStream(reader, onChunk, onFinalResult);
 }
 
-export default function ChatMessages({ chatId, initialMessages, initialActions, isNewChat }: ChatMessagesProps) {
+export default function ChatMessages({ chatId, initialMessages, initialActions, isNewChat, initialPrompt }: ChatMessagesProps) {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [actions, setActions] = useState<Action[]>(initialActions);
     const [currentChatId, setCurrentChatId] = useState(chatId);
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
+    const hasSentInitialPrompt = useRef(false);
     const router = useRouter();
     const queryClient = useQueryClient();
     const isCentered = isNewChat && messages.length === 0;
@@ -65,6 +67,14 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
         if (!scrollAreaRef.current) return;
         scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }, [messages, actions]);
+
+    // Auto-send initialPrompt (from suggestion chips on the home page)
+    useEffect(() => {
+        if (!initialPrompt || hasSentInitialPrompt.current) return;
+        hasSentInitialPrompt.current = true;
+        sendMessageMutation(initialPrompt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     async function sendMessageMutation(content: string) {
         setError(null);

@@ -37,31 +37,39 @@
 }
 
 .description {
-    margin: 0 0 2.5rem 0;
+    margin: 0 0 2rem 0;
     font-size: 1.1rem;
     color: var(--foreground-muted);
     line-height: 1.7;
 }
 
-.newChatButton {
-    padding: 0.8rem 2rem;
-    border: none;
-    border-radius: 8px;
-    background: var(--primary);
-    color: #fff;
-    font-family: inherit;
-    font-size: 1.05rem;
+.prompt {
+    margin: 0 0 1.25rem 0;
+    font-size: 1rem;
     font-weight: 600;
-    cursor: pointer;
+    color: var(--foreground);
+}
+
+.suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.suggestion {
+    padding: 0.65rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--foreground);
+    font-family: inherit;
+    font-size: 0.95rem;
     text-decoration: none;
-    transition: opacity 0.15s;
+    transition: border-color 0.15s, background 0.15s;
 }
 
-.newChatButton:hover {
-    opacity: 0.85;
-}
-
-.newChatButton:active {
-    opacity: 0.7;
-    transform: translateY(1px);
+.suggestion:hover {
+    border-color: var(--primary);
+    background: var(--background);
 }
