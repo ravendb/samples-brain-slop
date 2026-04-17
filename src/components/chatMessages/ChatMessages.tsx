@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import MessageInput from "@/components/messageInput/MessageInput";
 import ActionPager from "@/components/actionPager/ActionPager";
 import ChatMessage from "./ChatMessage";
+import ChatError from "./ChatError";
 import styles from "./ChatMessages.module.css";
 import { useRouter } from "next/navigation";
 import { decodeStream } from "@/services/stream";
@@ -161,7 +162,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
                 )}
             </div>
 
-            {error !== null && <p className={`${styles.subtle} ${styles.error}`}>{error.message}</p>}
+            {error !== null && <ChatError error={error} />}
 
             <MessageInput onSend={sendMessageMutation} disabled={isPending || actions.length > 0} />
         </div>

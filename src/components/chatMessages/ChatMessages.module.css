@@ -149,6 +149,30 @@
 	color: var(--danger);
 }
 
+.errorBox {
+	padding: 0.85rem 1.1rem;
+	border-radius: 10px;
+	background-color: color-mix(in srgb, var(--danger) 10%, transparent);
+	border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+	color: var(--danger);
+	font-size: 0.9rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	overflow-wrap: break-word;
+	min-width: 0;
+}
+
+.errorBox a {
+	color: var(--danger);
+	text-decoration: underline;
+	opacity: 0.85;
+}
+
+.errorBox a:hover {
+	opacity: 1;
+}
+
 .chunk {
   display: inline-block;
   opacity: 0;
