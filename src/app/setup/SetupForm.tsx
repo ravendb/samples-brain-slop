@@ -13,10 +13,15 @@ type FormState = {
     smallModel: string;
 };
 
-export default function SetupForm() {
+type SetupFormProps = {
+    initialConfig?: { ravenUrl: string; ravenDb: string };
+};
+
+export default function SetupForm({ initialConfig }: SetupFormProps) {
+    const isReconfigure = initialConfig !== undefined;
     const [form, setForm] = useState<FormState>({
-        ravenUrl: "http://127.0.0.1:8080",
-        ravenDb: "BrainSlop",
+        ravenUrl: initialConfig?.ravenUrl ?? "http://127.0.0.1:8080",
+        ravenDb: initialConfig?.ravenDb ?? "BrainSlop",
         openAiApiKey: "",
         mainModel: "gpt-4o",
         smallModel: "gpt-4o-mini",
@@ -51,7 +56,7 @@ export default function SetupForm() {
                 <div className={styles.card}>
                     <h1 className={styles.title}>Brain Slop</h1>
                     <p className={styles.successMessage}>
-                        Setup complete. Your AI assistant is ready.
+                        {isReconfigure ? "Configuration updated." : "Setup complete. Your AI assistant is ready."}
                     </p>
                     <Link href="/" className={styles.submitButton}>
                         Open the app
@@ -70,7 +75,7 @@ export default function SetupForm() {
                 </p>
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <Field label="RavenDB URL" name="ravenUrl" value={form.ravenUrl} onChange={handleChange} />
-                    <Field label="Database Name" name="ravenDb" value={form.ravenDb} onChange={handleChange} />
+                    <Field label="Database Name" name="ravenDb" value={form.ravenDb} onChange={handleChange} hint="Created automatically if it doesn't exist" />
                     <Field label="OpenAI API Key" name="openAiApiKey" value={form.openAiApiKey} onChange={handleChange} type="password" />
                     <Field label="Main Model" name="mainModel" value={form.mainModel} onChange={handleChange} hint="Used for the AI assistant" />
                     <Field label="Small Model" name="smallModel" value={form.smallModel} onChange={handleChange} hint="Used for title generation" />
@@ -81,7 +86,9 @@ export default function SetupForm() {
 
                     <button type="submit" className={styles.submitButton} disabled={mutation.isPending}>
                         {mutation.isPending && <span className={styles.spinner} aria-hidden="true" />}
-                        {mutation.isPending ? "Setting up…" : "Set up Brain Slop"}
+                        {mutation.isPending
+                            ? (isReconfigure ? "Saving…" : "Setting up…")
+                            : (isReconfigure ? "Save configuration" : "Set up Brain Slop")}
                     </button>
                 </form>
             </div>
@@ -101,8 +108,10 @@ type FieldProps = {
 function Field({ label, name, value, onChange, type = "text", hint }: FieldProps) {
     return (
         <div className={styles.fieldGroup}>
-            <label htmlFor={name} className={styles.label}>{label}</label>
-            {hint && <span className={styles.hint}>{hint}</span>}
+            <label htmlFor={name} className={styles.label}>
+                {label}
+                {hint && <span className={styles.hint}> ({hint})</span>}
+            </label>
             <input
                 id={name}
                 name={name}
