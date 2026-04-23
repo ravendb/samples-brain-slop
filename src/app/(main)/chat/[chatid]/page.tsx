@@ -1,6 +1,7 @@
 import { loadChat } from "@/repositories/chatRepo";
 import styles from "./page.module.css";
 import ChatMessages from "@/components/chatMessages/ChatMessages";
+import Link from "next/link";
 
 type ChatPageProps = {
 	params: Promise<{ chatid: string }>;
@@ -16,9 +17,11 @@ function decodeChatId(encodedChatId: string): string | null {
 
 function renderError(message: string) {
 	return (
-		<div className={styles.page}>
-			<h1 className={styles.title}>Chat</h1>
-			<p className={`${styles.subtle} ${styles.error}`}>{message}</p>
+		<div className={styles.errorPage}>
+			<div className={styles.errorCard}>
+				<span>{message}</span>
+				<Link href="/setup">Go to setup →</Link>
+			</div>
 		</div>
 	);
 }
@@ -38,7 +41,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
 		messages = chat.messages;
 		actions = chat.actions ? chat.actions : [];
 	} catch {
-		return renderError("Could not load this conversation.");
+		return renderError("Could not load this conversation.\nIt may not belong to the current RavenDB database, or the server may be unreachable.");
 	}
 
 	return (
