@@ -32,6 +32,7 @@ export function encodeStream<T>(streamingFunction: (onChunk: (chunk: string) => 
                 controller.enqueue(encoder.encode(finalPayload + "\n"));
                 controller.close();
             } catch (err) {
+                console.log("Error in streaming function:", err);
                 let message = "Failed to send message.";
                 let errorName = "Error";
 

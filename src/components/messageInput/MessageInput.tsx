@@ -1,16 +1,26 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./MessageInput.module.css";
 
 type MessageInputProps = {
 	onSend: (content: string) => Promise<void> | void;
 	disabled: boolean;
+	lockedValue?: string;
 };
 
-export default function MessageInput({ onSend, disabled }: MessageInputProps) {
+export default function MessageInput({ onSend, disabled, lockedValue }: MessageInputProps) {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const isLocked = lockedValue !== undefined;
     const [isEmpty, setIsEmpty] = useState(true);
+
+    useEffect(() => {
+        const input = textareaRef.current;
+        if (!input || !isLocked) return;
+        input.value = lockedValue;
+        input.style.height = "auto";
+        input.style.height = `${input.scrollHeight}px`;
+    }, [lockedValue, isLocked]);
 
 	function handleInput() {
 		const input = textareaRef.current;
@@ -30,13 +40,15 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
 	async function handleSend() {
         const input = textareaRef.current;
         if (!input || disabled) return;
-        const content = input.value.trim();
+        const content = isLocked ? lockedValue! : input.value.trim();
         if (content === "") return;
 
 		try {
 			await onSend(content);
-			input.value = "";
-			input.style.height = "auto";
+            if (!isLocked) {
+                input.value = "";
+                input.style.height = "auto";
+            }
 		} catch (error) {
 			console.error("Error sending message:", error);
 		}
@@ -50,6 +62,7 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
 				placeholder="Message..."
 				rows={1}
 				disabled={disabled}
+				readOnly={isLocked}
 				onInput={handleInput}
                 onKeyDown={handleKeyDown}
 			/>
@@ -57,7 +70,7 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
                 className={styles.sendButton} 
                 type="button" 
                 onClick={() => void handleSend()} 
-                disabled={disabled || isEmpty}
+                disabled={disabled || (isLocked ? lockedValue === "" : isEmpty)}
             >
                 Send
             </button>

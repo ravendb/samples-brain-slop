@@ -18,6 +18,7 @@ type ChatMessagesProps = {
     initialActions: Action[];
     isNewChat: boolean;
     initialPrompt?: string;
+    demoScript?: string[];
 };
 
 async function sendMessage(
@@ -42,12 +43,13 @@ async function sendMessage(
     await decodeStream(reader, onChunk, onFinalResult);
 }
 
-export default function ChatMessages({ chatId, initialMessages, initialActions, isNewChat, initialPrompt }: ChatMessagesProps) {
+export default function ChatMessages({ chatId, initialMessages, initialActions, isNewChat, initialPrompt, demoScript }: ChatMessagesProps) {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [actions, setActions] = useState<Action[]>(initialActions);
     const [currentChatId, setCurrentChatId] = useState(chatId);
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<Error | null>(null);
+    const [demoIndex, setDemoIndex] = useState(1);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const hasSentInitialPrompt = useRef(false);
     const router = useRouter();
@@ -76,9 +78,18 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    async function sendMessageMutation(content: string) {
+    // Auto-send first demo message on mount
+    useEffect(() => {
+        if (!demoScript || hasSentInitialPrompt.current) return;
+        hasSentInitialPrompt.current = true;
+        sendMessageMutation(demoScript[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    async function sendMessageMutation(content: string, isDemoMessage = false) {
         setError(null);
         addUserMessage(content);
+        if (isDemoMessage) setDemoIndex(prev => prev + 1);
 
         const id = crypto.randomUUID();
         setMessages(prev => [...prev,
@@ -120,7 +131,10 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
 
         if (isNewChat && result.chatId && result.chatId !== currentChatId) {
             setCurrentChatId(result.chatId);
-            router.replace(`/chat/${encodeURIComponent(result.chatId)}`);
+
+            if (!demoScript) {
+                router.replace(`/chat/${encodeURIComponent(result.chatId)}`);
+            }
 
             queryClient.invalidateQueries({ queryKey: ["chats"] });
 
@@ -174,7 +188,13 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
 
             {error !== null && <ChatError error={error} />}
 
-            <MessageInput onSend={sendMessageMutation} disabled={isPending || actions.length > 0} />
+            <MessageInput
+                onSend={demoScript && demoIndex < demoScript.length
+                    ? (content) => sendMessageMutation(content, true)
+                    : sendMessageMutation}
+                disabled={isPending || actions.length > 0}
+                lockedValue={demoScript && demoIndex < demoScript.length ? demoScript[demoIndex] : undefined}
+            />
         </div>
     );
 }

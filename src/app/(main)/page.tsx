@@ -2,9 +2,9 @@ import Link from "next/link";
 import styles from "./page.module.css";
 
 const SUGGESTIONS = [
-    "Turn an idea into a project",
-    "Break down a goal into tasks",
-    "Turn meeting notes into tasks",
+    { label: "Turn an idea into a project", href: "/demo/0" },
+    { label: "Break down a goal into tasks", href: "/demo/1" },
+    { label: "Turn meeting notes into tasks", href: "/demo/2" },
 ];
 
 export default function Home() {
@@ -19,11 +19,11 @@ export default function Home() {
                 <div className={styles.suggestions}>
                     {SUGGESTIONS.map((s) => (
                         <Link
-                            key={s}
-                            href={`/chat/new?prompt=${encodeURIComponent(s)}`}
+                            key={s.label}
+                            href={s.href}
                             className={styles.suggestion}
                         >
-                            {s}
+                            {s.label}
                         </Link>
                     ))}
                 </div>

@@ -1,0 +1,26 @@
+[
+  {
+    "label": "Turn an idea into a project",
+    "messages": [
+      "I have an idea for a mobile app that helps people track their daily water intake.",
+      "Let's call it 'HydroTrack'. I want to complete it in 3 months.\nCan you break this down into development phases?",
+      "What should I tackle first this week?"
+    ]
+  },
+  {
+    "label": "Break down a goal into tasks",
+    "messages": [
+      "My goal is to run a 5K in 3 months. I've never run before.",
+      "Can you make a week-by-week schedule?",
+      "What should I do on rest days?"
+    ]
+  },
+  {
+    "label": "Turn meeting notes into tasks",
+    "messages": [
+      "Here are my meeting notes: Discussed Q3 roadmap, agreed to ship auth by Aug 1, redesign by Aug 15, Alex owns auth, Priya owns design.",
+      "Can you prioritize these tasks?",
+      "What blockers should we watch out for?"
+    ]
+  }
+]
