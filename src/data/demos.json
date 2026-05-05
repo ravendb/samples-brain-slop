@@ -1,26 +1,218 @@
 [
   {
     "label": "Turn an idea into a project",
-    "messages": [
-      "I have an idea for a mobile app that helps people track their daily water intake.",
-      "Let's call it 'HydroTrack'. I want to complete it in 3 months.\nCan you break this down into development phases?",
-      "What should I tackle first this week?"
+    "steps": [
+      {
+        "userMessage": "I want to build a habit tracking app.",
+        "aiResponse": "Let's set it up. I'll create a project with the key tasks.",
+        "action": {
+          "type": "CreateProject",
+          "label": "Create project 'Habit Tracker'",
+          "actionResponse": "Project created with 5 tasks.",
+          "args": {
+            "title": "Habit Tracker",
+            "description": "A mobile app for building and tracking daily habits.",
+            "tasks": [
+              { "title": "Define the data model", "priority": "normal", "completed": false },
+              { "title": "Build the daily check-in screen", "priority": "normal", "completed": false },
+              { "title": "Add streak tracking", "priority": "normal", "completed": false },
+              { "title": "Design onboarding flow", "priority": "normal", "completed": false },
+              { "title": "Submit to App Store", "priority": "normal", "completed": false }
+            ]
+          }
+        }
+      },
+      {
+        "userMessage": "Add a task for writing unit tests.",
+        "aiResponse": "Adding it now.",
+        "action": {
+          "type": "AddNewTask",
+          "label": "Add task 'Write unit tests'",
+          "actionResponse": "Task added to the project.",
+          "args": {
+            "projectId": "{{projectId}}",
+            "projectTitle": "Habit Tracker",
+            "task": { "title": "Write unit tests", "priority": "normal", "completed": false }
+          }
+        }
+      },
+      {
+        "userMessage": "The data model task is the most critical — mark it high priority.",
+        "aiResponse": "On it.",
+        "action": {
+          "type": "EditTask",
+          "label": "Set 'Define the data model' to high priority",
+          "actionResponse": "Task updated to high priority.",
+          "args": {
+            "taskId": "{{taskIds.0}}",
+            "currentTitle": "Define the data model",
+            "updates": { "priority": "high" }
+          }
+        }
+      },
+      {
+        "userMessage": "Remove the App Store submission task — too early for that.",
+        "aiResponse": "Removing it.",
+        "action": {
+          "type": "DeleteTask",
+          "label": "Delete 'Submit to App Store'",
+          "actionResponse": "Task removed.",
+          "args": {
+            "taskId": "{{taskIds.4}}",
+            "taskTitle": "Submit to App Store",
+            "projectId": "{{projectId}}",
+            "projectTitle": "Habit Tracker"
+          }
+        }
+      },
+      {
+        "userMessage": "Ok, delete this demo project.",
+        "aiResponse": "Cleaning up.",
+        "action": {
+          "type": "DeleteProject",
+          "label": "Delete project 'Habit Tracker'",
+          "actionResponse": "Project deleted.",
+          "args": {
+            "projectId": "{{projectId}}",
+            "title": "Habit Tracker"
+          }
+        }
+      }
     ]
   },
   {
     "label": "Break down a goal into tasks",
-    "messages": [
-      "My goal is to run a 5K in 3 months. I've never run before.",
-      "Can you make a week-by-week schedule?",
-      "What should I do on rest days?"
+    "steps": [
+      {
+        "userMessage": "I want to learn Spanish in 6 months.",
+        "aiResponse": "30 minutes a day is enough. Here's a plan with monthly milestones.",
+        "action": {
+          "type": "CreateProject",
+          "label": "Create project 'Learn Spanish'",
+          "actionResponse": "Project created with 5 milestones.",
+          "args": {
+            "title": "Learn Spanish",
+            "description": "Go from beginner to conversational Spanish in 6 months.",
+            "tasks": [
+              { "title": "Month 1–2: Learn 500 core words with flashcards", "priority": "normal", "completed": false },
+              { "title": "Month 2–3: Complete a beginner course", "priority": "normal", "completed": false },
+              { "title": "Month 3–4: Weekly 30-min tutor sessions", "priority": "normal", "completed": false },
+              { "title": "Month 5: Watch Spanish TV with Spanish subtitles", "priority": "normal", "completed": false },
+              { "title": "Month 6: Hold a 10-min conversation without notes", "priority": "normal", "completed": false }
+            ]
+          }
+        }
+      },
+      {
+        "userMessage": "Rename it to 'Spanish in 6 Months' and update the description.",
+        "aiResponse": "Updating the project.",
+        "action": {
+          "type": "EditProject",
+          "label": "Rename to 'Spanish in 6 Months'",
+          "actionResponse": "Project updated.",
+          "args": {
+            "projectId": "{{projectId}}",
+            "currentTitle": "Learn Spanish",
+            "updates": {
+              "title": "Spanish in 6 Months",
+              "description": "Daily 30-minute practice to reach conversational Spanish in 6 months."
+            }
+          }
+        }
+      },
+      {
+        "userMessage": "The TV subtitles task feels redundant — remove it.",
+        "aiResponse": "Removing it.",
+        "action": {
+          "type": "DeleteTask",
+          "label": "Delete 'Watch Spanish TV with Spanish subtitles'",
+          "actionResponse": "Task removed.",
+          "args": {
+            "taskId": "{{taskIds.3}}",
+            "taskTitle": "Month 5: Watch Spanish TV with Spanish subtitles",
+            "projectId": "{{projectId}}",
+            "projectTitle": "Spanish in 6 Months"
+          }
+        }
+      },
+      {
+        "userMessage": "Ok, delete this demo project.",
+        "aiResponse": "Cleaning up.",
+        "action": {
+          "type": "DeleteProject",
+          "label": "Delete project 'Spanish in 6 Months'",
+          "actionResponse": "Project deleted.",
+          "args": {
+            "projectId": "{{projectId}}",
+            "title": "Spanish in 6 Months"
+          }
+        }
+      }
     ]
   },
   {
     "label": "Turn meeting notes into tasks",
-    "messages": [
-      "Here are my meeting notes: Discussed Q3 roadmap, agreed to ship auth by Aug 1, redesign by Aug 15, Alex owns auth, Priya owns design.",
-      "Can you prioritize these tasks?",
-      "What blockers should we watch out for?"
+    "steps": [
+      {
+        "userMessage": "Meeting notes: launch March 1. Sara owns backend, Tom owns frontend. Design review by Feb 15.",
+        "aiResponse": "Two owners, two deadlines. Creating the project.",
+        "action": {
+          "type": "CreateProject",
+          "label": "Create project 'March Launch'",
+          "actionResponse": "Project created with 4 tasks.",
+          "args": {
+            "title": "March Launch",
+            "description": "Product launch on March 1. Backend: Sara, Frontend: Tom.",
+            "tasks": [
+              { "title": "Backend implementation — Sara (due Mar 1)", "priority": "normal", "completed": false },
+              { "title": "Frontend implementation — Tom (due Mar 1)", "priority": "normal", "completed": false },
+              { "title": "Design review sign-off (due Feb 15)", "priority": "normal", "completed": false },
+              { "title": "QA and smoke testing before launch", "priority": "normal", "completed": false }
+            ]
+          }
+        }
+      },
+      {
+        "userMessage": "The design review is the bottleneck — mark it high priority.",
+        "aiResponse": "Good call.",
+        "action": {
+          "type": "EditTask",
+          "label": "Set design review to high priority",
+          "actionResponse": "Task updated to high priority.",
+          "args": {
+            "taskId": "{{taskIds.2}}",
+            "currentTitle": "Design review sign-off (due Feb 15)",
+            "updates": { "priority": "high" }
+          }
+        }
+      },
+      {
+        "userMessage": "We also need someone to handle the release notes.",
+        "aiResponse": "Adding that task.",
+        "action": {
+          "type": "AddNewTask",
+          "label": "Add task 'Write release notes'",
+          "actionResponse": "Task added.",
+          "args": {
+            "projectId": "{{projectId}}",
+            "projectTitle": "March Launch",
+            "task": { "title": "Write release notes", "priority": "normal", "completed": false }
+          }
+        }
+      },
+      {
+        "userMessage": "Ok, delete this demo project.",
+        "aiResponse": "Cleaning up.",
+        "action": {
+          "type": "DeleteProject",
+          "label": "Delete project 'March Launch'",
+          "actionResponse": "Project deleted.",
+          "args": {
+            "projectId": "{{projectId}}",
+            "title": "March Launch"
+          }
+        }
+      }
     ]
   }
 ]

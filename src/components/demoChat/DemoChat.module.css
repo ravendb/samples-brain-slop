@@ -1,0 +1,17 @@
+.doneMessage {
+    margin: 0;
+    text-align: center;
+    color: var(--foreground-muted);
+    font-size: 0.9rem;
+    padding: 0.75rem;
+}
+
+.doneLink {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.doneLink:hover {
+    opacity: 0.8;
+}
