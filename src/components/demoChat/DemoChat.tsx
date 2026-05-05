@@ -8,7 +8,7 @@ import chatStyles from "@/components/chatMessages/ChatMessages.module.css";
 import inputStyles from "@/components/messageInput/MessageInput.module.css";
 import styles from "./DemoChat.module.css";
 
-type DemoActionStep = {
+export type DemoActionStep = {
     type: string;
     label: string;
     args: Record<string, unknown>;
@@ -41,7 +41,7 @@ export default function DemoChat({ steps }: { steps: DemoStep[] }) {
     function resolveArgs(args: Record<string, unknown>): Record<string, unknown> {
         const str = JSON.stringify(args)
             .replace(/"{{projectId}}"/g, JSON.stringify(demoContext.projectId ?? ""))
-            .replace(/"{{taskIds\.(\d+)}}"/g, (_, i) => JSON.stringify(demoContext.taskIds?.[parseInt(i)] ?? ""));
+            .replace(/"{{taskIds\.(\d+)}}"/g, (_, i) => JSON.stringify(demoContext.taskIds?.[parseInt(i, 10)] ?? ""));
         return JSON.parse(str) as Record<string, unknown>;
     }
 
@@ -77,18 +77,16 @@ export default function DemoChat({ steps }: { steps: DemoStep[] }) {
         if (step.action) {
             setPhase("action");
         } else {
-            advance(stepIndex);
+            advance();
         }
     }
 
-    function advance(currentStepIndex: number) {
-        const nextIndex = currentStepIndex + 1;
-        if (nextIndex < steps.length) {
-            setStepIndex(nextIndex);
-            setPhase("sending");
-        } else {
-            setPhase("done");
-        }
+    function advance() {
+        setStepIndex(prev => {
+            const next = prev + 1;
+            setPhase(next < steps.length ? "sending" : "done");
+            return next < steps.length ? next : prev;
+        });
     }
 
     async function streamWords(text: string, appendToLast = false) {
@@ -146,7 +144,7 @@ export default function DemoChat({ steps }: { steps: DemoStep[] }) {
             await streamWords(step.action.actionResponse, true);
         }
 
-        advance(stepIndex);
+        advance();
     }
 
     return (

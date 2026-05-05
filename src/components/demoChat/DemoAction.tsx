@@ -3,13 +3,7 @@
 import { Action } from "@/models/action";
 import ActionCard from "@/components/actions/Action";
 import styles from "@/components/actionPager/ActionPager.module.css";
-
-type DemoActionStep = {
-    type: string;
-    label: string;
-    args: Record<string, unknown>;
-    actionResponse?: string;
-};
+import { DemoActionStep } from "./DemoChat";
 
 type DemoActionProps = {
     action: DemoActionStep;
