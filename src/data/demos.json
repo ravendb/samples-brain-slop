@@ -32,7 +32,7 @@
           "args": {
             "projectId": "{{projectId}}",
             "projectTitle": "Habit Tracker",
-            "task": { "title": "Write unit tests", "priority": "normal", "completed": false }
+            "task": { "title": "Write unit tests", "priority": "normal" }
           }
         }
       },
@@ -196,7 +196,7 @@
           "args": {
             "projectId": "{{projectId}}",
             "projectTitle": "March Launch",
-            "task": { "title": "Write release notes", "priority": "normal", "completed": false }
+            "task": { "title": "Write release notes", "priority": "normal" }
           }
         }
       },

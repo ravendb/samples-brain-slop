@@ -31,10 +31,14 @@ export const TaskSchema = z.object({
 
 export type Task = z.infer<typeof TaskSchema>;
 
+export const NewTaskSchema = TaskSchema.omit({ id: true, completed: true });
+
+export type NewTask = z.infer<typeof NewTaskSchema>;
+
 export const AddNewTaskArgumentsSchema = z.object({
     projectId: z.string(),
     projectTitle: z.string(),
-    task: TaskSchema
+    task: NewTaskSchema
 })
 
 export type AddNewTaskArguments = z.infer<typeof AddNewTaskArgumentsSchema>;
