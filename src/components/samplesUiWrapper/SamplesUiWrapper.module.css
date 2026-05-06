@@ -114,7 +114,7 @@
 
 .main {
     flex: 1;
-    overflow: hidden;
+    overflow-y: scroll;
     display: flex;
     flex-direction: column;
 }
