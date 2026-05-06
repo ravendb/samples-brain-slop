@@ -42,7 +42,7 @@ export default function SamplesUiWrapper({ sourceLink, children }: Props) {
                         </div>
                         <div className={styles.welcomeToastTitle}>Welcome to RavenDB Sample App</div>
                         <p className={styles.welcomeToastDescription}>
-                            This project demonstrates how to build apps using RavenDB's AI Agents and GenAI tasks.
+                            This project demonstrates how to build apps using RavenDB&apos;s AI Agents and GenAI tasks.
                         </p>
                         <a className={styles.welcomeToastLink} href="https://ravendb.net/cloud" target="_blank" rel="noreferrer">
                             Try it yourself on RavenDB Cloud
