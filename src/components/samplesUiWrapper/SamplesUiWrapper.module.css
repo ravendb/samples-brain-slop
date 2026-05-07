@@ -1,0 +1,244 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.header,
+.footer {
+    font-family: inherit;
+    font-size: 0.75rem;
+    background-color: var(--topbar-bg);
+    color: var(--foreground-muted);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+}
+
+.badgeLink {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    color: var(--foreground-muted);
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: var(--transition-base);
+}
+
+.badgeLink:hover {
+    border-color: var(--primary);
+    color: var(--foreground);
+}
+
+.badgeLink svg {
+    flex-shrink: 0;
+    fill: var(--foreground-muted);
+    transition: fill 0.15s;
+}
+
+.badgeLink:hover svg {
+    fill: var(--primary);
+}
+
+.ravendbLogo {
+    width: 72px;
+    height: 15px;
+    opacity: 0.85;
+}
+
+.resources {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.poweredBy {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: var(--foreground-muted);
+}
+
+.ravendbLink {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.ravendbLink:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+.toggleResources {
+    display: none;
+}
+
+.showResources,
+.hideResources {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: var(--foreground-muted);
+    transition: var(--transition-base);
+}
+
+.showResources:hover,
+.hideResources:hover {
+    color: var(--foreground);
+}
+
+.main {
+    flex: 1;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Welcome toast */
+
+.welcomeToast {
+    position: absolute;
+    right: 16px;
+    bottom: 56px;
+    width: 320px;
+    border-radius: 10px;
+    transform: translateX(120%);
+    animation: slideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 0.8s;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(120%); }
+    to   { transform: translateX(0); }
+}
+
+.welcomeToastContent {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.welcomeToastClose {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--foreground-muted);
+    transition: var(--transition-base);
+}
+
+.welcomeToastClose:hover {
+    border-color: var(--primary);
+    color: var(--foreground);
+}
+
+.welcomeToastClose svg {
+    fill: currentColor;
+}
+
+.welcomeToastTitle {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--foreground);
+}
+
+.welcomeToastDescription {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--foreground-muted);
+    line-height: 1.5;
+}
+
+.welcomeToastLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: var(--link);
+    text-decoration: none;
+    width: fit-content;
+}
+
+.welcomeToastLink:hover {
+    text-decoration: underline;
+    opacity: 0.85;
+}
+
+.welcomeToastLink svg {
+    fill: var(--link);
+    flex-shrink: 0;
+}
+
+/* Responsive */
+
+@media screen and (min-width: 770px) {
+    .toggleResources {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 769px) {
+    .footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .poweredBy {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .toggleResources {
+        display: block;
+    }
+
+    .welcomeToast {
+        bottom: 80px;
+    }
+}
+
+@media (max-width: 370px) {
+    .welcomeToast {
+        width: 260px;
+    }
+}

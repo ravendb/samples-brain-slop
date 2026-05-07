@@ -3,7 +3,7 @@ import { TaskDocument } from "@/models/task";
 import { getStore } from "@/db/ravendb";
 import { taskToDocument } from "./taskRepo";
 
-export async function createProject(project: ProjectDocument, tasks: TaskDocument[]) {
+export async function createProject(project: ProjectDocument, tasks: TaskDocument[]): Promise<{ projectId: string; taskIds: string[] }> {
     const session = getStore().openSession();
 
     const taskIds: string[] = [];
@@ -15,12 +15,14 @@ export async function createProject(project: ProjectDocument, tasks: TaskDocumen
 
     await session.store(project);
     await session.saveChanges();
+
+    return { projectId: project.id!, taskIds };
 }
 
-export async function createProjectFromAction(project: Project) {
+export async function createProjectFromAction(project: Project): Promise<{ projectId: string; taskIds: string[] }> {
     const projectDocument = new ProjectDocument(project.title, project.description, project.dueDate);
     const taskDocuments = project.tasks?.map(taskToDocument) || [];
-    await createProject(projectDocument, taskDocuments);
+    return await createProject(projectDocument, taskDocuments);
 }
 
 export async function loadProjects(): Promise<Project[]> {

@@ -125,6 +125,11 @@
 	line-height: 1.35;
 }
 
+.itemError {
+	color: var(--danger);
+	opacity: 0.8;
+}
+
 .updatedAt {
 	display: inline-block;
 	margin-top: 0.35rem;

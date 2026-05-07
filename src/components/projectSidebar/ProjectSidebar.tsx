@@ -27,7 +27,7 @@ export default function ProjectSidebar() {
 			</div>
 			<div className={styles.projectList}>
 				{isLoading && <div>Loading projects...</div>}
-				{error && <div>Failed to load projects</div>}
+				{error && <p className={styles.error}>Could not load projects</p>}
 				{projects && projects.map((project) => (
 					<ProjectItem key={project.id} project={project} />
 				))}

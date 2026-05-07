@@ -101,10 +101,9 @@ const AGENT_ACTIONS = [
                         title: { type: "string", description: "Short title of the task." },
                         description: { type: "string", description: "Optional detailed description of the task." },
                         priority: { type: "string", enum: ["low", "normal", "high"], default: "normal", description: "Priority of the task." },
-                        dueDate: { type: "string", description: "The tasks deadline in ISO 8601 format (YYYY-MM-DD). If not mentioned, omit this field." },
-                        completed: { type: "boolean", description: "Is the task completed or not.", default: false }
+                        dueDate: { type: "string", description: "The tasks deadline in ISO 8601 format (YYYY-MM-DD). If not mentioned, omit this field." }
                     },
-                    required: ["title", "priority", "completed"],
+                    required: ["title", "priority"],
                     additionalProperties: false
                 }
             },
@@ -114,7 +113,7 @@ const AGENT_ACTIONS = [
     },
     {
         name: "EditTask",
-        description: "Trigger this action when the user intends to edit an existing task. Make sure you know the ID of the task to edit. You can use query tools to get the info you need.\nOnly fill the properties that the user wants to edit. Leave the other properties empty so the task won't change beyond what the user intended.",
+        description: "Trigger this action when the user intends to edit an existing task, including when the user says a task is done or completed. Make sure you know the ID of the task to edit — use query tools to look it up by name if you don't have it. Only fill the properties that the user wants to edit. Leave the other properties empty so the task won't change beyond what the user intended. To mark a task complete, set completed to true.",
         parametersSchema: JSON.stringify({
             type: "object",
             properties: {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import Providers from "@/app/providers";
+import SamplesUiWrapper from "@/components/samplesUiWrapper/SamplesUiWrapper";
 import "./globals.css";
 import React from "react";
 
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={geist.variable}>
-        <Providers>{children}</Providers>
+        <SamplesUiWrapper sourceLink="https://github.com/ravendb/samples-brain-slop">
+          <Providers>{children}</Providers>
+        </SamplesUiWrapper>
       </body>
     </html>
   );

@@ -1,9 +1,8 @@
-import { TaskDocument } from "@/models/task";
+import { TaskDocument, NewTask, EditTaskArguments } from "@/models/task";
 import { getStore } from "@/db/ravendb";
-import { Task, EditTaskArguments } from "@/models/task";
 import { ProjectDocument } from "@/models/project";
 
-export async function createTask(projectId: string, task: TaskDocument) {
+export async function createTask(projectId: string, task: NewTask) {
     const taskDocument = taskToDocument(task);
 
     const session = getStore().openSession();
@@ -76,7 +75,7 @@ export async function isTaskCompleted(taskId: string) {
     return task.completed;
 }
 
-export function taskToDocument(task: Task) {
+export function taskToDocument(task: NewTask) {
     return new TaskDocument(
         task.title,
         task.description,

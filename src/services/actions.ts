@@ -46,6 +46,19 @@ export async function rejectAction(chatId: string, action: Action, onChunk: (chu
     )
 }
 
+export type DemoActionContext = { projectId?: string; taskIds?: string[] };
+
+export async function executeDemoAction(type: string, args: unknown): Promise<DemoActionContext> {
+    if (type === "CreateProject") {
+        const result = await createProjectFromAction(args as ActionMap["CreateProject"]);
+        return result;
+    }
+    const executor = executors[type as keyof ActionMap] as ((args: unknown) => Promise<string>) | undefined;
+    if (!executor) throw new Error(`Unknown action type: ${type}`);
+    await executor(args);
+    return {};
+}
+
 async function executeMappedAction<K extends keyof ActionMap>(action: Action<K>) {
     try {
         const executor = executors[action.name];

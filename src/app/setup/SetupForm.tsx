@@ -23,7 +23,7 @@ export default function SetupForm({ initialConfig }: SetupFormProps) {
         ravenUrl: initialConfig?.ravenUrl ?? "http://127.0.0.1:8080",
         ravenDb: initialConfig?.ravenDb ?? "BrainSlop",
         openAiApiKey: "",
-        mainModel: "gpt-4o",
+        mainModel: "gpt-5",
         smallModel: "gpt-4o-mini",
     });
 
