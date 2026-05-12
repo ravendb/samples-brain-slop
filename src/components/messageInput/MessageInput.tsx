@@ -1,16 +1,30 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./MessageInput.module.css";
 
 type MessageInputProps = {
 	onSend: (content: string) => Promise<void> | void;
 	disabled: boolean;
+	chatId: string | null;
 };
 
-export default function MessageInput({ onSend, disabled }: MessageInputProps) {
+export default function MessageInput({ onSend, disabled, chatId }: MessageInputProps) {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [isEmpty, setIsEmpty] = useState(true);
+	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const storageKey = `chat-draft-${chatId ?? "new"}`;
+
+	useEffect(() => {
+		const input = textareaRef.current;
+		if (!input) return;
+		const saved = localStorage.getItem(storageKey);
+		input.value = saved ?? "";
+		input.style.height = "auto";
+		if (input.value) input.style.height = `${input.scrollHeight}px`;
+		setIsEmpty(input.value.trim() === "");
+	}, [storageKey]);
 
 	function handleInput() {
 		const input = textareaRef.current;
@@ -18,6 +32,11 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
 		input.style.height = "auto";
 		input.style.height = `${input.scrollHeight}px`;
 		setIsEmpty(input.value.trim() === "");
+
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		debounceRef.current = setTimeout(() => {
+			localStorage.setItem(storageKey, input.value);
+		}, 300);
 	}
 
 	function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -37,6 +56,8 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
 			await onSend(content);
 			input.value = "";
 			input.style.height = "auto";
+			setIsEmpty(true);
+			localStorage.removeItem(storageKey);
 		} catch (error) {
 			console.error("Error sending message:", error);
 		}

@@ -174,7 +174,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
 
             {error !== null && <ChatError error={error} />}
 
-            <MessageInput onSend={sendMessageMutation} disabled={isPending || actions.length > 0} />
+            <MessageInput onSend={sendMessageMutation} disabled={isPending || actions.length > 0} chatId={currentChatId} />
         </div>
     );
 }
