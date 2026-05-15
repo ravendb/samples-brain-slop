@@ -234,6 +234,7 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
     validateRavenUrl(ravenUrl);
     await validateOpenAiKey(openAiApiKey);
 
+    const ravenBaseUrl = new URL(ravenUrl);
     const store = new DocumentStore([ravenUrl], databaseName);
     store.initialize();
 
@@ -282,7 +283,8 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
         genAiConfig.genAiTransformation = transformation;
         genAiConfig.maxConcurrency = 4;
 
-        const tasksRes = await fetch(`${ravenUrl}/databases/${encodeURIComponent(databaseName)}/tasks`);
+        const tasksUrl = new URL(`/databases/${encodeURIComponent(databaseName)}/tasks`, ravenBaseUrl);
+        const tasksRes = await fetch(tasksUrl.toString());
         if (!tasksRes.ok) throw new Error(`Failed to fetch tasks: ${tasksRes.status} ${tasksRes.statusText}`);
         const tasksJson = await tasksRes.json();
         const existingTask = tasksJson.OngoingTasks?.find(
