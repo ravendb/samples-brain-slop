@@ -17,11 +17,39 @@
 }
 
 .header {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 8px 12px;
     border-bottom: 1px solid var(--border);
+}
+
+.headerNav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.25rem;
+}
+
+.headerNavLink {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    color: var(--foreground-muted);
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: var(--transition-base);
+}
+
+.headerNavLink:hover {
+    color: var(--foreground);
+    background: var(--surface-hover);
+}
+
+.headerNavLinkActive {
+    color: var(--foreground);
+    background: var(--surface);
 }
 
 .footer {

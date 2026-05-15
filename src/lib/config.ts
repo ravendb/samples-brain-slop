@@ -3,8 +3,11 @@ import path from "path";
 
 export interface AppConfig {
   ravenUrl: string;
-  ravenDb: string;
+  databaseName: string;
   agentId: string;
+  openAiApiKey: string;
+  mainModel: string;
+  smallModel: string;
 }
 
 const CONFIG_PATH = path.join(process.cwd(), ".app-config.json");

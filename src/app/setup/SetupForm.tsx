@@ -7,24 +7,24 @@ import styles from "./setup.module.css";
 
 type FormState = {
     ravenUrl: string;
-    ravenDb: string;
+    databaseName: string;
     openAiApiKey: string;
     mainModel: string;
     smallModel: string;
 };
 
 type SetupFormProps = {
-    initialConfig?: { ravenUrl: string; ravenDb: string };
+    initialConfig?: FormState;
 };
 
 export default function SetupForm({ initialConfig }: SetupFormProps) {
     const isReconfigure = initialConfig !== undefined;
     const [form, setForm] = useState<FormState>({
         ravenUrl: initialConfig?.ravenUrl ?? "http://127.0.0.1:8080",
-        ravenDb: initialConfig?.ravenDb ?? "BrainSlop",
-        openAiApiKey: "",
-        mainModel: "gpt-5",
-        smallModel: "gpt-4o-mini",
+        databaseName: initialConfig?.databaseName ?? "BrainSlop",
+        openAiApiKey: initialConfig?.openAiApiKey ?? "",
+        mainModel: initialConfig?.mainModel ?? "gpt-5",
+        smallModel: initialConfig?.smallModel ?? "gpt-4o-mini",
     });
 
     const mutation = useMutation({
@@ -75,7 +75,7 @@ export default function SetupForm({ initialConfig }: SetupFormProps) {
                 </p>
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <Field label="RavenDB URL" name="ravenUrl" value={form.ravenUrl} onChange={handleChange} />
-                    <Field label="Database Name" name="ravenDb" value={form.ravenDb} onChange={handleChange} hint="Created automatically if it doesn't exist" />
+                    <Field label="Database Name" name="databaseName" value={form.databaseName} onChange={handleChange} hint="Created automatically if it doesn't exist" />
                     <Field label="OpenAI API Key" name="openAiApiKey" value={form.openAiApiKey} onChange={handleChange} type="password" />
                     <Field label="Main Model" name="mainModel" value={form.mainModel} onChange={handleChange} hint="Used for the AI assistant" />
                     <Field label="Small Model" name="smallModel" value={form.smallModel} onChange={handleChange} hint="Used for title generation" />

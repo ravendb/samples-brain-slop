@@ -182,25 +182,37 @@ const AGENT_ACTIONS = [
 
 export type SetupPayload = {
     ravenUrl: string;
-    ravenDb: string;
+    databaseName: string;
     openAiApiKey: string;
     mainModel: string;
     smallModel: string;
 };
 
-async function ensureDatabaseExists(store: DocumentStore, ravenDb: string, ravenUrl: string): Promise<void> {
+async function ensureDatabaseExists(store: DocumentStore, databaseName: string, ravenUrl: string): Promise<void> {
     try {
-        await store.maintenance.forDatabase(ravenDb).send(new GetStatisticsOperation());
+        await store.maintenance.forDatabase(databaseName).send(new GetStatisticsOperation());
     } catch (err) {
         if (err instanceof Error && err.name === "DatabaseDoesNotExistException") {
             await store.maintenance.server.send(
-                new CreateDatabaseOperation({ databaseName: ravenDb }, 1)
+                new CreateDatabaseOperation({ databaseName: databaseName }, 1)
             );
         } else if (err instanceof Error && err.message.includes("ECONNREFUSED")) {
             throw new Error(`Cannot reach RavenDB at "${ravenUrl}". Is the server running?`);
         } else {
             throw err;
         }
+    }
+}
+
+function validateRavenUrl(url: string): void {
+    let parsed: URL;
+    try {
+        parsed = new URL(url);
+    } catch {
+        throw new Error("Invalid RavenDB URL.");
+    }
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        throw new Error("RavenDB URL must use HTTP or HTTPS.");
     }
 }
 
@@ -217,14 +229,16 @@ async function validateOpenAiKey(openAiApiKey: string): Promise<void> {
 }
 
 export async function runSetup(payload: SetupPayload): Promise<void> {
-    const { ravenUrl, ravenDb, openAiApiKey, mainModel, smallModel } = payload;
+    const { ravenUrl, databaseName, openAiApiKey, mainModel, smallModel } = payload;
 
+    validateRavenUrl(ravenUrl);
     await validateOpenAiKey(openAiApiKey);
 
-    const store = new DocumentStore([ravenUrl], ravenDb);
+    const ravenBaseUrl = new URL(ravenUrl);
+    const store = new DocumentStore([ravenUrl], databaseName);
     store.initialize();
 
-    await ensureDatabaseExists(store, ravenDb, ravenUrl);
+    await ensureDatabaseExists(store, databaseName, ravenUrl);
 
     try {
         // Connection strings
@@ -269,7 +283,8 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
         genAiConfig.genAiTransformation = transformation;
         genAiConfig.maxConcurrency = 4;
 
-        const tasksRes = await fetch(`${ravenUrl}/databases/${encodeURIComponent(ravenDb)}/tasks`);
+        const tasksUrl = new URL(`/databases/${encodeURIComponent(databaseName)}/tasks`, ravenBaseUrl);
+        const tasksRes = await fetch(tasksUrl.toString());
         if (!tasksRes.ok) throw new Error(`Failed to fetch tasks: ${tasksRes.status} ${tasksRes.statusText}`);
         const tasksJson = await tasksRes.json();
         const existingTask = tasksJson.OngoingTasks?.find(
@@ -283,7 +298,7 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
             await store.maintenance.send(new AddGenAiOperation(genAiConfig));
         }
 
-        writeAppConfig({ ravenUrl, ravenDb, agentId: "assistant" });
+        writeAppConfig({ ravenUrl, databaseName, agentId: "assistant", openAiApiKey, mainModel, smallModel });
     } finally {
         store.dispose();
     }
