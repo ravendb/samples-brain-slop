@@ -204,6 +204,18 @@ async function ensureDatabaseExists(store: DocumentStore, databaseName: string, 
     }
 }
 
+function validateRavenUrl(url: string): void {
+    let parsed: URL;
+    try {
+        parsed = new URL(url);
+    } catch {
+        throw new Error("Invalid RavenDB URL.");
+    }
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        throw new Error("RavenDB URL must use HTTP or HTTPS.");
+    }
+}
+
 async function validateOpenAiKey(openAiApiKey: string): Promise<void> {
     const res = await fetch("https://api.openai.com/v1/models", {
         headers: { Authorization: `Bearer ${openAiApiKey}` },
@@ -219,6 +231,7 @@ async function validateOpenAiKey(openAiApiKey: string): Promise<void> {
 export async function runSetup(payload: SetupPayload): Promise<void> {
     const { ravenUrl, databaseName, openAiApiKey, mainModel, smallModel } = payload;
 
+    validateRavenUrl(ravenUrl);
     await validateOpenAiKey(openAiApiKey);
 
     const store = new DocumentStore([ravenUrl], databaseName);
