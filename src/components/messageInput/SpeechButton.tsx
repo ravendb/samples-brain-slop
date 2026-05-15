@@ -16,6 +16,7 @@ export default function SpeechButton({ isConnecting, isRecording, onStart, onSto
 
     useEffect(() => {
         const isChrome = /Chrome/.test(navigator.userAgent) && !/Edg\/|OPR\//.test(navigator.userAgent);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSpeechAvailable(isChrome);
     }, []);
 
