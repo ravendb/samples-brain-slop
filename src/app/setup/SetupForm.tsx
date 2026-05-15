@@ -14,7 +14,7 @@ type FormState = {
 };
 
 type SetupFormProps = {
-    initialConfig?: { ravenUrl: string; ravenDb: string };
+    initialConfig?: FormState;
 };
 
 export default function SetupForm({ initialConfig }: SetupFormProps) {
@@ -22,9 +22,9 @@ export default function SetupForm({ initialConfig }: SetupFormProps) {
     const [form, setForm] = useState<FormState>({
         ravenUrl: initialConfig?.ravenUrl ?? "http://127.0.0.1:8080",
         ravenDb: initialConfig?.ravenDb ?? "BrainSlop",
-        openAiApiKey: "",
-        mainModel: "gpt-5",
-        smallModel: "gpt-4o-mini",
+        openAiApiKey: initialConfig?.openAiApiKey ?? "",
+        mainModel: initialConfig?.mainModel ?? "gpt-5",
+        smallModel: initialConfig?.smallModel ?? "gpt-4o-mini",
     });
 
     const mutation = useMutation({

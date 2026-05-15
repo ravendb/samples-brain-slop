@@ -283,7 +283,7 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
             await store.maintenance.send(new AddGenAiOperation(genAiConfig));
         }
 
-        writeAppConfig({ ravenUrl, ravenDb, agentId: "assistant" });
+        writeAppConfig({ ravenUrl, ravenDb, agentId: "assistant", openAiApiKey, mainModel, smallModel });
     } finally {
         store.dispose();
     }
