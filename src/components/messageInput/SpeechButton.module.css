@@ -1,0 +1,51 @@
+.micButton,
+.stopButton {
+  flex-shrink: 0;
+  align-self: flex-end;
+  margin: 0.35rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.micButton {
+  background: transparent;
+}
+
+.micButton:hover:not(:disabled) {
+  opacity: 0.75;
+}
+
+.micButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.micButton[data-connecting="true"] {
+  animation: blink 0.8s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.stopButton {
+  background: var(--primary);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.stopButton:hover {
+  opacity: 0.85;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(148, 90, 181, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(148, 90, 181, 0); }
+}

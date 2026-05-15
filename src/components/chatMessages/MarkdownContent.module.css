@@ -1,0 +1,64 @@
+.root { white-space: normal; }
+
+.root p { margin: 0.5em 0; }
+.root p:first-child { margin-top: 0; }
+.root p:last-child { margin-bottom: 0; }
+
+.root h1, .root h2, .root h3 {
+    font-weight: 600;
+    margin: 1em 0 0.15em;
+}
+
+.root h1:first-child, .root h2:first-child, .root h3:first-child {
+    margin-top: 0;
+}
+
+.root ul, .root ol {
+    padding-left: 1.5em;
+    margin: 0.5em 0;
+}
+
+.root li {
+    margin: 0.25em 0;
+}
+
+.root li p {
+    margin: 0;
+}
+
+.root code {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    padding: 0.1em 0.3em;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.root pre {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    padding: 0.8em 1em;
+    overflow-x: auto;
+    margin: 0.3em 0 0.9em;
+}
+
+.root pre code {
+    background: none;
+    padding: 0;
+}
+
+.root strong { font-weight: 600; }
+.root em { font-style: italic; }
+
+.root table {
+    border-collapse: collapse;
+    margin: 0.3em 0;
+    font-size: 0.9em;
+}
+
+.root th, .root td {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.3em 0.6em;
+}
+
+.root th { background: rgba(255, 255, 255, 0.08); }
