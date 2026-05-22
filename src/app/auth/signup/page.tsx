@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "../auth.module.css";
 
 export default function SignupPage() {
     const [form, setForm] = useState({ name: "", username: "" });
+    const router = useRouter();
 
     const mutation = useMutation({
         mutationFn: async (data: { name: string; username: string }) => {
@@ -19,8 +21,9 @@ export default function SignupPage() {
                 const json = await res.json().catch(() => ({}));
                 throw new Error(json.error ?? "Signup failed.");
             }
-            return res.json();
+            return res.json() as Promise<{ userId: string }>;
         },
+        onSuccess: ({ userId }) => router.push(`/${userId}`),
     });
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
