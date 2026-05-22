@@ -58,7 +58,7 @@ export default function SetupForm({ initialConfig }: SetupFormProps) {
                     <p className={styles.successMessage}>
                         {isReconfigure ? "Configuration updated." : "Setup complete. Your AI assistant is ready."}
                     </p>
-                    <Link href="/" className={styles.submitButton}>
+                    <Link href="/auth/login" className={styles.submitButton}>
                         Open the app
                     </Link>
                 </div>

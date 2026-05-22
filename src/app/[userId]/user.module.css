@@ -55,6 +55,24 @@
     margin: 0;
 }
 
+.logoutButton {
+    margin-top: 1rem;
+    padding: 0.5rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--foreground-muted);
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.logoutButton:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
 .loginLink {
     color: var(--link);
     font-size: 0.95rem;
