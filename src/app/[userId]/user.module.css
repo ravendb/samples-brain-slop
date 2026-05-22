@@ -1,0 +1,66 @@
+.container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    max-width: 400px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    box-sizing: border-box;
+}
+
+.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 1.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.name {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--foreground);
+}
+
+.username {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--foreground-muted);
+}
+
+.empty {
+    color: var(--foreground-muted);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.loginLink {
+    color: var(--link);
+    font-size: 0.95rem;
+    text-decoration: none;
+}
+
+.loginLink:hover {
+    text-decoration: underline;
+}
