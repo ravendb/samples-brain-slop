@@ -5,27 +5,27 @@ import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import styles from "../team-form.module.css";
 
-async function createTeam(userId: string, name: string) {
-    const res = await fetch(`/api/users/${userId}/teams`, {
+async function joinTeam(userId: string, teamName: string) {
+    const res = await fetch(`/api/users/${userId}/teams/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ teamName }),
     });
     if (!res.ok) {
         const json = await res.json().catch(() => ({}));
-        throw new Error(json.error ?? "Failed to create team.");
+        throw new Error(json.error ?? "Failed to join team.");
     }
     return res.json();
 }
 
-export default function CreateTeamPage() {
+export default function JoinTeamPage() {
     const { userId } = useParams<{ userId: string }>();
     const router = useRouter();
     const queryClient = useQueryClient();
-    const [name, setName] = useState("");
+    const [teamName, setTeamName] = useState("");
 
     const mutation = useMutation({
-        mutationFn: (name: string) => createTeam(userId, name),
+        mutationFn: (teamName: string) => joinTeam(userId, teamName),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["userTeams", userId] });
             router.push(`/${userId}`);
@@ -34,22 +34,22 @@ export default function CreateTeamPage() {
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (name.trim()) mutation.mutate(name.trim());
+        if (teamName.trim()) mutation.mutate(teamName.trim());
     }
 
     return (
         <div className={styles.container}>
             <div className={styles.card}>
-                <h1 className={styles.title}>New team</h1>
+                <h1 className={styles.title}>Join a team</h1>
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.fieldGroup}>
-                        <label htmlFor="name" className={styles.label}>Team name</label>
+                        <label htmlFor="teamName" className={styles.label}>Team name</label>
                         <input
-                            id="name"
+                            id="teamName"
                             autoFocus
                             className={styles.input}
-                            value={name}
-                            onChange={e => setName(e.target.value)}
+                            value={teamName}
+                            onChange={e => setTeamName(e.target.value)}
                             disabled={mutation.isPending}
                             required
                         />
@@ -63,8 +63,8 @@ export default function CreateTeamPage() {
                         <button type="button" className={styles.cancelButton} onClick={() => router.push(`/${userId}`)}>
                             Cancel
                         </button>
-                        <button type="submit" className={styles.submitButton} disabled={mutation.isPending || !name.trim()}>
-                            {mutation.isPending ? "Creating…" : "Create team"}
+                        <button type="submit" className={styles.submitButton} disabled={mutation.isPending || !teamName.trim()}>
+                            {mutation.isPending ? "Joining…" : "Join team"}
                         </button>
                     </div>
                 </form>

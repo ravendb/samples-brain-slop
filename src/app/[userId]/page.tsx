@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { useUserTeams } from "@/hooks/useUserTeams";
 import styles from "./user.module.css";
 
 export default function UserPage() {
     const { userId } = useParams<{ userId: string }>();
+    const router = useRouter();
     const { data: user, isLoading } = useUser(userId);
     const { data: teams = [] } = useUserTeams(userId);
 
@@ -39,6 +40,9 @@ export default function UserPage() {
                     <div className={styles.avatar}>{user.name[0].toUpperCase()}</div>
                     <h1 className={styles.name}>{user.name}</h1>
                     <p className={styles.username}>@{user.username}</p>
+                    <button className={styles.logoutButton} onClick={() => router.push("/auth/login")}>
+                        Logout
+                    </button>
                 </div>
 
                 <div className={styles.teamsRow}>
@@ -53,6 +57,9 @@ export default function UserPage() {
                                 </div>
                             ))
                         }
+                        <Link href={`/${userId}/join-team`} className={styles.newTeamButton}>
+                            + Join team
+                        </Link>
                     </div>
 
                     <div className={styles.teamSection}>

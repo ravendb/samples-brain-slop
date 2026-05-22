@@ -33,3 +33,30 @@ export async function getTeamsByUserId(userId: string) {
 
     return result;
 }
+
+export async function joinTeamByName(userId: string, teamName: string) {
+    const session = getStore().openSession();
+    const team = await session.query<Team>({ collection: "Teams" })
+        .whereEquals("name", teamName)
+        .firstOrNull();
+
+    if (!team || !team.id) {
+        throw new Error("Team not found");
+    }
+
+    const existingMember = await session.query<Member>({ collection: "Members" })
+        .whereEquals("userId", userId)
+        .whereEquals("teamId", team.id)
+        .firstOrNull();
+
+    if (existingMember) {
+        throw new Error("User is already a member of this team");
+    }
+
+    const member = Member.withRandomColor(userId, team.id, "member");
+    
+    await session.store(member);
+    await session.saveChanges();
+
+    return member;
+}
