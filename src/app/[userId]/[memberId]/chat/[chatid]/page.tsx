@@ -4,7 +4,7 @@ import ChatMessages from "@/components/chatMessages/ChatMessages";
 import Link from "next/link";
 
 type ChatPageProps = {
-	params: Promise<{ chatid: string }>;
+	params: Promise<{ chatid: string; memberId: string }>;
 };
 
 function decodeChatId(encodedChatId: string): string | null {
@@ -27,7 +27,7 @@ function renderError(message: string) {
 }
 
 export default async function ChatPage({ params }: ChatPageProps) {
-	const { chatid } = await params;
+	const { chatid, memberId } = await params;
 
 	const decodedChatId = decodeChatId(chatid);
 	if (!decodedChatId) {
@@ -48,6 +48,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
 		<div className={styles.page}>
 			<ChatMessages
 				chatId={decodedChatId}
+				memberId={memberId}
 				initialMessages={messages}
 				initialActions={actions}
 				isNewChat={false}

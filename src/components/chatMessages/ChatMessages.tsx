@@ -14,6 +14,7 @@ import { decodeStream } from "@/services/stream";
 
 type ChatMessagesProps = {
     chatId: string;
+    memberId: string;
     initialMessages: Message[];
     initialActions: Action[];
     isNewChat: boolean;
@@ -22,6 +23,7 @@ type ChatMessagesProps = {
 
 async function sendMessage(
     chatId: string,
+    memberId: string,
     content: string,
     onChunk: (chunk: string) => void,
     onFinalResult: (result: SendMessageResult) => void
@@ -31,7 +33,7 @@ async function sendMessage(
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ chatId, content }),
+        body: JSON.stringify({ chatId, memberId, content }),
     });
 
     if (!response.ok || !response.body) {
@@ -42,7 +44,7 @@ async function sendMessage(
     await decodeStream(reader, onChunk, onFinalResult);
 }
 
-export default function ChatMessages({ chatId, initialMessages, initialActions, isNewChat, initialPrompt }: ChatMessagesProps) {
+export default function ChatMessages({ chatId, memberId, initialMessages, initialActions, isNewChat, initialPrompt }: ChatMessagesProps) {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [actions, setActions] = useState<Action[]>(initialActions);
     const [currentChatId, setCurrentChatId] = useState(chatId);
@@ -62,7 +64,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
         setPrevChatId(chatId);
     }
 
-    // Auto-scroll container to show new messages or actions
+    // Auto-scroll
     useEffect(() => {
         if (!scrollAreaRef.current) return;
         scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
@@ -92,7 +94,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
 
         setIsPending(true);
         try {
-            await sendMessage(currentChatId, content, (chunk) => onChunk(chunk, id), onFinalResult)
+            await sendMessage(currentChatId, memberId, content, (chunk) => onChunk(chunk, id), onFinalResult)
         } catch (err) {
             setError(err as Error);
             setIsPending(false);

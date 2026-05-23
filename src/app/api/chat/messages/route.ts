@@ -18,13 +18,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: Request) {
-    const { chatId, content } = await request.json();
+    const { chatId, content, memberId } = await request.json();
 
-    if (!chatId || !content) {
-        return NextResponse.json({ error: "Missing chatId or content." }, { status: 400 });
+    if (!chatId || !content || !memberId) {
+        return NextResponse.json({ error: "Missing chatId, content, or memberId." }, { status: 400 });
     }
 
-    const stream = encodeStream((onChunk) => sendMessage(chatId, content, onChunk));
+    const stream = encodeStream((onChunk) => sendMessage(chatId, content, onChunk, memberId));
 
     return new NextResponse(stream, { headers: { "Content-Type": "application/x-ndjson; charset=utf-8" } });
 }

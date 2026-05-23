@@ -20,9 +20,21 @@ export async function createProject(project: ProjectDocument, tasks: TaskDocumen
 }
 
 export async function createProjectFromAction(project: Project): Promise<{ projectId: string; taskIds: string[] }> {
-    const projectDocument = new ProjectDocument(project.title, project.description, project.dueDate);
+    const projectDocument = new ProjectDocument(project.title, project.description, project.teamId, project.createdBy, project.dueDate);
     const taskDocuments = project.tasks?.map(taskToDocument) || [];
     return await createProject(projectDocument, taskDocuments);
+}
+
+function documentToProject(doc: ProjectDocument, tasks: TaskDocument[]): Project {
+    return {
+        id: doc.id,
+        title: doc.title,
+        description: doc.description,
+        dueDate: doc.dueDate,
+        teamId: doc.teamId,
+        createdBy: doc.createdBy,
+        tasks
+    };
 }
 
 export async function loadProjects(): Promise<Project[]> {
@@ -30,20 +42,12 @@ export async function loadProjects(): Promise<Project[]> {
     const documents = await session.query(ProjectDocument)
         .include("taskIds")
         .all();
-        
+
     const projects: Project[] = [];
     for (const doc of documents) {
         const tasksDocs = await session.load<TaskDocument>(doc.taskIds);
         const tasks = Object.values(tasksDocs) as TaskDocument[];
-        const project = {
-            id: doc.id,
-            title: doc.title,
-            description: doc.description,
-            dueDate: doc.dueDate,
-            tasks: tasks
-        }
-
-        projects.push(project);
+        projects.push(documentToProject(doc, tasks));
     }
 
     return projects;
@@ -51,7 +55,7 @@ export async function loadProjects(): Promise<Project[]> {
 
 export async function loadProject(id: string) {
     const session = getStore().openSession();
-    
+
     const document = await session
         .include("taskIds")
         .load<ProjectDocument>(id);
@@ -63,13 +67,7 @@ export async function loadProject(id: string) {
     const tasksDocs = await session.load<TaskDocument>(document.taskIds);
     const tasks = Object.values(tasksDocs) as TaskDocument[];
 
-    return {
-        id: document.id,
-        title: document.title,
-        description: document.description,
-        dueDate: document.dueDate,
-        tasks: tasks
-    }
+    return documentToProject(document, tasks);
 }
 
 export async function editProject(projectId: string, updates: EditProjectArguments["updates"]) {

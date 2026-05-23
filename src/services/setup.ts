@@ -68,6 +68,8 @@ const AGENT_ACTIONS = [
                 title: { type: "string", description: "The title of the project. If not explicitly provided, generate a concise and meaningful title based on the user's request." },
                 description: { type: "string", description: "A clear description of the project's purpose, goals, and context. Expand based on the conversation if needed." },
                 dueDate: { type: "string", description: "The project deadline in ISO 8601 format (YYYY-MM-DD). If not mentioned, omit this field." },
+                teamId: { type: "string", description: "The ID of the team this project belongs to. Use the team ID from the conversation context." },
+                createdBy: { type: "string", description: "The ID of the user creating the project. Use the user ID from the conversation context." },
                 tasks: {
                     type: "array",
                     description: "A list of initial tasks for the project. Can be empty if no tasks are specified or inferred.",
@@ -84,7 +86,7 @@ const AGENT_ACTIONS = [
                     }
                 }
             },
-            required: ["title", "description"],
+            required: ["title", "description", "teamId", "createdBy"],
             additionalProperties: false
         })
     },
@@ -265,6 +267,10 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
             sampleObject: '{"response": "Provide your response."}',
             queries: AGENT_QUERIES,
             actions: AGENT_ACTIONS,
+            parameters: [
+                { name: "teamId", description: "The ID of the team this conversation belongs to.", sendToModel: true },
+                { name: "userId", description: "The ID of the user who started this conversation.", sendToModel: true },
+            ],
             disabled: false,
         }));
 

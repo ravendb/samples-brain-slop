@@ -1,9 +1,12 @@
 import { Action } from "./action";
 
+export const NEW_CHAT_ID = "Chats/";
+
 export type Chat = {
     id: string,
     updatedAt: string,
-    title: string
+    title: string,
+    memberId: string
 }
 
 export type Message = {

@@ -1,10 +1,11 @@
 import { AiAnswer, AiConversation } from "ravendb"
 import { getStore } from "@/db/ravendb";
 import { getAgentId } from "@/lib/config";
-import { Chat, Message } from "@/models/chat";
+import { Chat, Message, NEW_CHAT_ID } from "@/models/chat";
 import { receiveActions } from "@/services/actions";
 import { Action, StoredAction, ToolResponse } from "@/models/action";
 import { extractActions, formatActions } from "@/repositories/actionRepo";
+import { getMemberById } from "@/repositories/memberRepo";
 import { randomUUID } from "crypto";
 
 export async function loadChats(): Promise<Chat[]> {
@@ -12,14 +13,15 @@ export async function loadChats(): Promise<Chat[]> {
 
     const chats = await session.advanced.rawQuery<Chat>(`
             from @conversations
-            select id() as id, Title as title, LastMessageAt as updatedAt
+            select id() as id, Title as title, LastMessageAt as updatedAt, MemberId as memberId
         `)
         .all();
 
     return chats.map(chat => ({
         id: chat.id,
         title: chat.title?.trim() ? chat.title : "New chat",
-        updatedAt: formatUpdatedAt(chat.updatedAt)
+        updatedAt: formatUpdatedAt(chat.updatedAt),
+        memberId: chat.memberId
     }));
 }
 
@@ -44,11 +46,22 @@ async function streamChat(chat: AiConversation, onChunk: (chunk: string) => void
     return requiredActions
 }
 
-export async function sendMessage(chatId: string, prompt: string, onChunk: (chunk: string) => void) {
+export async function sendMessage(chatId: string, prompt: string, onChunk: (chunk: string) => void, memberId: string) {
     const agentId = getAgentId();
-    const chat = getStore().ai.conversation(agentId, chatId)
 
-    chat.setUserPrompt(prompt)
+    const isNewChat = chatId === NEW_CHAT_ID;
+    let creationOptions = undefined;
+    if (isNewChat) {
+        const member = await getMemberById(memberId);
+        if (member) {
+            creationOptions = { parameters: { teamId: member.teamId, userId: member.userId } };
+        } else {
+            throw new Error("Can't create new chat because member was not found.");
+        }
+    }
+
+    const chat = getStore().ai.conversation(agentId, chatId, creationOptions);
+    chat.setUserPrompt(prompt);
 
     const actions = await streamChat(chat, onChunk);
 

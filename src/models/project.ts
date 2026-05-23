@@ -8,11 +8,15 @@ export class ProjectDocument {
     description: string;
     dueDate?: string;
     taskIds: string[];
+    teamId: string;
+    createdBy: string;
 
-    constructor(title: string, description: string, dueDate?: string) {
+    constructor(title: string, description: string, teamId: string, createdBy: string, dueDate?: string) {
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
+        this.teamId = teamId;
+        this.createdBy = createdBy;
         this.taskIds = [];
     }
 
@@ -26,6 +30,8 @@ export const ProjectSchema = z.object({
     title: z.string(),
     description: z.string(),
     dueDate: DateSchema.optional(),
+    teamId: z.string(),
+    createdBy: z.string(),
     tasks: z.array(TaskSchema).default([]),
 })
 
