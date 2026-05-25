@@ -182,6 +182,7 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
             parameters: [
                 { name: "teamId", description: "The ID of the team this conversation belongs to.", sendToModel: true },
                 { name: "userId", description: "The ID of the user who started this conversation.", sendToModel: true },
+                { name: "memberId", description: "The ID of the member who started this conversation.", sendToModel: false },
             ],
             disabled: false,
         }));

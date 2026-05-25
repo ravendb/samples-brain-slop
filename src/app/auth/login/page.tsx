@@ -5,12 +5,10 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "../auth.module.css";
-import { useUserContext } from "@/context/UserContext";
 
 export default function LoginPage() {
     const [username, setUsername] = useState("");
     const router = useRouter();
-    const { setUserId } = useUserContext();
 
     const mutation = useMutation({
         mutationFn: async (data: { username: string }) => {
@@ -23,12 +21,9 @@ export default function LoginPage() {
                 const json = await res.json().catch(() => ({}));
                 throw new Error(json.error ?? "Login failed.");
             }
-            return res.json() as Promise<{ userId: string }>;
+            return res.json();
         },
-        onSuccess: ({ userId }) => {
-            setUserId(userId);
-            router.push("/profile");
-        },
+        onSuccess: () => router.push("/profile"),
     });
 
     function handleSubmit(e: React.FormEvent) {

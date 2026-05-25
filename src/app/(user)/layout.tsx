@@ -1,13 +1,18 @@
-import React from "react";
+import { redirect } from "next/navigation";
+import { getSession } from "@/lib/session";
+import { UserProvider } from "@/context/UserContext";
 import styles from "./layout.module.css";
-import { MemberProvider } from "@/context/MemberContext";
+import React from "react";
 
-export default function UserRingLayout({ children }: { children: React.ReactNode }) {
+export default async function UserRingLayout({ children }: { children: React.ReactNode }) {
+    const { userId } = await getSession();
+    if (!userId) redirect("/auth/login");
+
     return (
-        <MemberProvider>
+        <UserProvider userId={userId}>
             <div className={styles.container}>
                 {children}
             </div>
-        </MemberProvider>
+        </UserProvider>
     );
 }

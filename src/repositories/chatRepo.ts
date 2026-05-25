@@ -13,8 +13,8 @@ export async function loadChats(memberId: string): Promise<Chat[]> {
 
     const chats = await session.advanced.rawQuery<Chat>(`
             from @conversations
+            where Parameters.memberId = $memberId
             select id() as id, Title as title, LastMessageAt as updatedAt, MemberId as memberId
-            where MemberId = $memberId
         `)
         .addParameter("memberId", memberId)
         .all();
@@ -56,7 +56,7 @@ export async function sendMessage(chatId: string, prompt: string, onChunk: (chun
     if (isNewChat) {
         const member = await getMemberById(memberId);
         if (member) {
-            creationOptions = { parameters: { teamId: member.teamId, userId: member.userId } };
+            creationOptions = { parameters: { teamId: member.teamId, userId: member.userId, memberId: memberId } };
         } else {
             throw new Error("Can't create new chat because member was not found.");
         }

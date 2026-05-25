@@ -2,6 +2,7 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { signup } from "@/repositories/userRepo";
+import { setUserIdCookie } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => null);
@@ -12,7 +13,8 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        const user = await signup(username, name);
+        const user = await signup(username, name) as { id: string };
+        await setUserIdCookie(user.id);
         return NextResponse.json({ userId: user.id });
     } catch (err) {
         const message = err instanceof Error ? err.message : "Signup failed.";

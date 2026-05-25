@@ -1,40 +1,33 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { useUserTeams } from "@/hooks/useUserTeams";
-import { useUserContext } from "@/context/UserContext";
-import { useMemberContext } from "@/context/MemberContext";
+import { useUserId } from "@/context/UserContext";
+import { selectMember, logout } from "@/actions/session";
 import styles from "./user.module.css";
 
 export default function UserPage() {
     const router = useRouter();
-    const { userId, setUserId } = useUserContext();
-    const { setMemberId } = useMemberContext();
-    const { data: user, isLoading } = useUser(userId ?? "");
-    const { data: teams = [] } = useUserTeams(userId ?? "");
-
-    useEffect(() => {
-        if (!userId) router.replace("/auth/login");
-    }, [userId, router]);
+    const userId = useUserId();
+    const { data: user, isLoading } = useUser(userId);
+    const { data: teams = [] } = useUserTeams(userId);
 
     const memberOf = teams.filter(({ member }) => member.role === "member");
     const managing = teams.filter(({ member }) => member.role === "manager");
 
-    function handleTeamSelect(memberId: string) {
-        setMemberId(memberId);
+    async function handleTeamSelect(memberId: string) {
+        await selectMember(memberId);
         router.push("/home");
     }
 
-    function handleLogout() {
-        setUserId(null);
-        setMemberId(null);
+    async function handleLogout() {
+        await logout();
         router.push("/auth/login");
     }
 
-    if (!userId || isLoading) {
+    if (isLoading) {
         return (
             <div className={styles.container}>
                 <p className={styles.empty}>Loading…</p>
