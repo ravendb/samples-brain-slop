@@ -51,10 +51,10 @@ export default function UserPage() {
                         {memberOf.length === 0
                             ? <p className={styles.empty}>No teams.</p>
                             : memberOf.map(({ team, member }) => (
-                                <div key={member.id} className={styles.teamItem}>
+                                <Link key={member.id} href={`/${userId}/${member.id}`} className={styles.teamItem}>
                                     <span className={styles.colorDot} style={{ background: member.color }} />
                                     <span className={styles.teamName}>{team?.name}</span>
-                                </div>
+                                </Link>
                             ))
                         }
                         <Link href={`/${userId}/join-team`} className={styles.newTeamButton}>
@@ -67,10 +67,10 @@ export default function UserPage() {
                         {managing.length === 0
                             ? <p className={styles.empty}>No teams.</p>
                             : managing.map(({ team, member }) => (
-                                <div key={member.id} className={styles.teamItem}>
+                                <Link key={member.id} href={`/${userId}/${member.id}`} className={styles.teamItem}>
                                     <span className={styles.colorDot} style={{ background: member.color }} />
                                     <span className={styles.teamName}>{team?.name}</span>
-                                </div>
+                                </Link>
                             ))
                         }
                         <Link href={`/${userId}/create-team`} className={styles.newTeamButton}>
