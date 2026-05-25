@@ -2,6 +2,9 @@ import { DocumentStore, AiConnectionString, OpenAiSettings, PutConnectionStringO
 import { AddOrUpdateAiAgentOperation } from "ravendb";
 import { AddGenAiOperation, UpdateGenAiOperation, GenAiConfiguration, GenAiTransformation } from "ravendb";
 import { writeAppConfig } from "@/lib/config";
+import { z } from "zod";
+import { AddNewTaskArgumentsSchema, EditTaskArgumentsSchema, DeleteTaskArgumentsSchema } from "@/models/task";
+import { CreateProjectArgumentsSchema, EditProjectArgumentsSchema, DeleteProjectArgumentsSchema } from "@/models/project";
 
 const SYSTEM_PROMPT = `You are an AI assistant for a task management system BrainSlop.
 Your goal is to convert unstructured manager messages into structured tasks and execute actions using available tools.
@@ -62,123 +65,32 @@ const AGENT_ACTIONS = [
     {
         name: "CreateProject",
         description: "Trigger this action when the user intends to create a new project or start tracking a new initiative.\nThis includes explicit requests or when the user provides a project name, goal, or context implying a new project.\nEnsure you have a project name (or can infer one). If key details are missing, ask a follow-up question instead of triggering the tool.",
-        parametersSchema: JSON.stringify({
-            type: "object",
-            properties: {
-                title: { type: "string", description: "The title of the project. If not explicitly provided, generate a concise and meaningful title based on the user's request." },
-                description: { type: "string", description: "A clear description of the project's purpose, goals, and context. Expand based on the conversation if needed." },
-                dueDate: { type: "string", description: "The project deadline in ISO 8601 format (YYYY-MM-DD). If not mentioned, omit this field." },
-                teamId: { type: "string", description: "The ID of the team this project belongs to. Use the team ID from the conversation context." },
-                createdBy: { type: "string", description: "The ID of the user creating the project. Use the user ID from the conversation context." },
-                tasks: {
-                    type: "array",
-                    description: "A list of initial tasks for the project. Can be empty if no tasks are specified or inferred.",
-                    items: {
-                        type: "object",
-                        properties: {
-                            title: { type: "string", description: "Short title of the task." },
-                            description: { type: "string", description: "Optional detailed description of the task." },
-                            priority: { type: "string", enum: ["low", "normal", "high"], description: "Priority of the task." },
-                            dueDate: { type: "string", description: "The tasks deadline in ISO 8601 format (YYYY-MM-DD). If not mentioned, omit this field." }
-                        },
-                        required: ["title"],
-                        additionalProperties: false
-                    }
-                }
-            },
-            required: ["title", "description", "teamId", "createdBy"],
-            additionalProperties: false
-        })
+        parametersSchema: JSON.stringify(z.toJSONSchema(CreateProjectArgumentsSchema))
     },
     {
         name: "AddNewTask",
         description: "Trigger this action when the user intends to create a new task and add it to an existing project. If the user wants to add a task to a new project - create a new project with that task using the CreateProject action.",
-        parametersSchema: JSON.stringify({
-            type: "object",
-            properties: {
-                projectId: { type: "string", description: "The document ID of the project the task is added to. NOT THE PROJECT TITLE. The document ID that RavenDB can use to load the document. If you don't know what the ID is, ask for it." },
-                projectTitle: { type: "string", description: "The title of the project so the user would know which project is being updated." },
-                task: {
-                    type: "object",
-                    properties: {
-                        title: { type: "string", description: "Short title of the task." },
-                        description: { type: "string", description: "Optional detailed description of the task." },
-                        priority: { type: "string", enum: ["low", "normal", "high"], default: "normal", description: "Priority of the task." },
-                        dueDate: { type: "string", description: "The tasks deadline in ISO 8601 format (YYYY-MM-DD). If not mentioned, omit this field." }
-                    },
-                    required: ["title", "priority"],
-                    additionalProperties: false
-                }
-            },
-            required: ["projectId", "projectTitle", "task"],
-            additionalProperties: false
-        })
+        parametersSchema: JSON.stringify(z.toJSONSchema(AddNewTaskArgumentsSchema))
     },
     {
         name: "EditTask",
         description: "Trigger this action when the user intends to edit an existing task, including when the user says a task is done or completed. Make sure you know the ID of the task to edit — use query tools to look it up by name if you don't have it. Only fill the properties that the user wants to edit. Leave the other properties empty so the task won't change beyond what the user intended. To mark a task complete, set completed to true.",
-        parametersSchema: JSON.stringify({
-            type: "object",
-            properties: {
-                taskId: { type: "string", description: "The ID of the task to edit." },
-                currentTitle: { type: "string", description: "The current title of the task to display to the user which task is being edited." },
-                updates: {
-                    type: "object",
-                    properties: {
-                        title: { type: "string", description: "Short title of the task." },
-                        description: { type: "string", description: "Optional detailed description of the task." },
-                        priority: { type: "string", enum: ["low", "normal", "high"], description: "Priority of the task." },
-                        dueDate: { type: "string", description: "The tasks deadline in ISO 8601 format (YYYY-MM-DD). If not mentioned, omit this field." },
-                        completed: { type: "boolean", description: "Is the task completed or not." }
-                    },
-                    required: [],
-                    additionalProperties: false
-                }
-            },
-            required: ["taskId", "updates", "currentTitle"],
-            additionalProperties: false
-        })
+        parametersSchema: JSON.stringify(z.toJSONSchema(EditTaskArgumentsSchema))
     },
     {
         name: "EditProject",
         description: "Trigger this action when the user intends to edit an existing project. Make sure you know the ID of the project to edit. You can use query tools to get the info you need.\nOnly fill the properties that the user wants to edit. Leave the other properties empty so the project wont change beyond what the user intended.",
-        parametersSchema: JSON.stringify({
-            type: "object",
-            properties: {
-                projectId: { type: "string", description: "The ID of the project to edit." },
-                currentTitle: { type: "string", description: "The current title of the project to display to the user which project is being eddited." },
-                updates: {
-                    type: "object",
-                    properties: {
-                        title: { type: "string", description: "The title of the project." },
-                        description: { type: "string", description: "A clear description of the project's purpose, goals, and context." },
-                        dueDate: { type: "string", description: "The project deadline in a common date format." }
-                    },
-                    required: [],
-                    additionalProperties: false
-                }
-            },
-            required: ["projectId", "updates", "currentTitle"],
-            additionalProperties: false
-        })
+        parametersSchema: JSON.stringify(z.toJSONSchema(EditProjectArgumentsSchema))
     },
     {
         name: "DeleteProject",
         description: "Trigger this action when the user intends to delete a project permanently.",
-        parametersSampleObject: JSON.stringify({
-            projectId: "The ID of the project to delete.",
-            title: "The title of the project to delete."
-        })
+        parametersSchema: JSON.stringify(z.toJSONSchema(DeleteProjectArgumentsSchema))
     },
     {
         name: "DeleteTask",
         description: "Trigger this action when the user intends to delete a task permanently.",
-        parametersSampleObject: JSON.stringify({
-            projectId: "The ID of the project the task belongs to.",
-            projectTitle: "The title of the project the task belongs to.",
-            taskId: "The ID of the task to be deleted.",
-            taskTitle: "The title of the task to be deleted."
-        })
+        parametersSchema: JSON.stringify(z.toJSONSchema(DeleteTaskArgumentsSchema))
     }
 ];
 
