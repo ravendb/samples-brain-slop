@@ -34,6 +34,13 @@ export async function getTeamsByUserId(userId: string) {
     return result;
 }
 
+export async function getMembersByTeamId(teamId: string): Promise<Member[]> {
+    const session = getStore().openSession();
+    return session.query<Member>({ collection: "Members" })
+        .whereEquals("teamId", teamId)
+        .all();
+}
+
 export async function joinTeamByName(userId: string, teamName: string) {
     const session = getStore().openSession();
     const team = await session.query<Team>({ collection: "Teams" })

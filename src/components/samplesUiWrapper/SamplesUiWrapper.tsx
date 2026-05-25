@@ -15,8 +15,6 @@ export default function SamplesUiWrapper({ sourceLink, children }: Props) {
     const [resourcesVisible, setResourcesVisible] = useState(true);
     const pathname = usePathname();
     const isAuthPage = pathname.startsWith("/auth") || pathname === "/setup";
-    const userId = pathname.split("/")[1];
-    const profileHref = !isAuthPage && userId ? `/${userId}` : null;
 
     return (
         <div className={styles.wrapper}>
@@ -30,11 +28,6 @@ export default function SamplesUiWrapper({ sourceLink, children }: Props) {
                 </a>
                 {!isAuthPage && (
                     <nav className={styles.headerNav}>
-                        {profileHref && (
-                            <Link href={profileHref} className={`${styles.headerNavLink} ${pathname === `/${userId}` ? styles.headerNavLinkActive : ""}`}>
-                                Profile
-                            </Link>
-                        )}
                         <Link href="/setup" className={`${styles.headerNavLink} ${pathname === "/setup" ? styles.headerNavLinkActive : ""}`}>
                             Setup
                         </Link>

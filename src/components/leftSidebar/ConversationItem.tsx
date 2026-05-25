@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { Chat } from "@/models/chat";
-import styles from "./ConversationSidebar.module.css";
+import styles from "./LeftSidebar.module.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemberId } from "@/context/MemberContext";
 
@@ -66,7 +66,7 @@ export default function ConversationItem({ chat }: ConversationItemProps) {
 
 		if (isDeleteConfirmed) {
 			deleteMutation.mutate(chat.id);
-		}        
+		}
 	}
 
 	return (

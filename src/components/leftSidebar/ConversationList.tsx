@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import styles from "./ConversationSidebar.module.css";
+import styles from "./LeftSidebar.module.css";
 import { Chat } from "@/models/chat";
 import ConversationItem from "./ConversationItem";
 import { useMemberId } from "@/context/MemberContext";
@@ -25,7 +25,7 @@ export default function ConversationList() {
     const { data: chatList = [], error } = useQuery<Chat[]>({
         queryKey: ["chats", memberId],
         queryFn: () => loadChats(memberId),
-        staleTime: 1000 * 60, // 1 minute
+        staleTime: 1000 * 60,
     });
 
 	const sortedChats = chatList.toSorted((a, b) =>

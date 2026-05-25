@@ -4,8 +4,18 @@
 	background-color: var(--sidebar-bg);
 	border-left: 1px solid var(--border);
 	padding: 1rem;
-	overflow-y: auto;
 	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+}
+
+/* ── Chats section ─────────────────────────────────── */
+
+.chatsSection {
+	flex: 7;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
 }
 
 .header {
@@ -135,4 +145,38 @@
 	margin-top: 0.35rem;
 	font-size: 0.8rem;
 	color: var(--foreground-muted);
+}
+
+/* ── Team section ──────────────────────────────────── */
+
+.teamSection {
+	flex: 3;
+	overflow-y: auto;
+	border-top: 1px solid var(--border);
+	padding-top: 0.75rem;
+	margin-top: 0.75rem;
+}
+
+.teamTitle {
+	color: var(--foreground-muted);
+	font-size: 1.1rem;
+	margin: 0;
+}
+
+.teamRow {
+	font-size: 0.85rem;
+	color: var(--foreground-muted);
+	margin-bottom: 0.4rem;
+	line-height: 1.4;
+}
+
+.teamRowLabel {
+	font-weight: 600;
+	color: var(--foreground);
+	margin-right: 0.25rem;
+}
+
+.memberName {
+	display: inline-block;
+	white-space: nowrap;
 }
