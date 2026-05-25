@@ -142,7 +142,8 @@
 
 .main {
     flex: 1;
-    overflow-y: scroll;
+    min-height: 0;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
 }
