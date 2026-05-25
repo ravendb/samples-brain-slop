@@ -11,10 +11,10 @@ import ChatError from "./ChatError";
 import styles from "./ChatMessages.module.css";
 import { useRouter } from "next/navigation";
 import { decodeStream } from "@/services/stream";
+import { useMemberId } from "@/context/MemberContext";
 
 type ChatMessagesProps = {
     chatId: string;
-    memberId: string;
     initialMessages: Message[];
     initialActions: Action[];
     isNewChat: boolean;
@@ -44,7 +44,8 @@ async function sendMessage(
     await decodeStream(reader, onChunk, onFinalResult);
 }
 
-export default function ChatMessages({ chatId, memberId, initialMessages, initialActions, isNewChat, initialPrompt }: ChatMessagesProps) {
+export default function ChatMessages({ chatId, initialMessages, initialActions, isNewChat, initialPrompt }: ChatMessagesProps) {
+    const memberId = useMemberId();
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [actions, setActions] = useState<Action[]>(initialActions);
     const [currentChatId, setCurrentChatId] = useState(chatId);
@@ -124,10 +125,10 @@ export default function ChatMessages({ chatId, memberId, initialMessages, initia
             setCurrentChatId(result.chatId);
             router.replace(`/chat/${encodeURIComponent(result.chatId)}`);
 
-            queryClient.invalidateQueries({ queryKey: ["chats"] });
+            queryClient.invalidateQueries({ queryKey: ["chats", memberId] });
 
             setTimeout(
-                () => { queryClient.invalidateQueries({ queryKey: ["chats"] }); },
+                () => { queryClient.invalidateQueries({ queryKey: ["chats", memberId] }); },
                 1000 * 30 // 30 seconds
             );
         }

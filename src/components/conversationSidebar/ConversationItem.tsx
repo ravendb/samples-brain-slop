@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Chat } from "@/models/chat";
 import styles from "./ConversationSidebar.module.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemberId } from "@/context/MemberContext";
 
 async function deleteChat(chatId: string): Promise<void> {
 	const response = await fetch(`/api/chat/${encodeURIComponent(chatId)}`, {
@@ -18,14 +19,9 @@ async function deleteChat(chatId: string): Promise<void> {
 }
 
 function isActiveChat(pathname: string, chatId: string): boolean {
-    if (!pathname?.startsWith("/chat/")) {
-        return false;
-    }
-
-    const encodedChatId = pathname.slice("/chat/".length).split("/")[0];
-
+    if (!pathname.startsWith("/chat/")) return false;
     try {
-        return decodeURIComponent(encodedChatId) === chatId;
+        return decodeURIComponent(pathname.slice("/chat/".length).split("/")[0]) === chatId;
     } catch {
         return false;
     }
@@ -36,6 +32,7 @@ type ConversationItemProps = {
 };
 
 export default function ConversationItem({ chat }: ConversationItemProps) {
+	const memberId = useMemberId();
 	const pathname = usePathname();
 	const isActive = isActiveChat(pathname, chat.id);
 	const router = useRouter();
@@ -44,7 +41,7 @@ export default function ConversationItem({ chat }: ConversationItemProps) {
     const deleteMutation = useMutation({
         mutationFn: deleteChat,
         onMutate: () => {
-            queryClient.setQueryData(["chats"], (oldChats: Chat[] | undefined) => {
+            queryClient.setQueryData(["chats", memberId], (oldChats: Chat[] | undefined) => {
                 if (!oldChats) return oldChats;
                 return oldChats.filter(c => c.id !== chat.id);
             });
@@ -54,7 +51,7 @@ export default function ConversationItem({ chat }: ConversationItemProps) {
 			}
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["chats"] });
+            queryClient.invalidateQueries({ queryKey: ["chats", memberId] });
         },
         onError: (error) => {
             console.error("Failed to delete chat:", error);

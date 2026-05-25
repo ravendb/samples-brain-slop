@@ -4,9 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import styles from "./ConversationSidebar.module.css";
 import { Chat } from "@/models/chat";
 import ConversationItem from "./ConversationItem";
+import { useMemberId } from "@/context/MemberContext";
 
-async function loadChats(): Promise<Chat[]> {
-	const response = await fetch("/api/chat", {
+async function loadChats(memberId: string): Promise<Chat[]> {
+	const response = await fetch(`/api/chat?memberId=${memberId}`, {
 		method: "GET",
 		cache: "no-store",
 	});
@@ -19,9 +20,11 @@ async function loadChats(): Promise<Chat[]> {
 }
 
 export default function ConversationList() {
+    const memberId = useMemberId();
+
     const { data: chatList = [], error } = useQuery<Chat[]>({
-        queryKey: ["chats"],
-        queryFn: loadChats,
+        queryKey: ["chats", memberId],
+        queryFn: () => loadChats(memberId),
         staleTime: 1000 * 60, // 1 minute
     });
 

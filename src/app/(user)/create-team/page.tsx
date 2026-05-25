@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUserId } from "@/context/UserContext";
 import styles from "../team-form.module.css";
 
 async function createTeam(userId: string, name: string) {
@@ -19,7 +20,7 @@ async function createTeam(userId: string, name: string) {
 }
 
 export default function CreateTeamPage() {
-    const { userId } = useParams<{ userId: string }>();
+    const userId = useUserId();
     const router = useRouter();
     const queryClient = useQueryClient();
     const [name, setName] = useState("");
@@ -28,7 +29,7 @@ export default function CreateTeamPage() {
         mutationFn: (name: string) => createTeam(userId, name),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["userTeams", userId] });
-            router.push(`/${userId}`);
+            router.push("/profile");
         },
     });
 
@@ -60,7 +61,7 @@ export default function CreateTeamPage() {
                     )}
 
                     <div className={styles.actions}>
-                        <button type="button" className={styles.cancelButton} onClick={() => router.push(`/${userId}`)}>
+                        <button type="button" className={styles.cancelButton} onClick={() => router.push("/profile")}>
                             Cancel
                         </button>
                         <button type="submit" className={styles.submitButton} disabled={mutation.isPending || !name.trim()}>

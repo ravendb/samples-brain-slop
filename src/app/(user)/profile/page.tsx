@@ -1,21 +1,40 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { useUserTeams } from "@/hooks/useUserTeams";
+import { useUserContext } from "@/context/UserContext";
+import { useMemberContext } from "@/context/MemberContext";
 import styles from "./user.module.css";
 
 export default function UserPage() {
-    const { userId } = useParams<{ userId: string }>();
     const router = useRouter();
-    const { data: user, isLoading } = useUser(userId);
-    const { data: teams = [] } = useUserTeams(userId);
+    const { userId, setUserId } = useUserContext();
+    const { setMemberId } = useMemberContext();
+    const { data: user, isLoading } = useUser(userId ?? "");
+    const { data: teams = [] } = useUserTeams(userId ?? "");
+
+    useEffect(() => {
+        if (!userId) router.replace("/auth/login");
+    }, [userId, router]);
 
     const memberOf = teams.filter(({ member }) => member.role === "member");
     const managing = teams.filter(({ member }) => member.role === "manager");
 
-    if (isLoading) {
+    function handleTeamSelect(memberId: string) {
+        setMemberId(memberId);
+        router.push("/home");
+    }
+
+    function handleLogout() {
+        setUserId(null);
+        setMemberId(null);
+        router.push("/auth/login");
+    }
+
+    if (!userId || isLoading) {
         return (
             <div className={styles.container}>
                 <p className={styles.empty}>Loading…</p>
@@ -40,7 +59,7 @@ export default function UserPage() {
                     <div className={styles.avatar}>{user.name[0].toUpperCase()}</div>
                     <h1 className={styles.name}>{user.name}</h1>
                     <p className={styles.username}>@{user.username}</p>
-                    <button className={styles.logoutButton} onClick={() => router.push("/auth/login")}>
+                    <button className={styles.logoutButton} onClick={handleLogout}>
                         Logout
                     </button>
                 </div>
@@ -51,13 +70,13 @@ export default function UserPage() {
                         {memberOf.length === 0
                             ? <p className={styles.empty}>No teams.</p>
                             : memberOf.map(({ team, member }) => (
-                                <Link key={member.id} href={`/${userId}/${member.id}`} className={styles.teamItem}>
+                                <button key={member.id} onClick={() => handleTeamSelect(member.id!)} className={styles.teamItem}>
                                     <span className={styles.colorDot} style={{ background: member.color }} />
                                     <span className={styles.teamName}>{team?.name}</span>
-                                </Link>
+                                </button>
                             ))
                         }
-                        <Link href={`/${userId}/join-team`} className={styles.newTeamButton}>
+                        <Link href="/join-team" className={styles.newTeamButton}>
                             + Join team
                         </Link>
                     </div>
@@ -67,13 +86,13 @@ export default function UserPage() {
                         {managing.length === 0
                             ? <p className={styles.empty}>No teams.</p>
                             : managing.map(({ team, member }) => (
-                                <Link key={member.id} href={`/${userId}/${member.id}`} className={styles.teamItem}>
+                                <button key={member.id} onClick={() => handleTeamSelect(member.id!)} className={styles.teamItem}>
                                     <span className={styles.colorDot} style={{ background: member.color }} />
                                     <span className={styles.teamName}>{team?.name}</span>
-                                </Link>
+                                </button>
                             ))
                         }
-                        <Link href={`/${userId}/create-team`} className={styles.newTeamButton}>
+                        <Link href="/create-team" className={styles.newTeamButton}>
                             + New team
                         </Link>
                     </div>

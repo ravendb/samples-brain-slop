@@ -8,13 +8,15 @@ import { extractActions, formatActions } from "@/repositories/actionRepo";
 import { getMemberById } from "@/repositories/memberRepo";
 import { randomUUID } from "crypto";
 
-export async function loadChats(): Promise<Chat[]> {
+export async function loadChats(memberId: string): Promise<Chat[]> {
     const session = getStore().openSession();
 
     const chats = await session.advanced.rawQuery<Chat>(`
             from @conversations
             select id() as id, Title as title, LastMessageAt as updatedAt, MemberId as memberId
+            where MemberId = $memberId
         `)
+        .addParameter("memberId", memberId)
         .all();
 
     return chats.map(chat => ({

@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        const user = await login(username);
+        const user = await login(username) as { id: string };
         return NextResponse.json({ userId: user.id });
     } catch (err) {
         const message = err instanceof Error ? err.message : "Login failed.";

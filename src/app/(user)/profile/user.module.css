@@ -48,6 +48,11 @@
     gap: 0.6rem;
     text-decoration: none;
     color: inherit;
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
     padding: 0.3rem 0.5rem;
     border-radius: 6px;
     margin: 0 -0.5rem;
