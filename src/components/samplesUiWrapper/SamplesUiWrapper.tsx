@@ -14,7 +14,7 @@ export default function SamplesUiWrapper({ sourceLink, children }: Props) {
     const [toastVisible, setToastVisible] = useState(true);
     const [resourcesVisible, setResourcesVisible] = useState(true);
     const pathname = usePathname();
-    const isAuthPage = pathname.startsWith("/auth") || pathname === "/setup";
+    const isSetupPage = pathname === "/setup";
 
     return (
         <div className={styles.wrapper}>
@@ -26,7 +26,7 @@ export default function SamplesUiWrapper({ sourceLink, children }: Props) {
                         className={styles.ravendbLogo}
                     />
                 </a>
-                {!isAuthPage && (
+                {!isSetupPage && (
                     <nav className={styles.headerNav}>
                         <Link href="/setup" className={`${styles.headerNavLink} ${pathname === "/setup" ? styles.headerNavLinkActive : ""}`}>
                             Setup

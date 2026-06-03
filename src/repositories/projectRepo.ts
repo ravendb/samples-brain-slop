@@ -37,10 +37,11 @@ function documentToProject(doc: ProjectDocument, tasks: TaskDocument[]): Project
     };
 }
 
-export async function loadProjects(): Promise<Project[]> {
+export async function loadProjects(teamId: string): Promise<Project[]> {
     const session = getStore().openSession();
     const documents = await session.query(ProjectDocument)
         .include("taskIds")
+        .whereEquals("teamId", teamId)
         .all();
 
     const projects: Project[] = [];

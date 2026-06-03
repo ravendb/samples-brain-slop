@@ -104,6 +104,7 @@ function formatMessages(storedMessages: StoredMessage[]): Message[] {
 
     storedMessages
         .filter(m => m.role !== "system" && m.role !== "tool")
+        .filter(m => !(m.role === "user" && typeof m.content === "string" && m.content.startsWith("AI Agent Parameters:")))
         .forEach(m => {
             const content = extractContent(m);
             if (content) {
