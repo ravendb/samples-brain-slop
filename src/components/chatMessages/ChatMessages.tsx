@@ -51,7 +51,7 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
     const [currentChatId, setCurrentChatId] = useState(chatId);
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<Error | null>(null);
-    const scrollAreaRef = useRef<HTMLDivElement>(null);
+    const pageRef = useRef<HTMLDivElement>(null);
     const hasSentInitialPrompt = useRef(false);
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -67,8 +67,8 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
 
     // Auto-scroll
     useEffect(() => {
-        if (!scrollAreaRef.current) return;
-        scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+        if (!pageRef.current) return;
+        pageRef.current.scrollTo({ top: pageRef.current.scrollHeight, behavior: "smooth" });
     }, [messages, actions]);
 
     // Auto-send initialPrompt (from suggestion chips on the home page)
@@ -146,34 +146,32 @@ export default function ChatMessages({ chatId, initialMessages, initialActions, 
     }
 
     return (
-        <div className={`${styles.page} ${isCentered ? styles.pageCentered : ""}`}>
-            <div className={styles.scrollArea} ref={scrollAreaRef}>
-                {messages.length === 0 && !isCentered && <p className={styles.subtle}>No messages yet.</p>}
-                {messages.length > 0 && (
-                    <ul className={styles.messageList}>
-                        {messages.map((message) => (
-                            <ChatMessage key={message.id} message={message} />
-                        ))}
-                        {isPending ? (
-                            <li className={styles.message} data-role="assistant" data-pending="true">
-                                <p className={styles.content}>
-                                    Thinking
-                                    <span className={styles.ellipsis} aria-label="thinking">
-                                        <span>.</span>
-                                        <span>.</span>
-                                        <span>.</span>
-                                    </span>
-                                </p>
-                            </li>
-                        ) : null}
-                        {actions.length > 0 && (
-                            <li className={styles.actionItem}>
-                                <ActionPager actions={actions} chatId={currentChatId} setActions={setActions} setMessages={setMessages} />
-                            </li>
-                        )}
-                    </ul>
-                )}
-            </div>
+        <div className={`${styles.page} ${isCentered ? styles.pageCentered : ""}`} ref={pageRef}>
+            {messages.length === 0 && !isCentered && <p className={styles.subtle}>No messages yet.</p>}
+            {messages.length > 0 && (
+                <ul className={styles.messageList}>
+                    {messages.map((message) => (
+                        <ChatMessage key={message.id} message={message} />
+                    ))}
+                    {isPending ? (
+                        <li className={styles.message} data-role="assistant" data-pending="true">
+                            <p className={styles.content}>
+                                Thinking
+                                <span className={styles.ellipsis} aria-label="thinking">
+                                    <span>.</span>
+                                    <span>.</span>
+                                    <span>.</span>
+                                </span>
+                            </p>
+                        </li>
+                    ) : null}
+                    {actions.length > 0 && (
+                        <li className={styles.actionItem}>
+                            <ActionPager actions={actions} chatId={currentChatId} setActions={setActions} setMessages={setMessages} />
+                        </li>
+                    )}
+                </ul>
+            )}
 
             {error !== null && <ChatError error={error} />}
 
