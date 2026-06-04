@@ -58,6 +58,20 @@ const AGENT_QUERIES = [
         query: "from \"TaskDocuments\" \nwhere id() in ($taskIds)",
         parametersSampleObject: "{\n    \"taskIds\": \"List of task IDs\"\n}",
         options: {}
+    },
+    {
+        name: "GetTeamInfo",
+        description: "Use this query to get the name of the current team. Returns the team document for the given teamId.",
+        query: "from \"Teams\" where id() = $teamId",
+        parametersSampleObject: "{}",
+        options: {}
+    },
+    {
+        name: "GetTeamMembers",
+        description: "Use this query to get all members of the current team, including their names and roles. Returns each member's name (from their user account) and their role (manager or member).",
+        query: "from \"Members\" as m\nwhere m.teamId = $teamId\nload m.userId as u\nselect { memberId: id(m), name: u.name, role: m.role }",
+        parametersSampleObject: "{}",
+        options: {}
     }
 ];
 
