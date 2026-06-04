@@ -47,6 +47,7 @@ async function sendActionDecision(
 export default function ActionPager({ actions, chatId, setActions, setMessages }: ActionPagerProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [decision, setDecision] = useState<ActionDecision | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const queryClient = useQueryClient();
 
     useEffect(() => {
@@ -72,6 +73,7 @@ export default function ActionPager({ actions, chatId, setActions, setMessages }
 
     async function handleActionDecision(action: Action, decision: ActionDecision) {
         setDecision(decision);
+        setError(null);
 
         const id = crypto.randomUUID();
         setMessages(prev => [...prev,
@@ -87,6 +89,8 @@ export default function ActionPager({ actions, chatId, setActions, setMessages }
             await sendActionDecision(chatId, action, decision, (chunk) => onChunk(chunk, id), onFinalResult);
         } catch (err) {
             console.error("Error handling action decision:", err);
+            setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+            setMessages(prev => prev.filter(m => m.id !== id));
         } finally {
             setDecision(null);
         }
@@ -131,6 +135,8 @@ export default function ActionPager({ actions, chatId, setActions, setMessages }
             </div>
 
             <ActionCard action={actions[currentIndex]} />
+
+            {error && <p className={styles.error}>{error}</p>}
 
             <div className={styles.actions}>
                 <button

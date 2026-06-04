@@ -104,6 +104,12 @@
     cursor: not-allowed;
 }
 
+.error {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--danger);
+}
+
 @media (max-width: 640px) {
     .header {
         align-items: center;
@@ -117,3 +123,4 @@
         flex: 1;
     }
 }
+
