@@ -72,6 +72,13 @@ const AGENT_QUERIES = [
         query: "from \"Members\" as m\nwhere m.teamId = $teamId\nload m.userId as u\nselect { memberId: id(m), name: u.name, role: m.role }",
         parametersSampleObject: "{}",
         options: {}
+    },
+    {
+        name: "GetCurrentUser",
+        description: "Use this query to get information about the user you are currently talking to, including their name, username, color, and role.",
+        query: "from \"Members\" as m\nwhere id(m) = $memberId\nload m.userId as u\nselect { memberId: id(m), userId: m.userId, name: u.name, username: u.username, color: m.color, role: m.role }",
+        parametersSampleObject: "{}",
+        options: {}
     }
 ];
 
@@ -88,7 +95,7 @@ const AGENT_ACTIONS = [
     },
     {
         name: "EditTask",
-        description: "Trigger this action when the user intends to edit an existing task, including when the user says a task is done or completed. Make sure you know the ID of the task to edit — use query tools to look it up by name if you don't have it. Only fill the properties that the user wants to edit. Leave the other properties empty so the task won't change beyond what the user intended. To mark a task complete, set completed to true.",
+        description: "Trigger this action when the user intends to edit an existing task, including when the user says a task is done or completed. Make sure you know the ID of the task to edit — use query tools to look it up by name if you don't have it. Only fill the properties that the user wants to edit. Leave the other properties empty so the task won't change beyond what the user intended. To mark a task complete, set completed to true. When setting assigneeId, also set assigneeName to the member's display name (use GetTeamMembers to look it up).",
         parametersSchema: JSON.stringify(z.toJSONSchema(EditTaskArgumentsSchema))
     },
     {
@@ -195,8 +202,7 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
             actions: AGENT_ACTIONS,
             parameters: [
                 { name: "teamId", description: "The ID of the team this conversation belongs to.", sendToModel: true },
-                { name: "userId", description: "The ID of the user who started this conversation.", sendToModel: true },
-                { name: "memberId", description: "The ID of the member who started this conversation.", sendToModel: false },
+                { name: "memberId", description: "The ID of the member who started this conversation.", sendToModel: true },
             ],
             disabled: false,
         }));

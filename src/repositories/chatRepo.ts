@@ -56,7 +56,7 @@ export async function sendMessage(chatId: string, prompt: string, onChunk: (chun
     if (isNewChat) {
         const member = await getMemberById(memberId);
         if (member) {
-            creationOptions = { parameters: { teamId: member.teamId, userId: member.userId, memberId: memberId } };
+            creationOptions = { parameters: { teamId: member.teamId, memberId: memberId } };
         } else {
             throw new Error("Can't create new chat because member was not found.");
         }
