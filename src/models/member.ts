@@ -16,6 +16,9 @@ const COLORS = [
     "#10b981", // emerald
 ];
 
+export type MemberInfo = { name: string; color: string };
+export type MemberMap = Record<string, MemberInfo>; // keyed by memberId
+
 export class Member {
     id?: string;
     userId: string;

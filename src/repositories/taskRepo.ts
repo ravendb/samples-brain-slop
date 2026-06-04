@@ -80,6 +80,7 @@ export function taskToDocument(task: NewTask) {
         task.title,
         task.description,
         task.priority,
-        task.dueDate
+        task.dueDate,
+        task.assigneeId
     );
 }

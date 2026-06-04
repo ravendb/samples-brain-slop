@@ -3,6 +3,7 @@ import { getAppConfig } from "@/lib/config";
 import { getSession } from "@/lib/session";
 import { getMemberById } from "@/repositories/memberRepo";
 import { MemberProvider } from "@/context/MemberContext";
+import { TeamProvider } from "@/context/TeamContext";
 import ProjectSidebar from "@/components/projectSidebar/ProjectSidebar";
 import LeftSidebar from "@/components/leftSidebar/LeftSidebar";
 import shellStyles from "./layout.module.css";
@@ -19,11 +20,13 @@ export default async function MemberShellLayout({ children }: { children: React.
 
     return (
         <MemberProvider memberId={memberId} teamId={member.teamId}>
-            <main className={shellStyles.main}>
-                <LeftSidebar />
-                <section className={shellStyles.chatSection}>{children}</section>
-                <ProjectSidebar />
-            </main>
+            <TeamProvider>
+                <main className={shellStyles.main}>
+                    <LeftSidebar />
+                    <section className={shellStyles.chatSection}>{children}</section>
+                    <ProjectSidebar />
+                </main>
+            </TeamProvider>
         </MemberProvider>
     );
 }

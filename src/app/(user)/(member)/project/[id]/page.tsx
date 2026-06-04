@@ -1,8 +1,13 @@
 import { loadProject } from "@/repositories/projectRepo";
+import { getMembersByTeamId } from "@/repositories/memberRepo";
+import { getUserById } from "@/repositories/userRepo";
+import { getSession } from "@/lib/session";
 import { compareTasksByDueDate } from "@/services/tasks";
 import Checkbox from "@/components/checkbox/Checkbox";
+import AssigneeChip from "@/components/assigneeChip/AssigneeChip";
 import styles from "./page.module.css";
 import PriorityBang from "@/components/priorityBang/PriorityBang";
+import { MemberMap } from "@/models/member";
 
 type ProjectPageProps = {
     params: Promise<{ id: string }>;
@@ -22,6 +27,17 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     }
 
     const tasks = project.tasks.toSorted(compareTasksByDueDate);
+    const { memberId: currentMemberId } = await getSession();
+
+    const members = await getMembersByTeamId(project.teamId);
+    const memberMap: MemberMap = Object.fromEntries(
+        await Promise.all(
+            members.map(async (member) => {
+                const user = await getUserById(member.userId);
+                return [member.id!, { name: user?.name ?? "Unknown", color: member.color }] as const;
+            })
+        )
+    );
 
     return (
       <main className={styles.main}>
@@ -57,6 +73,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                         )}
                         <div className={styles.taskMeta}>
                             {task.dueDate && <span>Due: {task.dueDate}</span>}
+                            {task.assigneeId && memberMap[task.assigneeId] && (
+                                <AssigneeChip
+                                    name={task.assigneeId === currentMemberId ? "You" : memberMap[task.assigneeId].name}
+                                    color={memberMap[task.assigneeId].color}
+                                />
+                            )}
                         </div>
                     </li>
                 ))}
