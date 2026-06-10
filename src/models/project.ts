@@ -7,7 +7,6 @@ export class ProjectDocument {
     title: string;
     description: string;
     dueDate?: string;
-    taskIds: string[];
     teamId: string;
     createdBy: string;
 
@@ -17,11 +16,6 @@ export class ProjectDocument {
         this.dueDate = dueDate;
         this.teamId = teamId;
         this.createdBy = createdBy;
-        this.taskIds = [];
-    }
-
-    setTasks(taskIds: string[]) {
-        this.taskIds = taskIds;
     }
 }
 

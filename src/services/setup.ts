@@ -40,7 +40,7 @@ Each conversation belongs to a specific project. Use the project description and
 const AGENT_QUERIES = [
     {
         name: "GetProjects",
-        description: "Use this query when you need information about the users projects. \nThe query will return a list of projects with information like: \n- The ID or the project.\n- The due date.\n- The description.\n- A list of task IDs",
+        description: "Use this query when you need information about the users projects. \nThe query will return a list of projects with information like: \n- The ID of the project.\n- The due date.\n- The description.",
         query: "from \"ProjectDocuments\" ",
         parametersSampleObject: "{}",
         options: {}
@@ -53,10 +53,10 @@ const AGENT_QUERIES = [
         options: {}
     },
     {
-        name: "GetTasksByIDList",
-        description: "Use this when you have a list of task IDs. From a project for example. And you want to get information about them.",
-        query: "from \"TaskDocuments\" \nwhere id() in ($taskIds)",
-        parametersSampleObject: "{\n    \"taskIds\": \"List of task IDs\"\n}",
+        name: "GetTasksByProjectId",
+        description: "Use this to get all tasks belonging to a specific project. Pass the project's document ID as projectId.",
+        query: "from \"TaskDocuments\" \nwhere projectId = $projectId",
+        parametersSampleObject: "{\n    \"projectId\": \"The document ID of the project\"\n}",
         options: {}
     },
     {

@@ -1,28 +1,25 @@
-import { Project, ProjectDocument, EditProjectArguments } from "@/models/project"
+import { Project, ProjectDocument, EditProjectArguments, CreateProjectArguments } from "@/models/project"
 import { TaskDocument } from "@/models/task";
 import { getStore } from "@/db/ravendb";
 import { taskToDocument } from "./taskRepo";
 
-export async function createProject(project: ProjectDocument, tasks: TaskDocument[]): Promise<{ projectId: string; taskIds: string[] }> {
+export async function createProjectFromAction(project: CreateProjectArguments): Promise<{ projectId: string; taskIds: string[] }> {
+    const projectDocument = new ProjectDocument(project.title, project.description, project.teamId, project.createdBy, project.dueDate);
     const session = getStore().openSession();
 
-    const taskIds: string[] = [];
-    for (const task of tasks) {
-        await session.store(task);
-        taskIds.push(task.id!);
-    }
-    project.setTasks(taskIds);
+    await session.store(projectDocument);
+    const projectId = projectDocument.id!;
 
-    await session.store(project);
+    const taskIds: string[] = [];
+    for (const task of project.tasks ?? []) {
+        const taskDoc = taskToDocument(projectId, task);
+        await session.store(taskDoc);
+        taskIds.push(taskDoc.id!);
+    }
+
     await session.saveChanges();
 
-    return { projectId: project.id!, taskIds };
-}
-
-export async function createProjectFromAction(project: Project): Promise<{ projectId: string; taskIds: string[] }> {
-    const projectDocument = new ProjectDocument(project.title, project.description, project.teamId, project.createdBy, project.dueDate);
-    const taskDocuments = project.tasks?.map(taskToDocument) || [];
-    return await createProject(projectDocument, taskDocuments);
+    return { projectId, taskIds };
 }
 
 function documentToProject(doc: ProjectDocument, tasks: TaskDocument[]): Project {
@@ -40,14 +37,14 @@ function documentToProject(doc: ProjectDocument, tasks: TaskDocument[]): Project
 export async function loadProjects(teamId: string): Promise<Project[]> {
     const session = getStore().openSession();
     const documents = await session.query(ProjectDocument)
-        .include("taskIds")
         .whereEquals("teamId", teamId)
         .all();
 
     const projects: Project[] = [];
     for (const doc of documents) {
-        const tasksDocs = await session.load<TaskDocument>(doc.taskIds);
-        const tasks = Object.values(tasksDocs) as TaskDocument[];
+        const tasks = await session.query(TaskDocument)
+            .whereEquals("projectId", doc.id)
+            .all();
         projects.push(documentToProject(doc, tasks));
     }
 
@@ -57,16 +54,15 @@ export async function loadProjects(teamId: string): Promise<Project[]> {
 export async function loadProject(id: string) {
     const session = getStore().openSession();
 
-    const document = await session
-        .include("taskIds")
-        .load<ProjectDocument>(id);
+    const document = await session.load<ProjectDocument>(id);
 
     if (!document) {
         return null;
     }
 
-    const tasksDocs = await session.load<TaskDocument>(document.taskIds);
-    const tasks = Object.values(tasksDocs) as TaskDocument[];
+    const tasks = await session.query(TaskDocument)
+        .whereEquals("projectId", id)
+        .all();
 
     return documentToProject(document, tasks);
 }
@@ -91,13 +87,13 @@ export async function editProject(projectId: string, updates: EditProjectArgumen
 
 export async function deleteProject(projectId: string) {
     const session = getStore().openSession();
-    const project = await session.load<ProjectDocument>(projectId);
-    if (!project) {
-        throw new Error(`Project with id ${projectId} not found`);
-    }
 
-    for (const taskId of project.taskIds) {
-        await session.delete<TaskDocument>(taskId);
+    const tasks = await session.query(TaskDocument)
+        .whereEquals("projectId", projectId)
+        .all();
+
+    for (const task of tasks) {
+        await session.delete(task.id!);
     }
 
     await session.delete(projectId);

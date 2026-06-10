@@ -96,6 +96,6 @@ async function executeDeleteProjectAction(args: ActionMap["DeleteProject"]) {
 }
 
 async function executeDeleteTaskAction(args: ActionMap["DeleteTask"]) {
-    await deleteTask(args.projectId, args.taskId);
+    await deleteTask(args.taskId);
     return `Task '${args.taskTitle}' from project '${args.projectTitle}' deleted successfully.`;
 }

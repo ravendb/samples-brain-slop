@@ -5,6 +5,7 @@ export type TaskPriority = "low" | "normal" | "high";
 
 export class TaskDocument {
     id?: string;
+    projectId: string;
     title: string;
     completed: boolean;
     description?: string;
@@ -12,7 +13,8 @@ export class TaskDocument {
     dueDate?: string;
     assigneeId?: string;
 
-    constructor(title: string, description?: string, priority?: TaskPriority, dueDate?: string, assigneeId?: string) {
+    constructor(projectId: string, title: string, description?: string, priority?: TaskPriority, dueDate?: string, assigneeId?: string) {
+        this.projectId = projectId;
         this.title = title;
         this.completed = false;
         this.description = description;
