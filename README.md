@@ -8,7 +8,7 @@ BrainSlop **solves the chaos of unstructured task input** by using an AI Agent t
 
 The app **turns vague goals into one-click actions** — managers describe a project or objective in plain language, and the AI Agent suggests what to do next. A single click is all it takes to approve and move forward.
 
-Finally, BrainSlop **surfaces slow-moving work before it becomes a problem** by using Time Series to track task and project progress over time, giving managers early warnings on stalled initiatives.
+BrainSlop is also **built for teams** — invite teammates, assign tasks to specific members, and share AI conversations across your whole team so everyone stays in sync without extra overhead.
 
 Built with [RavenDB](https://ravendb.net) and [Next.js](https://nextjs.org).
 

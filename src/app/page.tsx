@@ -13,10 +13,9 @@ const PILLARS = [
         body: "Describe a project or objective in plain language and the AI suggests what to do next. Approve with a single click.",
     },
     {
-        icon: "📉",
-        title: "Early progress warnings",
-        body: "Time Series tracking surfaces slow-moving work before it becomes a problem, giving managers visibility into stalled initiatives.",
-        comingSoon: true,
+        icon: "🤝",
+        title: "Built for teams",
+        body: "Invite teammates, assign tasks to specific members, and share AI conversations across your whole team — everyone stays in sync without extra overhead.",
     },
 ];
 
