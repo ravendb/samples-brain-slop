@@ -1,11 +1,13 @@
 import { TaskDocument, NewTask, EditTaskArguments } from "@/models/task";
 import { getStore } from "@/db/ravendb";
+import { appendUncompletedCount } from "./timeSeriesRepo";
 
 export async function createTask(projectId: string, task: NewTask) {
     const taskDocument = taskToDocument(projectId, task);
 
     const session = getStore().openSession();
     await session.store(taskDocument);
+    await appendUncompletedCount(session, projectId);
     await session.saveChanges();
 }
 
@@ -29,7 +31,13 @@ export async function editTask(taskId: string, updates: EditTaskArguments["updat
 
 export async function deleteTask(taskId: string) {
     const session = getStore().openSession();
+    const task = await session.load<TaskDocument>(taskId);
+    if (!task) {
+        throw new Error("Task not found");
+    }
+    const { projectId } = task;
     await session.delete(taskId);
+    await appendUncompletedCount(session, projectId);
     await session.saveChanges();
 }
 
@@ -43,6 +51,7 @@ export async function markTaskCompleted(taskId: string, completed: boolean) {
     }
 
     task.completed = completed;
+    await appendUncompletedCount(session, task.projectId);
     await session.saveChanges();
     return completed;
 }
@@ -50,7 +59,7 @@ export async function markTaskCompleted(taskId: string, completed: boolean) {
 export async function isTaskCompleted(taskId: string) {
     const session = getStore().openSession();
     const task = await session.load<TaskDocument>(taskId);
-    
+
     if (!task) {
         throw new Error("Task not found");
     }
