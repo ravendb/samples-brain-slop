@@ -8,13 +8,17 @@ export interface AppConfig {
   openAiApiKey: string;
   mainModel: string;
   smallModel: string;
+  ravenDbLicense: string;
 }
 
 const CONFIG_PATH = path.join(process.cwd(), ".app-config.json");
 
 export function getAppConfig(): AppConfig | null {
   try {
-    return JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
+    const config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
+    if (process.env.RAVENDB_URI) config.ravenUrl = process.env.RAVENDB_URI;
+    if (process.env.RAVENDB_DATABASE) config.databaseName = process.env.RAVENDB_DATABASE;
+    return config;
   } catch {
     return null;
   }
