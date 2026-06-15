@@ -1,3 +1,6 @@
+# Aspire agent skills (local tooling, not project code)
+.agents/
+
 # dependencies
 /node_modules
 /.pnp
