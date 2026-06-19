@@ -3,8 +3,8 @@ import { TaskDocument } from "@/models/task";
 import { getStore } from "@/db/ravendb";
 import { taskToDocument } from "./taskRepo";
 
-export async function createProjectFromAction(project: CreateProjectArguments): Promise<{ projectId: string; taskIds: string[] }> {
-    const projectDocument = new ProjectDocument(project.title, project.description, project.teamId, project.createdBy, project.dueDate);
+export async function createProjectFromAction(project: CreateProjectArguments, createdByUserId: string, createdByMemberId?: string): Promise<{ projectId: string; taskIds: string[] }> {
+    const projectDocument = new ProjectDocument(project.title, project.description, project.teamId, createdByUserId, project.dueDate);
     const session = getStore().openSession();
 
     await session.store(projectDocument);
@@ -12,7 +12,7 @@ export async function createProjectFromAction(project: CreateProjectArguments): 
 
     const taskIds: string[] = [];
     for (const task of project.tasks ?? []) {
-        const taskDoc = taskToDocument(projectId, task);
+        const taskDoc = taskToDocument(projectId, task, createdByMemberId);
         await session.store(taskDoc);
         taskIds.push(taskDoc.id!);
     }
@@ -20,6 +20,11 @@ export async function createProjectFromAction(project: CreateProjectArguments): 
     await session.saveChanges();
 
     return { projectId, taskIds };
+}
+
+export async function loadProjectDocument(projectId: string): Promise<ProjectDocument | null> {
+    const session = getStore().openSession();
+    return session.load<ProjectDocument>(projectId);
 }
 
 function documentToProject(doc: ProjectDocument, tasks: TaskDocument[]): Project {

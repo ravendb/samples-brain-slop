@@ -34,3 +34,31 @@
 	border-color: var(--foreground-muted);
 	background: var(--surface-hover);
 }
+
+.wrap {
+	position: relative;
+	display: inline-flex;
+}
+
+.tooltip {
+	position: fixed;
+	transform: translate(-50%, -100%);
+	background: var(--foreground, #1a1a1a);
+	color: var(--background, #fff);
+	font-size: 0.7rem;
+	white-space: nowrap;
+	padding: 4px 8px;
+	border-radius: 5px;
+	pointer-events: none;
+	z-index: 9999;
+}
+
+.tooltip::after {
+	content: '';
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	border: 5px solid transparent;
+	border-top-color: var(--foreground, #1a1a1a);
+}

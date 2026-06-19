@@ -32,8 +32,16 @@ async function sendActionDecision(
         body: JSON.stringify({ chatId, action }),
     });
 
-    if (!response.ok || !response.body) {
-        throw new Error(`Action ${action.id} failed. Status: ${response.status}`);
+    if (!response.ok) {
+        let message = `Action failed (${response.status}).`;
+        try {
+            const body = await response.json();
+            if (body?.error) message = body.error;
+        } catch { /* ignore parse errors */ }
+        throw new Error(message);
+    }
+    if (!response.body) {
+        throw new Error(`Action ${action.id} failed: no response body.`);
     }
 
     const reader = response.body.getReader();

@@ -86,32 +86,32 @@ const AGENT_ACTIONS = [
     {
         name: "CreateProject",
         description: "Trigger this action when the user intends to create a new project or start tracking a new initiative.\nThis includes explicit requests or when the user provides a project name, goal, or context implying a new project.\nEnsure you have a project name (or can infer one). If key details are missing, ask a follow-up question instead of triggering the tool.",
-        parametersSchema: JSON.stringify(z.toJSONSchema(CreateProjectArgumentsSchema))
+        parametersSchema: JSON.stringify(z.toJSONSchema(CreateProjectArgumentsSchema.strict()))
     },
     {
         name: "AddNewTask",
         description: "Trigger this action when the user intends to create a new task and add it to an existing project. If the user wants to add a task to a new project - create a new project with that task using the CreateProject action.",
-        parametersSchema: JSON.stringify(z.toJSONSchema(AddNewTaskArgumentsSchema))
+        parametersSchema: JSON.stringify(z.toJSONSchema(AddNewTaskArgumentsSchema.strict()))
     },
     {
         name: "EditTask",
         description: "Trigger this action when the user intends to edit an existing task, including when the user says a task is done or completed. Make sure you know the ID of the task to edit — use query tools to look it up by name if you don't have it. Only fill the properties that the user wants to edit. Leave the other properties empty so the task won't change beyond what the user intended. To mark a task complete, set completed to true. When setting assigneeId, also set assigneeName to the member's display name (use GetTeamMembers to look it up).",
-        parametersSchema: JSON.stringify(z.toJSONSchema(EditTaskArgumentsSchema))
+        parametersSchema: JSON.stringify(z.toJSONSchema(EditTaskArgumentsSchema.strict()))
     },
     {
         name: "EditProject",
         description: "Trigger this action when the user intends to edit an existing project. Make sure you know the ID of the project to edit. You can use query tools to get the info you need.\nOnly fill the properties that the user wants to edit. Leave the other properties empty so the project wont change beyond what the user intended.",
-        parametersSchema: JSON.stringify(z.toJSONSchema(EditProjectArgumentsSchema))
+        parametersSchema: JSON.stringify(z.toJSONSchema(EditProjectArgumentsSchema.strict()))
     },
     {
         name: "DeleteProject",
         description: "Trigger this action when the user intends to delete a project permanently.",
-        parametersSchema: JSON.stringify(z.toJSONSchema(DeleteProjectArgumentsSchema))
+        parametersSchema: JSON.stringify(z.toJSONSchema(DeleteProjectArgumentsSchema.strict()))
     },
     {
         name: "DeleteTask",
         description: "Trigger this action when the user intends to delete a task permanently.",
-        parametersSchema: JSON.stringify(z.toJSONSchema(DeleteTaskArgumentsSchema))
+        parametersSchema: JSON.stringify(z.toJSONSchema(DeleteTaskArgumentsSchema.strict()))
     }
 ];
 
@@ -196,7 +196,7 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
             actions: AGENT_ACTIONS,
             parameters: [
                 { name: "teamId", description: "The ID of the team this conversation belongs to.", sendToModel: true },
-                { name: "memberId", description: "The ID of the member who started this conversation.", sendToModel: true },
+                { name: "memberId", description: "The ID of the member who started this conversation.", sendToModel: false },
             ],
             disabled: false,
         }));

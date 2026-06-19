@@ -2,13 +2,18 @@ import { TaskDocument, NewTask, EditTaskArguments } from "@/models/task";
 import { getStore } from "@/db/ravendb";
 import { appendUncompletedCount } from "./timeSeriesRepo";
 
-export async function createTask(projectId: string, task: NewTask) {
-    const taskDocument = taskToDocument(projectId, task);
+export async function createTask(projectId: string, task: NewTask, createdBy?: string) {
+    const taskDocument = taskToDocument(projectId, task, createdBy);
 
     const session = getStore().openSession();
     await session.store(taskDocument);
     await appendUncompletedCount(session, projectId);
     await session.saveChanges();
+}
+
+export async function loadTaskDocument(taskId: string): Promise<TaskDocument | null> {
+    const session = getStore().openSession();
+    return session.load<TaskDocument>(taskId);
 }
 
 export async function editTask(taskId: string, updates: EditTaskArguments["updates"]) {
@@ -67,13 +72,14 @@ export async function isTaskCompleted(taskId: string) {
     return task.completed;
 }
 
-export function taskToDocument(projectId: string, task: NewTask) {
+export function taskToDocument(projectId: string, task: NewTask, createdBy?: string) {
     return new TaskDocument(
         projectId,
         task.title,
         task.description,
         task.priority,
         task.dueDate,
-        task.assigneeId
+        task.assigneeId,
+        createdBy
     );
 }

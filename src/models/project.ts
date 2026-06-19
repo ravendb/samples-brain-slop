@@ -36,23 +36,22 @@ export const CreateProjectArgumentsSchema = z.object({
     description: ProjectSchema.shape.description,
     dueDate: ProjectSchema.shape.dueDate,
     teamId: ProjectSchema.shape.teamId,
-    createdBy: ProjectSchema.shape.createdBy,
     tasks: z.array(NewTaskSchema.strict()).default([]).describe("A list of initial tasks for the project. Can be empty if no tasks are specified or inferred."),
-}).strict()
+})
 
 export type CreateProjectArguments = z.infer<typeof CreateProjectArgumentsSchema>;
 
 export const EditProjectArgumentsSchema = z.object({
     projectId: z.string().describe("The ID of the project to edit."),
     currentTitle: z.string().describe("The current title of the project to display to the user which project is being edited."),
-    updates: ProjectSchema.omit({ id: true, tasks: true }).partial().strict(),
-}).strict()
+    updates: ProjectSchema.omit({ id: true, tasks: true }).partial(),
+})
 
 export type EditProjectArguments = z.infer<typeof EditProjectArgumentsSchema>;
 
 export const DeleteProjectArgumentsSchema = z.object({
     projectId: z.string().describe("The ID of the project to delete."),
     title: z.string().describe("The title of the project to delete.")
-}).strict()
+})
 
 export type DeleteProjectArguments = z.infer<typeof DeleteProjectArgumentsSchema>;
