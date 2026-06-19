@@ -8,9 +8,8 @@ BrainSlop **solves the chaos of unstructured task input** by using an AI Agent t
 
 The app **turns vague goals into one-click actions** — managers describe a project or objective in plain language, and the AI Agent suggests what to do next. A single click is all it takes to approve and move forward.
 
-Finally, BrainSlop **surfaces slow-moving work before it becomes a problem** by using Time Series to track task and project progress over time, giving managers early warnings on stalled initiatives.
 
-Built with [RavenDB](https://ravendb.net) and [Next.js](https://nextjs.org).
+Built with [RavenDB](https://ravendb.net), [Next.js](https://nextjs.org), and [.NET Aspire](https://aspire.dev).
 
 <img width="2229" height="1180" alt="image" src="https://github.com/user-attachments/assets/c4be7913-27b7-49f8-a527-865f27116f3c" />
 
@@ -20,31 +19,32 @@ Built with [RavenDB](https://ravendb.net) and [Next.js](https://nextjs.org).
 The following RavenDB features are used to build the application:
 
 1. [AI Agents](https://ravendb.net/docs/article-page/7.2/csharp/ai-integration/ai-agents) – Interprets unstructured user input and dispatches the correct actions (e.g., create tasks, mark as completed, query by due date)
-1. [GenAI](https://ravendb.net/docs/article-page/7.2/csharp/ai-integration/overview) – Enriches task descriptions with subtasks, tags, and priority using project context
-1. [Time Series](https://ravendb.net/docs/article-page/7.2/csharp/document-extensions/timeseries/overview) – Track task creation, completion, and progress over time to display in a Burndown chart.
-1. [Attachments / Remote Attachments](https://ravendb.net/docs/article-page/7.2/csharp/document-extensions/attachments/what-are-attachments) – Store PDFs, images, or screenshots with project and task documents
-1. [Revisions](https://ravendb.net/docs/article-page/7.2/csharp/document-extensions/revisions/overview) – Show previous versions of a task document
+1. [GenAI](https://ravendb.net/docs/article-page/7.2/csharp/ai-integration/overview) – Give chat's a title based on the user's messages
 ## Technologies
 
 The following technologies were used to build this application:
 
-1. [RavenDB](https://ravendb.net/)
+1. [RavenDB 7.2](https://ravendb.net/)
 1. [Next.js](https://nextjs.org/)
+1. [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+1. [.NET Aspire](https://aspire.dev)
+1. [Node.js 20](https://nodejs.org)
 
 ## Run locally
 
-If you want to run the application locally, please follow the steps:
-
 1. Check out the GIT repository
 1. Install prerequisites:
-   1. [Node.js](https://nodejs.org)
-   1. [RavenDB](https://ravendb.net/download) – grab a new license while you're there
-1. Start RavenDB in [unsecured mode](https://docs.ravendb.net/7.2/start/installation/setup-wizard/choose-security-option) (no TLS or authentication — suitable for local development). The app will create the database automatically on first setup.
-1. Get the app running:
+   1. [Docker](https://docs.docker.com/engine/install)
+   1. [.NET 10.x](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+   1. [Node.js 20.x](https://nodejs.org/en/download)
+   1. [Aspire CLI](https://aspire.dev) — `dotnet tool install -g Aspire.Cli`
+1. Run the application:
    ```
-   npm install
-   npm run dev
+   aspire start
    ```
+1. Open the app URL shown in the Aspire dashboard and complete the one-time setup:
+   1. **RavenDB License** — paste your license JSON (get one free at [ravendb.net/download](https://ravendb.net/download))
+   1. **OpenAI API Key** — your OpenAI key
 
 ## Community & Support
 

@@ -1,4 +1,4 @@
-import { DocumentStore, AiConnectionString, OpenAiSettings, PutConnectionStringOperation, CreateDatabaseOperation, GetStatisticsOperation } from "ravendb";
+import { DocumentStore, AiConnectionString, OpenAiSettings, PutConnectionStringOperation } from "ravendb";
 import { AddOrUpdateAiAgentOperation } from "ravendb";
 import { AddGenAiOperation, UpdateGenAiOperation, GenAiConfiguration, GenAiTransformation } from "ravendb";
 import { writeAppConfig } from "@/lib/config";
@@ -181,40 +181,12 @@ const AGENT_ACTIONS = [
 ];
 
 export type SetupPayload = {
-    ravenUrl: string;
-    databaseName: string;
     openAiApiKey: string;
     mainModel: string;
     smallModel: string;
+    ravenDbLicense: string;
 };
 
-async function ensureDatabaseExists(store: DocumentStore, databaseName: string, ravenUrl: string): Promise<void> {
-    try {
-        await store.maintenance.forDatabase(databaseName).send(new GetStatisticsOperation());
-    } catch (err) {
-        if (err instanceof Error && err.name === "DatabaseDoesNotExistException") {
-            await store.maintenance.server.send(
-                new CreateDatabaseOperation({ databaseName: databaseName }, 1)
-            );
-        } else if (err instanceof Error && err.message.includes("ECONNREFUSED")) {
-            throw new Error(`Cannot reach RavenDB at "${ravenUrl}". Is the server running?`);
-        } else {
-            throw err;
-        }
-    }
-}
-
-function validateRavenUrl(url: string): void {
-    let parsed: URL;
-    try {
-        parsed = new URL(url);
-    } catch {
-        throw new Error("Invalid RavenDB URL.");
-    }
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-        throw new Error("RavenDB URL must use HTTP or HTTPS.");
-    }
-}
 
 async function validateOpenAiKey(openAiApiKey: string): Promise<void> {
     const res = await fetch("https://api.openai.com/v1/models", {
@@ -228,17 +200,39 @@ async function validateOpenAiKey(openAiApiKey: string): Promise<void> {
     }
 }
 
-export async function runSetup(payload: SetupPayload): Promise<void> {
-    const { ravenUrl, databaseName, openAiApiKey, mainModel, smallModel } = payload;
+async function activateLicense(ravenUrl: string, licenseJson: string): Promise<void> {
+    let license: unknown;
+    try {
+        license = JSON.parse(licenseJson);
+    } catch {
+        throw new Error("Invalid RavenDB license: must be valid JSON.");
+    }
+    const res = await fetch(new URL("/admin/license/activate", ravenUrl).toString(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(license),
+    });
+    if (!res.ok) {
+        const text = await res.text().catch(() => res.statusText);
+        throw new Error(`Failed to activate RavenDB license: ${text}`);
+    }
+}
 
-    validateRavenUrl(ravenUrl);
+export async function runSetup(payload: SetupPayload): Promise<void> {
+    const { openAiApiKey, mainModel, smallModel, ravenDbLicense } = payload;
+
+    const ravenUrl = process.env.RAVENDB_URI;
+    const databaseName = process.env.RAVENDB_DATABASE;
+    if (!ravenUrl || !databaseName) {
+        throw new Error("RavenDB connection info is not available. Make sure the app is running via Aspire.");
+    }
+
+    await activateLicense(ravenUrl, ravenDbLicense);
     await validateOpenAiKey(openAiApiKey);
 
     const ravenBaseUrl = new URL(ravenUrl);
     const store = new DocumentStore([ravenUrl], databaseName);
     store.initialize();
-
-    await ensureDatabaseExists(store, databaseName, ravenUrl);
 
     try {
         // Connection strings
@@ -298,7 +292,7 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
             await store.maintenance.send(new AddGenAiOperation(genAiConfig));
         }
 
-        writeAppConfig({ ravenUrl, databaseName, agentId: "assistant", openAiApiKey, mainModel, smallModel });
+        writeAppConfig({ ravenUrl: ravenUrl!, databaseName: databaseName!, agentId: "assistant", openAiApiKey, mainModel, smallModel, ravenDbLicense });
     } finally {
         store.dispose();
     }
