@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styles from "./page.module.css";
 
-const PILLARS = [
+const PILLARS: { icon: string; title: string; body: string; comingSoon?: boolean }[] = [
     {
         icon: "🧠",
         title: "Turns chaos into tasks",
