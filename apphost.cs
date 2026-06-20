@@ -1,6 +1,6 @@
-#:sdk Aspire.AppHost.Sdk@13.4.4
+#:sdk Aspire.AppHost.Sdk@13.4.6
 #:package CommunityToolkit.Aspire.Hosting.RavenDB@13.4.0
-#:package Aspire.Hosting.JavaScript@13.4.4
+#:package Aspire.Hosting.JavaScript@13.4.6
 
 var builder = DistributedApplication.CreateBuilder(args);
 
