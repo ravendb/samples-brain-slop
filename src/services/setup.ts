@@ -41,7 +41,7 @@ const AGENT_QUERIES = [
     {
         name: "GetProjects",
         description: "Use this query when you need information about the users projects. \nThe query will return a list of projects with information like: \n- The ID of the project.\n- The due date.\n- The description.",
-        query: "from \"ProjectDocuments\" ",
+        query: "from \"ProjectDocuments\" where teamId = $teamId",
         parametersSampleObject: "{}",
         options: {}
     },
