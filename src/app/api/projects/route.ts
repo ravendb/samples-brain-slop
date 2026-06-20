@@ -1,9 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { loadProjects } from "@/repositories/projectRepo";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+    const teamId = request.nextUrl.searchParams.get("teamId");
+    if (!teamId) {
+        return NextResponse.json({ error: "teamId is required" }, { status: 400 });
+    }
+
     try {
-        const projects = await loadProjects();
+        const projects = await loadProjects(teamId);
         return NextResponse.json({ projects });
     } catch (error) {
         console.error("Error loading projects:", error);

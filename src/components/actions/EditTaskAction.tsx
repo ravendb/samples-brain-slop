@@ -2,7 +2,7 @@ import { Action } from "@/models/action";
 import styles from "./Action.module.css";
 
 export default function EditTaskAction({ action }: { action: Action<'EditTask'> }) {
-    const { currentTitle, updates } = action.arguments;
+    const { currentTitle, assigneeName, updates } = action.arguments;
 
     return (
         <article className={styles.card}>
@@ -41,6 +41,13 @@ export default function EditTaskAction({ action }: { action: Action<'EditTask'> 
                         <div className={styles.row}>
                             <dt>Priority</dt>
                             <dd style={{ textTransform: "capitalize" }}>{updates.priority}</dd>
+                        </div>
+                    ) : null}
+
+                    {updates.assigneeId ? (
+                        <div className={styles.row}>
+                            <dt>Assignee</dt>
+                            <dd>{assigneeName ?? updates.assigneeId}</dd>
                         </div>
                     ) : null}
 

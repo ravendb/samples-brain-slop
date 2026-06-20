@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { isTaskCompleted, markTaskCompleted } from "@/repositories/taskRepo";
+import { isTaskCompleted, loadTaskDocument, markTaskCompleted } from "@/repositories/taskRepo";
+import { loadProjectDocument } from "@/repositories/projectRepo";
+import { getSessionMemberDoc } from "@/lib/session";
+import { canToggleTaskCompletion } from "@/lib/permissions";
 
 export async function POST(request: Request) {
 	try {
@@ -7,6 +10,24 @@ export async function POST(request: Request) {
 		if (typeof taskId !== "string" || typeof completed !== "boolean") {
 			return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
 		}
+
+		const member = await getSessionMemberDoc();
+		if (!member) {
+			return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+		}
+
+		const task = await loadTaskDocument(taskId);
+		if (!task) {
+			return NextResponse.json({ error: "Task not found." }, { status: 404 });
+		}
+
+		if (!canToggleTaskCompletion(member, task)) {
+			return NextResponse.json(
+				{ error: "Only the task creator, assignee, or a manager can mark this task complete." },
+				{ status: 403 }
+			);
+		}
+
 		const result = await markTaskCompleted(taskId, completed);
 		return NextResponse.json({ success: true, completed: result });
 	} catch (error) {
@@ -22,6 +43,21 @@ export async function GET(request: Request) {
         const taskId = decodeURIComponent(encodedTaskId || "");
 		if (typeof taskId !== "string" || !taskId) {
 			return NextResponse.json({ error: "Missing or invalid taskId query parameter" }, { status: 400 });
+		}
+
+		const member = await getSessionMemberDoc();
+		if (!member) {
+			return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+		}
+
+		const task = await loadTaskDocument(taskId);
+		if (!task) {
+			return NextResponse.json({ error: "Task not found." }, { status: 404 });
+		}
+
+		const project = await loadProjectDocument(task.projectId);
+		if (!project || project.teamId !== member.teamId) {
+			return NextResponse.json({ error: "Task not found." }, { status: 404 });
 		}
 
 		const result = await isTaskCompleted(taskId);

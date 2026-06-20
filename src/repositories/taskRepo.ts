@@ -1,23 +1,17 @@
 import { TaskDocument, NewTask, EditTaskArguments } from "@/models/task";
 import { getStore } from "@/db/ravendb";
-import { ProjectDocument } from "@/models/project";
 
-export async function createTask(projectId: string, task: NewTask) {
-    const taskDocument = taskToDocument(task);
+export async function createTask(projectId: string, task: NewTask, createdBy?: string) {
+    const taskDocument = taskToDocument(projectId, task, createdBy);
 
     const session = getStore().openSession();
     await session.store(taskDocument);
-    if (!taskDocument.id) {
-        throw new Error("Failed to store task");
-    }
-
-    const project = await session.load<ProjectDocument>(projectId);
-    if (!project) {
-        throw new Error("Project not found");
-    }
-    project.taskIds.push(taskDocument.id);
-    
     await session.saveChanges();
+}
+
+export async function loadTaskDocument(taskId: string): Promise<TaskDocument | null> {
+    const session = getStore().openSession();
+    return session.load<TaskDocument>(taskId);
 }
 
 export async function editTask(taskId: string, updates: EditTaskArguments["updates"]) {
@@ -38,14 +32,8 @@ export async function editTask(taskId: string, updates: EditTaskArguments["updat
     return task;
 }
 
-export async function deleteTask(projectId: string, taskId: string) {
+export async function deleteTask(taskId: string) {
     const session = getStore().openSession();
-    const project = await session.load<ProjectDocument>(projectId);
-    if (!project) {
-        throw new Error("Project not found");
-    }
-    project.taskIds = project.taskIds.filter(id => id !== taskId);
-
     await session.delete(taskId);
     await session.saveChanges();
 }
@@ -75,11 +63,14 @@ export async function isTaskCompleted(taskId: string) {
     return task.completed;
 }
 
-export function taskToDocument(task: NewTask) {
+export function taskToDocument(projectId: string, task: NewTask, createdBy?: string) {
     return new TaskDocument(
+        projectId,
         task.title,
         task.description,
         task.priority,
-        task.dueDate
+        task.dueDate,
+        task.assigneeId,
+        createdBy
     );
 }

@@ -1,12 +1,16 @@
 .inputRow {
-	position: relative;
+	position: sticky;
+	bottom: 0;
+	z-index: 1;
 	display: flex;
 	align-items: flex-end;
 	border-radius: 12px;
 	border: 1px solid var(--border);
 	background: var(--surface);
+	box-shadow: 0 0 24px 12px color-mix(in srgb, var(--background) 55%, transparent),
+	            0 4px 20px rgba(0, 0, 0, 0.35);
 	transition: border-color 0.15s;
-    width: 85%;
+    width: 95%;
     align-self: center;
 }
 

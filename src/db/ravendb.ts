@@ -15,6 +15,7 @@ export function getStore(): DocumentStore {
 
   global.ravenStore?.dispose();
   const store = new DocumentStore([config.ravenUrl], config.databaseName);
+  store.conventions.identityPartsSeparator = "_";
   store.initialize();
   global.ravenStore = store;
   global.ravenStoreKey = key;

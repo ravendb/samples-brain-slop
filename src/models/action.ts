@@ -1,9 +1,9 @@
 import z from "zod";
-import { ProjectSchema, EditProjectArgumentsSchema, DeleteProjectArgumentsSchema } from "./project";
+import { CreateProjectArgumentsSchema, EditProjectArgumentsSchema, DeleteProjectArgumentsSchema } from "./project";
 import { AddNewTaskArgumentsSchema, EditTaskArgumentsSchema, DeleteTaskArgumentsSchema } from "./task";
 
 export const schemas = {
-    CreateProject: ProjectSchema,
+    CreateProject: CreateProjectArgumentsSchema,
     AddNewTask: AddNewTaskArgumentsSchema,
     EditTask: EditTaskArgumentsSchema,
     EditProject: EditProjectArgumentsSchema,

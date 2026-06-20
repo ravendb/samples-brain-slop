@@ -32,8 +32,16 @@ async function sendActionDecision(
         body: JSON.stringify({ chatId, action }),
     });
 
-    if (!response.ok || !response.body) {
-        throw new Error(`Action ${action.id} failed. Status: ${response.status}`);
+    if (!response.ok) {
+        let message = `Action failed (${response.status}).`;
+        try {
+            const body = await response.json();
+            if (body?.error) message = body.error;
+        } catch { /* ignore parse errors */ }
+        throw new Error(message);
+    }
+    if (!response.body) {
+        throw new Error(`Action ${action.id} failed: no response body.`);
     }
 
     const reader = response.body.getReader();
@@ -47,6 +55,7 @@ async function sendActionDecision(
 export default function ActionPager({ actions, chatId, setActions, setMessages }: ActionPagerProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [decision, setDecision] = useState<ActionDecision | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const queryClient = useQueryClient();
 
     useEffect(() => {
@@ -72,6 +81,7 @@ export default function ActionPager({ actions, chatId, setActions, setMessages }
 
     async function handleActionDecision(action: Action, decision: ActionDecision) {
         setDecision(decision);
+        setError(null);
 
         const id = crypto.randomUUID();
         setMessages(prev => [...prev,
@@ -87,6 +97,8 @@ export default function ActionPager({ actions, chatId, setActions, setMessages }
             await sendActionDecision(chatId, action, decision, (chunk) => onChunk(chunk, id), onFinalResult);
         } catch (err) {
             console.error("Error handling action decision:", err);
+            setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+            setMessages(prev => prev.filter(m => m.id !== id));
         } finally {
             setDecision(null);
         }
@@ -131,6 +143,8 @@ export default function ActionPager({ actions, chatId, setActions, setMessages }
             </div>
 
             <ActionCard action={actions[currentIndex]} />
+
+            {error && <p className={styles.error}>{error}</p>}
 
             <div className={styles.actions}>
                 <button

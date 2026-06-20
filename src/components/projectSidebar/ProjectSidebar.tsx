@@ -4,9 +4,10 @@ import ProjectItem from "@/components/projectItem/ProjectItem";
 import { Project } from "@/models/project";
 import { useQuery } from "@tanstack/react-query";
 import styles from "./ProjectSidebar.module.css";
+import { useTeamId } from "@/context/MemberContext";
 
-async function fetchProjects(): Promise<Project[]> {
-  const response = await fetch("/api/projects");
+async function fetchProjects(teamId: string): Promise<Project[]> {
+  const response = await fetch(`/api/projects?teamId=${encodeURIComponent(teamId)}`);
 
   if (!response.ok) throw new Error("Failed to fetch projects");
 
@@ -15,9 +16,10 @@ async function fetchProjects(): Promise<Project[]> {
 }
 
 export default function ProjectSidebar() {
+	const teamId = useTeamId();
 	const { data: projects, isLoading, error } = useQuery<Project[]>({
-		queryKey: ["projects"],
-		queryFn: fetchProjects,
+		queryKey: ["projects", teamId],
+		queryFn: () => fetchProjects(teamId),
 	});
 
 	return (

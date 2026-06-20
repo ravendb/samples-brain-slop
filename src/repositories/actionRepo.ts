@@ -34,13 +34,15 @@ export function formatActions(storedActions: StoredAction[]): Action[] {
 function parseArguments(actionName: Action["name"], argumentsString: string) {
     const parser = schemas[actionName];
     if (!parser) {
-        throw new Error(`No parser defined for action: ${actionName}`);
+        console.warn(`No parser defined for action: ${actionName}`);
+        return null;
     }
 
     try {
         const jsonArguments = JSON.parse(argumentsString);
         return parser.parse(jsonArguments);
-    } catch {
-        throw new Error(`Failed to parse arguments for action: ${actionName}`);
+    } catch (err) {
+        console.warn(`Failed to parse arguments for action ${actionName}:`, err);
+        return null;
     }
 }
