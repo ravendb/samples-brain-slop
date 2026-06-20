@@ -65,10 +65,9 @@ export async function executeDemoAction(type: string, args: unknown): Promise<De
         const result = await createProjectFromAction(args as ActionMap["CreateProject"], "demo");
         return result;
     }
-    if (!Object.prototype.hasOwnProperty.call(executors, type)) throw new Error(`Unknown action type: ${type}`);
-    const executor = executors[type as keyof ActionMap];
-    if (typeof executor !== "function") throw new Error(`Unknown action type: ${type}`);
-    await executor(args as never, {});
+    const matchedType = (Object.keys(executors) as (keyof ActionMap)[]).find(k => k === type);
+    if (!matchedType) throw new Error(`Unknown action type: ${type}`);
+    await executors[matchedType](args as never, {});
     return {};
 }
 
