@@ -67,6 +67,7 @@ export async function executeDemoAction(type: string, args: unknown): Promise<De
     }
     if (!Object.prototype.hasOwnProperty.call(executors, type)) throw new Error(`Unknown action type: ${type}`);
     const executor = executors[type as keyof ActionMap];
+    if (typeof executor !== "function") throw new Error(`Unknown action type: ${type}`);
     await executor(args as never, {});
     return {};
 }
