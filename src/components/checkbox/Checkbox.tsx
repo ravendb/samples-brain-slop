@@ -51,15 +51,11 @@ export default function Checkbox({ taskId }: { taskId: string }) {
     const wrapRef = useRef<HTMLSpanElement>(null);
 
     useEffect(() => {
-        if (!error) { setTooltipPos(null); return; }
-        if (wrapRef.current) {
-            const rect = wrapRef.current.getBoundingClientRect();
-            setTooltipPos({
-                top: rect.top - 8,
-                left: rect.left + rect.width / 2,
-            });
-        }
-        const t = setTimeout(() => setError(null), 3000);
+        if (!error) return;
+        const t = setTimeout(() => {
+            setError(null);
+            setTooltipPos(null);
+        }, 3000);
         return () => clearTimeout(t);
     }, [error]);
 
@@ -78,10 +74,18 @@ export default function Checkbox({ taskId }: { taskId: string }) {
             return { previousValue }
         },
         onError: (err, _variables, context) => {
-            if (context?.previousValue) {
+            if (context?.previousValue !== undefined) {
                 queryClient.setQueryData(queryKey, context.previousValue);
             }
-            setError(err instanceof Error ? err.message : 'Failed to update task status');
+            const message = err instanceof Error ? err.message : 'Failed to update task status';
+            setError(message);
+            if (wrapRef.current) {
+                const rect = wrapRef.current.getBoundingClientRect();
+                setTooltipPos({
+                    top: rect.top - 8,
+                    left: rect.left + rect.width / 2,
+                });
+            }
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey });
@@ -90,7 +94,6 @@ export default function Checkbox({ taskId }: { taskId: string }) {
 
     const handleToggle = () => {
         setError(null);
-        queryClient.setQueryData(queryKey, (prev: boolean) => !prev);
         mutation.mutate(!data.completed);
     };
 
