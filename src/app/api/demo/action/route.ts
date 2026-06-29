@@ -18,9 +18,15 @@ export async function POST(request: Request) {
 
     const parsed = schema.safeParse(resolvedArgs);
     if (!parsed.success) {
-        return Response.json({ error: "Invalid arguments" }, { status: 400 });
+        console.error("[demo/action] validation failed", type, parsed.error.flatten());
+        return Response.json({ error: "Invalid arguments", details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const context = await executeDemoAction(type, parsed.data);
-    return Response.json({ success: true, ...context });
+    try {
+        const context = await executeDemoAction(type, parsed.data);
+        return Response.json({ success: true, ...context });
+    } catch (err) {
+        console.error("[demo/action] executeDemoAction threw", type, err);
+        return Response.json({ error: String(err) }, { status: 500 });
+    }
 }

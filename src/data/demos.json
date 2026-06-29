@@ -13,11 +13,11 @@
             "title": "Habit Tracker",
             "description": "A mobile app for building and tracking daily habits.",
             "tasks": [
-              { "title": "Define the data model", "priority": "normal", "completed": false },
-              { "title": "Build the daily check-in screen", "priority": "normal", "completed": false },
-              { "title": "Add streak tracking", "priority": "normal", "completed": false },
-              { "title": "Design onboarding flow", "priority": "normal", "completed": false },
-              { "title": "Submit to App Store", "priority": "normal", "completed": false }
+              { "title": "Define the data model", "priority": "normal" },
+              { "title": "Build the daily check-in screen", "priority": "normal" },
+              { "title": "Add streak tracking", "priority": "normal" },
+              { "title": "Design onboarding flow", "priority": "normal" },
+              { "title": "Submit to App Store", "priority": "normal" }
             ]
           }
         }
@@ -94,11 +94,11 @@
             "title": "Learn Spanish",
             "description": "Go from beginner to conversational Spanish in 6 months.",
             "tasks": [
-              { "title": "Month 1–2: Learn 500 core words with flashcards", "priority": "normal", "completed": false },
-              { "title": "Month 2–3: Complete a beginner course", "priority": "normal", "completed": false },
-              { "title": "Month 3–4: Weekly 30-min tutor sessions", "priority": "normal", "completed": false },
-              { "title": "Month 5: Watch Spanish TV with Spanish subtitles", "priority": "normal", "completed": false },
-              { "title": "Month 6: Hold a 10-min conversation without notes", "priority": "normal", "completed": false }
+              { "title": "Month 1–2: Learn 500 core words with flashcards", "priority": "normal" },
+              { "title": "Month 2–3: Complete a beginner course", "priority": "normal" },
+              { "title": "Month 3–4: Weekly 30-min tutor sessions", "priority": "normal" },
+              { "title": "Month 5: Watch Spanish TV with Spanish subtitles", "priority": "normal" },
+              { "title": "Month 6: Hold a 10-min conversation without notes", "priority": "normal" }
             ]
           }
         }
@@ -164,10 +164,10 @@
             "title": "March Launch",
             "description": "Product launch on March 1. Backend: Sara, Frontend: Tom.",
             "tasks": [
-              { "title": "Backend implementation — Sara (due Mar 1)", "priority": "normal", "completed": false },
-              { "title": "Frontend implementation — Tom (due Mar 1)", "priority": "normal", "completed": false },
-              { "title": "Design review sign-off (due Feb 15)", "priority": "normal", "completed": false },
-              { "title": "QA and smoke testing before launch", "priority": "normal", "completed": false }
+              { "title": "Backend implementation — Sara (due Mar 1)", "priority": "normal" },
+              { "title": "Frontend implementation — Tom (due Mar 1)", "priority": "normal" },
+              { "title": "Design review sign-off (due Feb 15)", "priority": "normal" },
+              { "title": "QA and smoke testing before launch", "priority": "normal" }
             ]
           }
         }

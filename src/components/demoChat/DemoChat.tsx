@@ -121,7 +121,11 @@ export default function DemoChat({ steps }: { steps: DemoStep[] }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ type: step.action.type, args: resolvedArgs }),
             });
-            if (!response.ok) throw new Error("Demo action failed");
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => null);
+                console.error("Demo action failed", { status: response.status, body: errorBody });
+                throw new Error("Demo action failed");
+            }
 
             const data = await response.json() as { projectId?: string; taskIds?: string[] };
             if (data.projectId) setDemoContext({ projectId: data.projectId, taskIds: data.taskIds });
