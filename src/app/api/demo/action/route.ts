@@ -1,5 +1,6 @@
 import { schemas } from "@/models/action";
 import { executeDemoAction } from "@/services/actions";
+import { getSessionMemberDoc } from "@/lib/session";
 
 export async function POST(request: Request) {
     const { type, args } = await request.json();
@@ -9,7 +10,13 @@ export async function POST(request: Request) {
         return Response.json({ error: "Unknown action type" }, { status: 400 });
     }
 
-    const parsed = schema.safeParse(args);
+    let resolvedArgs = args;
+    if (type === "CreateProject" && !args.teamId) {
+        const member = await getSessionMemberDoc();
+        if (member?.teamId) resolvedArgs = { ...args, teamId: member.teamId };
+    }
+
+    const parsed = schema.safeParse(resolvedArgs);
     if (!parsed.success) {
         return Response.json({ error: "Invalid arguments" }, { status: 400 });
     }
