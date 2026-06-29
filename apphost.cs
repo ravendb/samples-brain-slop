@@ -2,6 +2,8 @@
 #:package CommunityToolkit.Aspire.Hosting.RavenDB@13.4.0
 #:package Aspire.Hosting.JavaScript@13.4.6
 
+using CommunityToolkit.Aspire.Hosting.RavenDB;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var ravenSettings = RavenDBServerSettings.Unsecured();
