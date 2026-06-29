@@ -5,8 +5,8 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var ravenSettings = RavenDBServerSettings.Unsecured();
-ravenSettings.Port = 9536;
-ravenSettings.TcpPort = 41352;
+ravenSettings.Port = 9538;
+ravenSettings.TcpPort = 41354;
 
 var ravenServer = builder.AddRavenDB("ravenServer", ravenSettings)
     .WithImageTag("7.2-latest")
