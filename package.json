@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "aspire:start": "npm --prefix aspire-apphost run aspire:start",
+    "aspire:build": "npm --prefix aspire-apphost run aspire:build",
+    "aspire:dev": "npm --prefix aspire-apphost run aspire:dev"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.95.0",
