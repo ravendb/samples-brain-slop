@@ -1,6 +1,9 @@
 # Aspire agent skills (local tooling, not project code)
 .agents/
 
+# Aspire CLI cache (integration restore artifacts)
+/.aspire/
+
 # dependencies
 /node_modules
 /.pnp
