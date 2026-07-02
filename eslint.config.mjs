@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Aspire AppHost has its own tsconfig and eslint config.
+    "aspire-apphost/**",
   ]),
 ]);
 
