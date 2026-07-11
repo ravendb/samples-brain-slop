@@ -58,29 +58,30 @@ const STEPS = [
         body: (
             <>
                 Install prerequisites:{" "}
-                <a href="https://nodejs.org" target="_blank" rel="noreferrer">Node.js</a>
-                {" and "}
-                <a href="https://ravendb.net/download" target="_blank" rel="noreferrer">RavenDB</a>
-                {" (grab a free license while you're there)."}
+                <a href="https://docs.docker.com/engine/install" target="_blank" rel="noreferrer">Docker</a>,{" "}
+                <a href="https://dotnet.microsoft.com/en-us/download/dotnet/10.0" target="_blank" rel="noreferrer">.NET 10</a>,{" "}
+                <a href="https://nodejs.org/en/download" target="_blank" rel="noreferrer">Node.js 20</a>
+                {" and the "}
+                <a href="https://aspire.dev" target="_blank" rel="noreferrer">Aspire CLI</a>:
+                <pre className={styles.codeBlock}>{`dotnet tool install -g Aspire.Cli`}</pre>
             </>
         ),
     },
     {
         body: (
             <>
-                Start RavenDB in{" "}
-                <a href="https://docs.ravendb.net/7.2/start/installation/setup-wizard/choose-security-option" target="_blank" rel="noreferrer">
-                    unsecured mode
-                </a>
-                {" "}(no TLS or auth — suitable for local development). The app creates the database automatically on first setup.
+                Run the application — RavenDB starts in a Docker container and the database is created automatically:
+                <pre className={styles.codeBlock}>{`aspire start`}</pre>
             </>
         ),
     },
     {
         body: (
             <>
-                Install dependencies and start the dev server:
-                <pre className={styles.codeBlock}>{`npm install\nnpm run dev`}</pre>
+                Open the app URL shown in the Aspire dashboard and complete the one-time setup: your RavenDB license
+                {" (grab one free at "}
+                <a href="https://ravendb.net/download" target="_blank" rel="noreferrer">ravendb.net/download</a>
+                {") and your OpenAI API key."}
             </>
         ),
     },
