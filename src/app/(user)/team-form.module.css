@@ -66,11 +66,34 @@
     color: var(--danger);
 }
 
+.hint {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--foreground-muted);
+}
+
+.hint a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.hint a:hover {
+    text-decoration: underline;
+}
+
 .actions {
     display: flex;
     gap: 0.5rem;
-    justify-content: flex-end;
     margin-top: 0.25rem;
+}
+
+.actions > * {
+    flex: 1;
+}
+
+.actions > .submitButton {
+    flex: 2;
 }
 
 .submitButton {
@@ -110,4 +133,20 @@
 .cancelButton:hover {
     border-color: var(--foreground-muted);
     color: var(--foreground);
+}
+
+.switchLink {
+    margin: 1.25rem 0 0 0;
+    font-size: 0.875rem;
+    color: var(--foreground-muted);
+    text-align: center;
+}
+
+.switchLink a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.switchLink a:hover {
+    text-decoration: underline;
 }

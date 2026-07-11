@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserId } from "@/context/UserContext";
 import styles from "../team-form.module.css";
@@ -22,8 +23,9 @@ async function createTeam(userId: string, name: string) {
 export default function CreateTeamPage() {
     const userId = useUserId();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const queryClient = useQueryClient();
-    const [name, setName] = useState("");
+    const [name, setName] = useState(searchParams.get("name") ?? "");
 
     const mutation = useMutation({
         mutationFn: (name: string) => createTeam(userId, name),
@@ -69,6 +71,9 @@ export default function CreateTeamPage() {
                         </button>
                     </div>
                 </form>
+                <p className={styles.switchLink}>
+                    Joining an existing team? <Link href="/join-team">Join a team</Link>
+                </p>
             </div>
         </div>
     );

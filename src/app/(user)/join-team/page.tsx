@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserId } from "@/context/UserContext";
 import styles from "../team-form.module.css";
@@ -57,7 +58,16 @@ export default function JoinTeamPage() {
                     </div>
 
                     {mutation.error && (
-                        <p className={styles.error}>{(mutation.error as Error).message}</p>
+                        (mutation.error as Error).message === "Team not found" ? (
+                            <p className={styles.hint}>
+                                <strong>{mutation.variables}</strong> doesn&apos;t exist yet — want to start it?{" "}
+                                <Link href={`/create-team?name=${encodeURIComponent(mutation.variables ?? "")}`}>
+                                    Create {mutation.variables}
+                                </Link>
+                            </p>
+                        ) : (
+                            <p className={styles.error}>{(mutation.error as Error).message}</p>
+                        )
                     )}
 
                     <div className={styles.actions}>
@@ -69,6 +79,9 @@ export default function JoinTeamPage() {
                         </button>
                     </div>
                 </form>
+                <p className={styles.switchLink}>
+                    Want to start a new team instead? <Link href="/create-team">Create a team</Link>
+                </p>
             </div>
         </div>
     );
