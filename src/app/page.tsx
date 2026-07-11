@@ -1,5 +1,10 @@
 import Link from "next/link";
+import { getAppConfig } from "@/lib/config";
 import styles from "./page.module.css";
+
+// getAppConfig() reads from the filesystem, which doesn't opt the route into
+// dynamic rendering on its own — without this the CTA would be frozen at build time.
+export const dynamic = "force-dynamic";
 
 const PILLARS: { icon: string; title: string; body: string; comingSoon?: boolean }[] = [
     {
@@ -82,6 +87,8 @@ const STEPS = [
 ];
 
 export default function LandingPage() {
+    const setupDone = getAppConfig() !== null;
+
     return (
         <div className={styles.wrapper}><div className={styles.page}>
 
@@ -91,8 +98,8 @@ export default function LandingPage() {
                 <p className={styles.tagline}>
                     AI-assisted task management for busy managers — turn messy thoughts into actionable work, automatically.
                 </p>
-                <Link href="/auth/login" className={styles.cta}>
-                    Get started →
+                <Link href={setupDone ? "/auth/login" : "/setup"} className={styles.cta}>
+                    {setupDone ? "Login" : "Get started →"}
                 </Link>
             </section>
 
