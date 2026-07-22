@@ -49,9 +49,8 @@ export default function UserPage() {
         <div className={styles.container}>
             <div className={styles.inner}>
                 <div className={styles.card}>
-                    <div className={styles.avatar}>{user.name[0].toUpperCase()}</div>
-                    <h1 className={styles.name}>{user.name}</h1>
-                    <p className={styles.username}>@{user.username}</p>
+                    <div className={styles.avatar}>{user.username[0].toUpperCase()}</div>
+                    <h1 className={styles.username}>@{user.username}</h1>
                     <button className={styles.logoutButton} onClick={handleLogout}>
                         Logout
                     </button>

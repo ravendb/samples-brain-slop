@@ -1,7 +1,7 @@
 import { User } from '@/models/user';
 import { getStore } from '@/db/ravendb';
 
-export async function signup(username: string, name: string) {
+export async function signup(username: string) {
     const session = getStore().openSession();
 
     const existing = await session.query({ collection: "Users" })
@@ -12,7 +12,7 @@ export async function signup(username: string, name: string) {
         throw new Error("Username already exists");
     }
 
-    const user: User = new User(username, name);
+    const user: User = new User(username);
     await session.store(user);
     await session.saveChanges();
     return user;

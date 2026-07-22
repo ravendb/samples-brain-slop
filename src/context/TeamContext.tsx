@@ -12,7 +12,7 @@ async function fetchMembers(teamId: string): Promise<MemberMap> {
     if (!response.ok) throw new Error("Failed to fetch team members");
     const data: { members: { member: Member; user: User }[] } = await response.json();
     return Object.fromEntries(
-        data.members.map(({ member, user }) => [member.id!, { name: user.name, color: member.color }])
+        data.members.map(({ member, user }) => [member.id!, { name: user.username, color: member.color }])
     );
 }
 

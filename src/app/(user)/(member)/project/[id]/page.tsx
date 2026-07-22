@@ -34,7 +34,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         await Promise.all(
             members.map(async (member) => {
                 const user = await getUserById(member.userId);
-                return [member.id!, { name: user?.name ?? "Unknown", color: member.color }] as const;
+                return [member.id!, { name: user?.username ?? "Unknown", color: member.color }] as const;
             })
         )
     );
