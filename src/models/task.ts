@@ -54,7 +54,7 @@ export type AddNewTaskArguments = z.infer<typeof AddNewTaskArgumentsSchema>;
 export const EditTaskArgumentsSchema = z.object({
     taskId: z.string().describe("The ID of the task to edit."),
     currentTitle: z.string().describe("The current title of the task to display to the user which task is being edited."),
-    assigneeName: z.string().optional().describe("The display name of the new assignee. Required when updates.assigneeId is set — look up the name using GetTeamMembers."),
+    assigneeName: z.string().optional().describe("The username of the new assignee. Required when updates.assigneeId is set — look up the username using GetTeamMembers."),
     updates: TaskSchema.omit({ id: true }).partial().extend({ completed: z.boolean().optional() })
 })
 

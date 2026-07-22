@@ -120,17 +120,11 @@
     margin-bottom: 0.75rem;
 }
 
-.name {
+.username {
     margin: 0;
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--foreground);
-}
-
-.username {
-    margin: 0;
-    font-size: 0.95rem;
-    color: var(--foreground-muted);
 }
 
 .empty {

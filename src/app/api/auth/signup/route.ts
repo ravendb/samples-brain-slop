@@ -6,14 +6,14 @@ import { setUserIdCookie } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => null);
-    const { username, name } = body ?? {};
+    const { username } = body ?? {};
 
-    if (!username || !name) {
-        return NextResponse.json({ error: "Username and name are required." }, { status: 400 });
+    if (!username) {
+        return NextResponse.json({ error: "Username is required." }, { status: 400 });
     }
 
     try {
-        const user = await signup(username, name) as { id: string };
+        const user = await signup(username) as { id: string };
         await setUserIdCookie(user.id);
         return NextResponse.json({ userId: user.id });
     } catch (err) {

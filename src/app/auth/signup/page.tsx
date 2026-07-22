@@ -7,11 +7,11 @@ import Link from "next/link";
 import styles from "../auth.module.css";
 
 export default function SignupPage() {
-    const [form, setForm] = useState({ name: "", username: "" });
+    const [form, setForm] = useState({ username: "" });
     const router = useRouter();
 
     const mutation = useMutation({
-        mutationFn: async (data: { name: string; username: string }) => {
+        mutationFn: async (data: { username: string }) => {
             const res = await fetch("/api/auth/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -40,19 +40,6 @@ export default function SignupPage() {
             <div className={styles.card}>
                 <h1 className={styles.title}>Brain Slop</h1>
                 <form onSubmit={handleSubmit} className={styles.form}>
-                    <div className={styles.fieldGroup}>
-                        <label htmlFor="name" className={styles.label}>Name</label>
-                        <input
-                            id="name"
-                            name="name"
-                            type="text"
-                            value={form.name}
-                            onChange={handleChange}
-                            className={styles.input}
-                            autoComplete="name"
-                            required
-                        />
-                    </div>
                     <div className={styles.fieldGroup}>
                         <label htmlFor="username" className={styles.label}>Username</label>
                         <input

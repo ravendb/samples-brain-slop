@@ -36,7 +36,7 @@ export default function TeamPanel() {
                 {manager
                     ? manager.member.userId === userId
                         ? <span style={{ color: manager.member.color }}>You</span>
-                        : (manager.user?.name ?? "—")
+                        : (manager.user?.username ?? "—")
                     : "—"
                 }
             </p>
@@ -51,7 +51,7 @@ export default function TeamPanel() {
                             <span className={styles.memberName}>
                                 {member.userId === userId
                                     ? <span style={{ color: member.color }}>You</span>
-                                    : (user?.name ?? "Unknown")
+                                    : (user?.username ?? "Unknown")
                                 }
                                 {i < regularMembers.length - 1 && ","}
                             </span>
