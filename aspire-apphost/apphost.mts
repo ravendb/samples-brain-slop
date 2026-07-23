@@ -5,7 +5,7 @@ const builder = await createBuilder();
 // Fixed host ports (HTTP 9538 / TCP 41354) avoid conflicts with a local
 // RavenDB instance and other samples in this repo.
 const ravenServer = await builder.addRavenDB('ravenServer')
-    .withImageTag('7.2-latest')
+    .withImageTag('7.2.5')
     .withDataVolume()
     .withEndpointCallback('http', async e => { await e.port.set(9538); })
     .withEndpointCallback('tcp', async e => { await e.port.set(41354); });
