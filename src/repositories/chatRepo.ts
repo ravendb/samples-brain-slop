@@ -1,4 +1,4 @@
-import { AiAnswer, AiConversation } from "ravendb"
+import { AiAnswer, AiConversation, AiConversationCreationOptions } from "ravendb"
 import { getStore } from "@/db/ravendb";
 import { getAgentId } from "@/lib/config";
 import { Chat, Message, NEW_CHAT_ID } from "@/models/chat";
@@ -52,11 +52,11 @@ export async function sendMessage(chatId: string, prompt: string, onChunk: (chun
     const agentId = getAgentId();
 
     const isNewChat = chatId === NEW_CHAT_ID;
-    let creationOptions = undefined;
+    let creationOptions: AiConversationCreationOptions | undefined = undefined;
     if (isNewChat) {
         const member = await getMemberById(memberId);
         if (member) {
-            creationOptions = { parameters: { teamId: member.teamId, memberId: memberId } };
+            creationOptions = new AiConversationCreationOptions({ teamId: member.teamId, memberId: memberId });
         } else {
             throw new Error("Can't create new chat because member was not found.");
         }
