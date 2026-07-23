@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAppConfig } from "@/lib/config";
 import styles from "./page.module.css";
+import glow from "@/styles/glow.module.css";
 
 // getAppConfig() reads from the filesystem, which doesn't opt the route into
 // dynamic rendering on its own — without this the CTA would be frozen at build time.
@@ -99,7 +100,7 @@ export default function LandingPage() {
                 <p className={styles.tagline}>
                     AI-assisted task management for busy managers — turn messy thoughts into actionable work, automatically.
                 </p>
-                <Link href={setupDone ? "/auth/login" : "/setup"} className={styles.cta}>
+                <Link href={setupDone ? "/auth/login" : "/setup"} className={setupDone ? styles.cta : `${styles.cta} ${glow.glow}`}>
                     {setupDone ? "Login" : "Get started →"}
                 </Link>
             </section>

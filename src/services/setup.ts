@@ -1,7 +1,7 @@
 import { DocumentStore, AiConnectionString, OpenAiSettings, PutConnectionStringOperation } from "ravendb";
 import { AddOrUpdateAiAgentOperation } from "ravendb";
 import { AddGenAiOperation, UpdateGenAiOperation, GenAiConfiguration, GenAiTransformation } from "ravendb";
-import { writeAppConfig } from "@/lib/config";
+import { getAppConfig, writeAppConfig } from "@/lib/config";
 import { z } from "zod";
 import { AddNewTaskArgumentsSchema, EditTaskArgumentsSchema, DeleteTaskArgumentsSchema } from "@/models/task";
 import { CreateProjectArgumentsSchema, EditProjectArgumentsSchema, DeleteProjectArgumentsSchema } from "@/models/project";
@@ -231,7 +231,17 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
             await store.maintenance.send(new AddGenAiOperation(genAiConfig));
         }
 
-        writeAppConfig({ ravenUrl: ravenUrl!, databaseName: databaseName!, agentId: "assistant", openAiApiKey, mainModel, smallModel, ravenDbLicense });
+        const existing = getAppConfig();
+        writeAppConfig({
+            ravenUrl: ravenUrl!,
+            databaseName: databaseName!,
+            agentId: "assistant",
+            openAiApiKey,
+            mainModel,
+            smallModel,
+            ravenDbLicense,
+            onboardingCompleted: existing?.onboardingCompleted ?? false,
+        });
     } finally {
         store.dispose();
     }

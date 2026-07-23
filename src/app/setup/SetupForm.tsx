@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import styles from "./setup.module.css";
+import glow from "@/styles/glow.module.css";
 
 type FormState = {
     openAiApiKey: string;
@@ -56,7 +57,10 @@ export default function SetupForm({ initialConfig }: SetupFormProps) {
                     <p className={styles.successMessage}>
                         {isReconfigure ? "Configuration updated." : "Setup complete. Your AI assistant is ready."}
                     </p>
-                    <Link href={isReconfigure ? "/auth/login" : "/auth/signup"} className={styles.submitButton}>
+                    <Link
+                        href={isReconfigure ? "/auth/login" : "/auth/signup"}
+                        className={!isReconfigure ? `${styles.submitButton} ${glow.glow}` : styles.submitButton}
+                    >
                         {isReconfigure ? "Open the app" : "Create your account →"}
                     </Link>
                 </div>
@@ -81,7 +85,11 @@ export default function SetupForm({ initialConfig }: SetupFormProps) {
                         <p className={styles.error}>{(mutation.error as Error).message}</p>
                     )}
 
-                    <button type="submit" className={styles.submitButton} disabled={mutation.isPending}>
+                    <button
+                        type="submit"
+                        className={!isReconfigure ? `${styles.submitButton} ${glow.glow}` : styles.submitButton}
+                        disabled={mutation.isPending}
+                    >
                         {mutation.isPending && <span className={styles.spinner} aria-hidden="true" />}
                         {mutation.isPending
                             ? (isReconfigure ? "Saving…" : "Setting up…")

@@ -1,0 +1,8 @@
+@keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 6px 0 color-mix(in srgb, var(--primary) 30%, transparent); }
+    50%      { box-shadow: 0 0 14px 2px color-mix(in srgb, var(--primary) 65%, transparent); }
+}
+
+.glow {
+    animation: glow-pulse 1.8s ease-in-out infinite;
+}

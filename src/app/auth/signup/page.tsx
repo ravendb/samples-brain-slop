@@ -5,10 +5,14 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "../auth.module.css";
+import glow from "@/styles/glow.module.css";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 
 export default function SignupPage() {
     const [form, setForm] = useState({ username: "" });
     const router = useRouter();
+    const { data: onboardingCompleted } = useOnboardingStatus();
+    const glowSubmit = onboardingCompleted === false;
 
     const mutation = useMutation({
         mutationFn: async (data: { username: string }) => {
@@ -58,7 +62,11 @@ export default function SignupPage() {
                         <p className={styles.error}>{(mutation.error as Error).message}</p>
                     )}
 
-                    <button type="submit" className={styles.submitButton} disabled={mutation.isPending}>
+                    <button
+                        type="submit"
+                        className={glowSubmit ? `${styles.submitButton} ${glow.glow}` : styles.submitButton}
+                        disabled={mutation.isPending}
+                    >
                         {mutation.isPending && <span className={styles.spinner} aria-hidden="true" />}
                         {mutation.isPending ? "Signing up…" : "Sign up"}
                     </button>
