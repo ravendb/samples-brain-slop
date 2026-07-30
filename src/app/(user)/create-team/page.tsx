@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserId } from "@/context/UserContext";
 import styles from "../team-form.module.css";
+import glow from "@/styles/glow.module.css";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 
 async function createTeam(userId: string, name: string) {
     const res = await fetch(`/api/users/${userId}/teams`, {
@@ -26,6 +28,8 @@ export default function CreateTeamPage() {
     const searchParams = useSearchParams();
     const queryClient = useQueryClient();
     const [name, setName] = useState(searchParams.get("name") ?? "");
+    const { data: onboardingCompleted } = useOnboardingStatus();
+    const glowSubmit = onboardingCompleted === false;
 
     const mutation = useMutation({
         mutationFn: (name: string) => createTeam(userId, name),
@@ -66,7 +70,11 @@ export default function CreateTeamPage() {
                         <button type="button" className={styles.cancelButton} onClick={() => router.push("/profile")}>
                             Cancel
                         </button>
-                        <button type="submit" className={styles.submitButton} disabled={mutation.isPending || !name.trim()}>
+                        <button
+                            type="submit"
+                            className={glowSubmit ? `${styles.submitButton} ${glow.glow}` : styles.submitButton}
+                            disabled={mutation.isPending || !name.trim()}
+                        >
                             {mutation.isPending ? "Creating…" : "Create team"}
                         </button>
                     </div>

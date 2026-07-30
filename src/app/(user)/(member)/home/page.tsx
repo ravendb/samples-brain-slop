@@ -1,5 +1,10 @@
+"use client";
+
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
 import styles from "./page.module.css";
+import glow from "@/styles/glow.module.css";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 
 const SUGGESTIONS = [
     { label: "Turn an idea into a project", href: "/demo/0" },
@@ -8,6 +13,15 @@ const SUGGESTIONS = [
 ];
 
 export default function Home() {
+    const queryClient = useQueryClient();
+    const { data: onboardingCompleted } = useOnboardingStatus();
+    const showGlow = onboardingCompleted === false;
+
+    function handleDemoClick() {
+        fetch("/api/onboarding", { method: "POST", keepalive: true }).catch(() => {});
+        queryClient.invalidateQueries({ queryKey: ["onboardingStatus"] });
+    }
+
     return (
         <div className={styles.container}>
             <div className={styles.card}>
@@ -21,7 +35,8 @@ export default function Home() {
                         <Link
                             key={s.label}
                             href={s.href}
-                            className={styles.suggestion}
+                            onClick={handleDemoClick}
+                            className={showGlow ? `${styles.suggestion} ${glow.glow}` : styles.suggestion}
                         >
                             {s.label}
                         </Link>

@@ -9,6 +9,7 @@ export interface AppConfig {
   mainModel: string;
   smallModel: string;
   ravenDbLicense: string;
+  onboardingCompleted?: boolean;
 }
 
 const CONFIG_PATH = path.join(process.cwd(), ".app-config.json");

@@ -7,15 +7,22 @@ import { useUserTeams } from "@/hooks/useUserTeams";
 import { useUserId } from "@/context/UserContext";
 import { selectMember, logout } from "@/actions/session";
 import styles from "./user.module.css";
+import glow from "@/styles/glow.module.css";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 
 export default function UserPage() {
     const router = useRouter();
     const userId = useUserId();
     const { data: user, isLoading } = useUser(userId);
     const { data: teams = [] } = useUserTeams(userId);
+    const { data: onboardingCompleted } = useOnboardingStatus();
+    const stillOnboarding = onboardingCompleted === false;
 
     const memberOf = teams.filter(({ member }) => member.role === "member");
     const managing = teams.filter(({ member }) => member.role === "manager");
+
+    const glowNewTeam = stillOnboarding && memberOf.length === 0 && managing.length === 0;
+    const glowSoleTeam = stillOnboarding && managing.length === 1 && memberOf.length === 0;
 
     async function handleTeamSelect(memberId: string) {
         await selectMember(memberId);
@@ -78,13 +85,17 @@ export default function UserPage() {
                         {managing.length === 0
                             ? <p className={styles.empty}>No teams.</p>
                             : managing.map(({ team, member }) => (
-                                <button key={member.id} onClick={() => handleTeamSelect(member.id!)} className={styles.teamItem}>
+                                <button
+                                    key={member.id}
+                                    onClick={() => handleTeamSelect(member.id!)}
+                                    className={glowSoleTeam ? `${styles.teamItem} ${glow.glow}` : styles.teamItem}
+                                >
                                     <span className={styles.colorDot} style={{ background: member.color }} />
                                     <span className={styles.teamName}>{team?.name}</span>
                                 </button>
                             ))
                         }
-                        <Link href="/create-team" className={styles.newTeamButton}>
+                        <Link href="/create-team" className={glowNewTeam ? `${styles.newTeamButton} ${glow.glow}` : styles.newTeamButton}>
                             + New team
                         </Link>
                     </div>
