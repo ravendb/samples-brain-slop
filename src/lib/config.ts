@@ -6,8 +6,6 @@ export interface AppConfig {
   databaseName: string;
   agentId: string;
   openAiApiKey: string;
-  mainModel: string;
-  smallModel: string;
   ravenDbLicense: string;
   onboardingCompleted?: boolean;
 }

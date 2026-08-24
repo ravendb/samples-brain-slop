@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
     }
 
-    const { openAiApiKey, mainModel, smallModel, ravenDbLicense } = payload;
-    if (!openAiApiKey || !mainModel || !smallModel || !ravenDbLicense) {
+    const { openAiApiKey, ravenDbLicense } = payload;
+    if (!openAiApiKey || !ravenDbLicense) {
         return NextResponse.json({ error: "All fields are required." }, { status: 400 });
     }
 

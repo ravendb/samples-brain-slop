@@ -115,10 +115,13 @@ const AGENT_ACTIONS = [
     }
 ];
 
+// The models the app is built and tested against. Not user-configurable — they
+// are baked into the RavenDB AI connection strings when setup runs.
+const MAIN_MODEL = "gpt-5";          // the assistant agent
+const SMALL_MODEL = "gpt-4o-mini";   // conversation title generation
+
 export type SetupPayload = {
     openAiApiKey: string;
-    mainModel: string;
-    smallModel: string;
     ravenDbLicense: string;
 };
 
@@ -154,7 +157,7 @@ async function activateLicense(ravenUrl: string, licenseJson: string): Promise<v
 }
 
 export async function runSetup(payload: SetupPayload): Promise<void> {
-    const { openAiApiKey, mainModel, smallModel, ravenDbLicense } = payload;
+    const { openAiApiKey, ravenDbLicense } = payload;
 
     const ravenUrl = process.env.RAVENDB_URI;
     const databaseName = process.env.RAVENDB_DATABASE;
@@ -181,8 +184,8 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
         };
 
         await Promise.all([
-            store.maintenance.send(new PutConnectionStringOperation(makeCs("OpenAI", "openai", mainModel))),
-            store.maintenance.send(new PutConnectionStringOperation(makeCs("Small OpenAI", "small-openai", smallModel))),
+            store.maintenance.send(new PutConnectionStringOperation(makeCs("OpenAI", "openai", MAIN_MODEL))),
+            store.maintenance.send(new PutConnectionStringOperation(makeCs("Small OpenAI", "small-openai", SMALL_MODEL))),
         ]);
 
         // AI agent
@@ -237,8 +240,6 @@ export async function runSetup(payload: SetupPayload): Promise<void> {
             databaseName: databaseName!,
             agentId: "assistant",
             openAiApiKey,
-            mainModel,
-            smallModel,
             ravenDbLicense,
             onboardingCompleted: existing?.onboardingCompleted ?? false,
         });
