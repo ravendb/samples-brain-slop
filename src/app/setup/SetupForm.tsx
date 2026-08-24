@@ -8,8 +8,6 @@ import glow from "@/styles/glow.module.css";
 
 type FormState = {
     openAiApiKey: string;
-    mainModel: string;
-    smallModel: string;
     ravenDbLicense: string;
 };
 
@@ -21,8 +19,6 @@ export default function SetupForm({ initialConfig }: SetupFormProps) {
     const isReconfigure = initialConfig !== undefined;
     const [form, setForm] = useState<FormState>({
         openAiApiKey: initialConfig?.openAiApiKey ?? "",
-        mainModel: initialConfig?.mainModel ?? "gpt-5",
-        smallModel: initialConfig?.smallModel ?? "gpt-4o-mini",
         ravenDbLicense: initialConfig?.ravenDbLicense ?? "",
     });
 
@@ -78,8 +74,6 @@ export default function SetupForm({ initialConfig }: SetupFormProps) {
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <Field label="RavenDB License" name="ravenDbLicense" value={form.ravenDbLicense} onChange={handleChange} hint="Paste your license JSON" multiline />
                     <Field label="OpenAI API Key" name="openAiApiKey" value={form.openAiApiKey} onChange={handleChange} type="password" />
-                    <Field label="Main Model" name="mainModel" value={form.mainModel} onChange={handleChange} hint="Used for the AI assistant" />
-                    <Field label="Small Model" name="smallModel" value={form.smallModel} onChange={handleChange} hint="Used for title generation" />
 
                     {mutation.error && (
                         <p className={styles.error}>{(mutation.error as Error).message}</p>
